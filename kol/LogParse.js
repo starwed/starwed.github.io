@@ -167,11 +167,7 @@
   Points = new Object();
 
   window.Run = function() {
-    var Kills, account, action, line, monster, pointOverride, tally, text, textArray, times, total, _i, _j, _len, _len1;
-    pointOverride = document.getElementById('points').value;
-    if (pointOverride.length > 1) {
-      PointValue = eval(pointOverride);
-    }
+    var Kills, account, action, line, monster, tally, text, textArray, times, total, _i, _j, _len, _len1;
     RunPlayers = new Array();
     AllPlayers = new Array();
     accounts = new Object();
@@ -183,7 +179,6 @@
       line = textArray[_i];
       Process(line);
     }
-    console.log(quickReport.toSource());
     instanceSummary();
     total = NewTally();
     for (account in accounts) {
@@ -343,7 +338,6 @@
 
   ChartResult = function(accounts, total) {
     var AddRow, SetRow, account, cumData, data, row, score, table, table2, tally;
-    console.log('yo');
     data = new google.visualization.DataTable();
     data.addColumn('string', 'name');
     data.addColumn('string', 'kills');
@@ -380,7 +374,6 @@
     };
     for (account in accounts) {
       tally = accounts[account];
-      console.log(account);
       AddRow(tally, account);
       row++;
     }

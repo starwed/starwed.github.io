@@ -93,9 +93,6 @@ instanceSummary = ()->
 	banishedLine("skeletons")
 	banishedLine("vampires")
 
-	
-	#html+= "<br/> <b>Reduced monsters:</b>" + quickReport.banishedMonsters.join(", ")
-	#console.log(html)
 	document.getElementById("sum").insertAdjacentHTML("beforeend", html);
 
 
@@ -168,9 +165,9 @@ accounts = new Object()
 Points = new Object()
 
 window.Run = () ->
-	pointOverride = document.getElementById('points').value
-	if(pointOverride.length>1)
-		PointValue=eval(pointOverride)
+	#pointOverride = document.getElementById('points').value
+	#if(pointOverride.length>1)
+	#		PointValue=eval(pointOverride)
 
 	RunPlayers= new Array()
 	AllPlayers = new Array()
@@ -183,7 +180,6 @@ window.Run = () ->
 	for line in textArray
 		Process(line)
 	#logit(accounts)
-	console.log(quickReport.toSource())
 	instanceSummary()
 
 
@@ -272,8 +268,6 @@ calcCum = () ->
 	logit(cumPoints)
 
 Process = (line) ->
-	#console(line)
-	#console.log(line)
 	parsed = keySearch.exec(line)
 	if (parsed?[1] and parsed?[2])
 		
@@ -335,7 +329,6 @@ Process = (line) ->
 		
 
 ChartResult = (accounts, total) -> 
-	console.log('yo')
 
 	data = new google.visualization.DataTable()
 
@@ -382,9 +375,6 @@ ChartResult = (accounts, total) ->
 			])
 
 	for account, tally of accounts
-		console.log(account)
-		#pointData.addRows 1
-		#pointData.setValue(row, 0, account.toString() )
 		AddRow(tally, account)
 		row++
 	
