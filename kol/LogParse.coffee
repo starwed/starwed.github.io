@@ -223,7 +223,6 @@ getAccountName = (account)->
 		for name, score of Points
 			if name.search(number) > -1
 				return name 
-		return name
 	else
 		accountNorm = account.trim().replace(/\s/g, "_").toLowerCase()
 		for name, score of Points
@@ -250,6 +249,7 @@ calcCum = () ->
 	oldScores = prior.split('\n')
 	logit('Old scores')
 	
+
 	
 	for line in oldScores
 		parsed = line.split(/\t|\s\s+/)

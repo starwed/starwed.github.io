@@ -221,7 +221,6 @@
           return name;
         }
       }
-      return name;
     } else {
       accountNorm = account.trim().replace(/\s/g, "_").toLowerCase();
       for (name in Points) {
@@ -344,7 +343,7 @@
     data.addColumn('string', 'keys');
     data.addColumn('string', 'element bans');
     data.addColumn('string', 'type bans');
-    data.addColumn('number', 'points [this run]');
+    data.addColumn('number', 'points');
     /*runData = new google.visualization.DataTable()
     
     	runData.addColumn('string', 'name')
@@ -357,7 +356,7 @@
 
     cumData = new google.visualization.DataTable();
     cumData.addColumn('string', 'name');
-    cumData.addColumn('number', 'points [total]');
+    cumData.addColumn('number', 'points');
     row = 0;
     SetRow = function(r) {
       var d, i, _i, _len, _results;
