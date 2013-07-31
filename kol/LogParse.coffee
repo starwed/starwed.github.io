@@ -339,7 +339,7 @@ ChartResult = (accounts, total) ->
 	data.addColumn('string', 'keys')
 	data.addColumn('string', 'element bans')
 	data.addColumn('string', 'type bans')
-	data.addColumn('string', 'points')
+	data.addColumn('number', 'points')
 
 	###runData = new google.visualization.DataTable()
 
@@ -353,7 +353,7 @@ ChartResult = (accounts, total) ->
 	cumData = new google.visualization.DataTable()
 
 	cumData.addColumn('string', 'name')
-	cumData.addColumn('string', 'points')
+	cumData.addColumn('number', 'points')
 
 
 	row = 0
@@ -371,7 +371,7 @@ ChartResult = (accounts, total) ->
 				t['keys'].toString()
 				t['banishElement'].toString()
 				t['banishType'].toString()
-				Points[a].toString()
+				parseFloat(Points[a])
 			])
 
 	for account, tally of accounts
@@ -391,7 +391,7 @@ ChartResult = (accounts, total) ->
 	for account, score of cumPoints
 		cumData.addRows 1
 		cumData.setValue(row, 0, account.toString() )
-		cumData.setValue( row, 1, score.toString() )
+		cumData.setValue( row, 1, parseFloat(score) )
 		row++
 
 

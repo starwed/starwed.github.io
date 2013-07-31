@@ -344,7 +344,7 @@
     data.addColumn('string', 'keys');
     data.addColumn('string', 'element bans');
     data.addColumn('string', 'type bans');
-    data.addColumn('string', 'points');
+    data.addColumn('number', 'points [this run]');
     /*runData = new google.visualization.DataTable()
     
     	runData.addColumn('string', 'name')
@@ -357,7 +357,7 @@
 
     cumData = new google.visualization.DataTable();
     cumData.addColumn('string', 'name');
-    cumData.addColumn('string', 'points');
+    cumData.addColumn('number', 'points [total]');
     row = 0;
     SetRow = function(r) {
       var d, i, _i, _len, _results;
@@ -370,7 +370,7 @@
     };
     AddRow = function(t, a) {
       data.addRows(1);
-      return SetRow([a.toString(), t['kills'].toString(), t['keys'].toString(), t['banishElement'].toString(), t['banishType'].toString(), Points[a].toString()]);
+      return SetRow([a.toString(), t['kills'].toString(), t['keys'].toString(), t['banishElement'].toString(), t['banishType'].toString(), parseFloat(Points[a])]);
     };
     for (account in accounts) {
       tally = accounts[account];
@@ -386,7 +386,7 @@
       score = cumPoints[account];
       cumData.addRows(1);
       cumData.setValue(row, 0, account.toString());
-      cumData.setValue(row, 1, score.toString());
+      cumData.setValue(row, 1, parseFloat(score));
       row++;
     }
     table2 = new google.visualization.Table(document.getElementById('point_div'));
