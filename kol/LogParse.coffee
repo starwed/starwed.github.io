@@ -3,6 +3,24 @@ google.load('visualization', '1', {packages: ['table']})
 
 
 
+PointValue = {
+	kills: 1,
+	keys: 5,
+	banishElement: 1,
+	banishType: 1,
+	losses: 0,
+}
+
+NewTally = () -> {
+			kills: 0, 
+			keys: 0,
+			banishElement: 0,
+			banishType: 0,
+			losses: 0
+		}
+
+
+
 logit = (text) ->
 	if (typeof console == "object")
 		console.log(text)
@@ -138,23 +156,8 @@ AllPlayers = new Array()
 RunPlayers = new Array()
 
 
-
-multi_search ={
-		multi_skeleton: /(.+) took out some skeletons \((\d+) turn/
-		multi_zombie: /(.+) took out some zombies \((\d+) turn/
-		multi_werewolf:/(.+) took care of some werewolves \((\d+) turn/
-		multi_ghost:  /(.+) trapped some ghosts \((\d+) turn/
-		multi_vampire: /(.+) slew some vampires \((\d+) turn/
-}
-
-
-
-
 cumPoints = new Object()
 thisRunPoints = new Object()
-
-
-
 
 
 accounts = new Object()
@@ -162,29 +165,12 @@ accounts = new Object()
 
 
 
-
-PointValue = {
-	kills: 1,
-	keys: 5,
-	banishElement: 1,
-	banishType: 1,
-	losses: 0,
-}
-
-NewTally = () -> {
-			kills: 0, 
-			keys: 0,
-			banishElement: 0,
-			banishType: 0,
-			losses: 0
-		}
-
 Points = new Object()
 
 window.Run = () ->
-	#pointOverride = document.getElementById('points').value
-	#if(pointOverride.length>1)
-	#	PointValue=eval(pointOverride)
+	pointOverride = document.getElementById('points').value
+	if(pointOverride.length>1)
+		PointValue=eval(pointOverride)
 
 	RunPlayers= new Array()
 	AllPlayers = new Array()
@@ -225,16 +211,6 @@ window.Run = () ->
 		Kills[monster] = 1.0 * total[monster] + KillValue["multi_#{monster}"] * 1.0 * total["multi_#{monster}"]
 		logit("#{monster} kills: #{Kills[monster]}")
 	
-	#logit('Kills:')
-	
-
-
-	
-
-	#Count kill per massacre
-	#logit("Kills per massacre of:")
-	#for monster in MonsterList
-	#	logit("#{monster}: " +  (300-total["#{monster}"])/total["multi_#{monster}"])
 
 	ChartResult(accounts, total)
 
@@ -244,29 +220,21 @@ getAccountName = (account)->
 		return account
 	
 
-	#logit("looking for foreign name #{account}")
 	numsearch=/\(.+\)/
 	matcher = numsearch.exec(account)
 	if(matcher)
-		#console.log("Looking by number in #{account}")
 		number = matcher[0]
 		for name, score of Points
 			if name.search(number) > -1
-				#logit("Found match #{name}")
 				return name 
 		return name
 	else
 		accountNorm = account.trim().replace(/\s/g, "_").toLowerCase()
-		#console.log("Comparing #{accountNorm} from #{account}\n")
 		for name, score of Points
 			name2 = name.split("(")[0]
 			norm = name2.trim().replace(/\s/g, "_").toLowerCase()
-			#console.log("Comparing #{norm} to #{accountNorm}")
 			if norm is accountNorm
-				console.log("MATCH FOUND!!!")
-				console.log(account + " is secretly " + name )
 				return name
-	#logit("looking for number #{number}")
 
 	
 	return account
@@ -285,41 +253,20 @@ calcCum = () ->
 	searchOldScore=/(.+)\t\s*(\d+)/
 	oldScores = prior.split('\n')
 	logit('Old scores')
-
 	
 	
 	for line in oldScores
-		#parsed = searchOldScore.exec(line)
-		#console.log("Line is #{line.toString()}")
 		parsed = line.split(/\t|\s\s+/)
-		#logit("Parsed is #{parsed.toString()}")
 		if parsed?[0] and parsed?[1]
-			#console.log("Old " + parsed[0])
 			key=getAccountName(parsed[0])
 			cumPoints[key] = parsed[1]
 			AllPlayers.push(key)
-			###if parseInt(parsed[2]) >0 or parsed[2]=='N'
-				staff[key] = true
-			else
-				staff[key] = false
-			if parseInt(parsed[3]) >=3 or parsed[3]=='N'
-				outfit[key] = true
-			else
-				outfit[key] = false	###
-				
-			
-	
 
-
-
-	logit('new scores')		
 	for account, score of Points
-		#key=getAccountName(account)
 		if(cumPoints[account])
 			cumPoints[account] = cumPoints[account] * 1.0 + 1.0*score
 		else
 			cumPoints[account] = score
-		#logit("#{account}, #{score}, #{cumPoints[account]}")
 		thisRunPoints[account] = cumPoints[account]
 
 	logit(cumPoints)
@@ -384,19 +331,7 @@ Process = (line) ->
 		number = parsed[3]
 		accounts[pName].kills+= parseFloat(number)
 		return
-		#logit(parsed[1] + ' killed ' + parsed[3] + ' ' + parsed[2])
-	
-	###for key, re of multi_search
-		parsed = re.exec(line)
-		if parsed?[1] and parsed?[2]
-			pName = parsed[1]
-			if not accounts?[pName]
-				accounts[pName] = NewTally()
-			action = key
-			number = parsed[2]
-			accounts[pName][action]=number
-			#logit(pName + ' multi-killed ' +  parsed[2])
-	###	
+
 		
 
 ChartResult = (accounts, total) -> 
@@ -406,13 +341,11 @@ ChartResult = (accounts, total) ->
 
 
 
-
-
 	data.addColumn('string', 'name')
 	data.addColumn('string', 'kills')
 	data.addColumn('string', 'keys')
-	data.addColumn('string', 'elemental banishes')
-	data.addColumn('string', 'type banishes')
+	data.addColumn('string', 'element bans')
+	data.addColumn('string', 'type bans')
 	data.addColumn('string', 'points')
 
 	###runData = new google.visualization.DataTable()
@@ -481,6 +414,10 @@ ChartResult = (accounts, total) ->
 
 	return
 
+
+
+
+	### Everything below here was HSH specific
 	row=0
 	minO=1
 	minS=1
