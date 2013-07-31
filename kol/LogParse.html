@@ -1,0 +1,63 @@
+
+<html lang="en">
+
+    <head>
+        <title>Dreadsylvania Parser</title>
+    </head>
+<body style="font-family: 'Helvetica', 'Verdana', sans-serif;">
+    	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    	<!--script type="text/javascript" src="coffee-script.js"></script-->
+		<!--script type="text/coffeescript" src="SuperBayes.coffee"></script-->
+        <script type="text/javascript" src="LogParse.js"></script>
+
+  
+    <table style="padding: 1em"><tr>
+    	<th style="background-color: pink">Raw Data</th>
+        <th style="background-color: palegreen">Parsed Data</th>
+    	
+    	</tr>
+    	<tr>
+	    <td >
+		    
+			<div style="width: 20em">
+				
+				<small><code>Paste raw log here</code></small><br/>
+				<textarea  style="width:20em" rows="5"  id="in"></textarea>
+				<br/><small><code>Paste saved points <b>(Now the first four columns)</b> here.<br/> (Names must match exactly!)</code></small><br/>
+				<textarea style="width:20em" rows="5" id="prior" ></textarea>
+                <button onclick="Run()">Parse Data</button>
+
+                <!--textarea style="width:20em" rows="5" id="points"></textarea-->
+			</div>
+	
+			<!--div>
+				<b>Raw Ouput:</b><br/>
+				<textarea  style="background-color: #EEEEEE" readonly='readonly' width="100" height="500" id="out" > </textarea>
+			</div-->
+
+		   
+		</td>
+
+   
+		<td  style="padding: 2em; font-size: smaller" >
+			<h3>Instance Summary</h3>
+			<div id = "sum"></div>
+			<!--After parsing,
+            <ul><li>First, copy and paste the loot table into the spreadsheet.</li><li>  <em>Then</em> paste the new cumulative point total over the old.</li></ul>-->
+            <h3>Full Run Data</h3>
+			<div id="table_div"></div>
+			<h3>Cumulative Points</h3>
+			<div id="point_div"></div>
+			<!--h3>Loot points table for this run</h3>
+			<div id="c_div"></div-->
+		</td>
+	   
+
+	</tr></table>
+    <small> Original coffeescript: <a href="LogParse.coffee">LogParse.coffee</a>
+
+</body>
+</html>
+
+
+
