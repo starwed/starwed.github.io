@@ -5,6 +5,7 @@ google.load('visualization', '1', {packages: ['table']})
 
 PointValue = {
 	kills: 1,
+	bossKills: 1,
 	keys: 5,
 	banishElement: 1,
 	banishType: 1,
@@ -16,7 +17,8 @@ NewTally = () -> {
 			keys: 0,
 			banishElement: 0,
 			banishType: 0,
-			losses: 0
+			losses: 0,
+			bossKills: 0
 		}
 
 
@@ -25,7 +27,7 @@ logit = (text) ->
 	if (typeof console == "object")
 		console.log(text)
 
-
+bossMatch = /(.+) defeated (The Great Wolf of the Air|the Zombie Homeowners' Association|The Unkillable Skeleton|Falls-From-Sky|Mayor Ghost|Count Drunkula)\s+\((\d+) turn/
 loseSearch = /(.+) was defeated .*\((\d+) turn/
 search = /(.+) defeated (\S+)\s+(\S+) .*\((\d+) turn/
 
@@ -69,42 +71,63 @@ quickReport= {
 
 }
 
+monsterAlias = {
+	zombies:"zombie", ghosts:"ghost", skeletons:"skeleton", vampires:"vampire", bugbears:"bugbear", werewolves: "werewolf"
+}
+
 instanceSummary = ()->
 	html = ""
 	banishedLine = (name)->
+		html += "<br/>&nbsp;&nbsp;&nbsp;" + "<i>#{name}:</i> " + quickReport.monstersKilled[monsterAlias[name]] + " kills"
 		if monsters[name] is 1
-			html+= "<br/>&nbsp;&nbsp;&nbsp;" + "<i>#{name}</i> banished once"
+			html+=  ", banished once"
 		if monsters[name] is 2
-			html+= "<br/>&nbsp;&nbsp;&nbsp;" + "<i>#{name}</i> banished twice"
+			html+= ", banished twice"
 
 	elementsLine = (el, area)->
 		html+= "<br/> <b>#{area}  (kisses: " + (el.length+1) + ")</b> " 
 		if (el.length is 5)
 			html+= "<br/>&nbsp;&nbsp;&nbsp; <b><i>all</i></b> elements removed" 
 		else if el.length is 0
-			html+= "<br/>&nbsp;&nbsp;&nbsp; <i>No</i> elements removed" 
+			html+= "<br/>&nbsp;&nbsp;&nbsp;<i>No</i> elements removed" 
 		else
 			html+=  "<br/>&nbsp;&nbsp;&nbsp;" + el.join(", ") + " elements removed" 
 
 
 	
 	monsters = quickReport.banishedMonsters;
+	mk = quickReport.monstersKilled
 	html += "<b>Doors unlocked:</b> <br/>&nbsp;&nbsp;&nbsp;" + quickReport.unlockedDoors.join(", ")
-	
+	html += "<table style='font-size: 8px' id='zones'><tr><td>"
 	elementsLine(quickReport.forestElements, "Forest");	
 	banishedLine("bugbears")
 	banishedLine("werewolves")
+	if mk["the great wolf of the air"]
+		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Great Wolf slain</b>"
+	if mk["falls-from-sky"]
+		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Falls-From-Sky slain</b>"
 
+	html += "</td><td>"
 	elementsLine(quickReport.villageElements, "Village");
 	banishedLine("ghosts")
 	banishedLine("zombies")
+	if mk["mayor ghost"]
+		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Mayor Ghost slain</b>"
+	if mk["the zombie homeowners' association"]
+		html+="<br/>&nbsp;&nbsp;&nbsp;<b>ZHO slain</b>"
 
+
+	html += "</td><td>"
 	elementsLine(quickReport.castleElements, "Castle");
 	banishedLine("skeletons")
 	banishedLine("vampires")
+	if mk["count drunkula"]
+		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Count slain</b>"
+	if mk["the unkillable skeleton"]
+		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Skelly slain</b>"
 
-	html+= "<br/>Total kills: " + quickReport.monstersKilled.toSource()
 
+	html += "</td><tr></table>"
 	document.getElementById("sum").insertAdjacentHTML("beforeend", html);
 
 
@@ -327,6 +350,19 @@ Process = (line) ->
 		accounts[pName].losses += parseFloat(number)
 		return
 
+	
+	parsed = bossMatch.exec(line)
+	if (parsed?[1] and parsed?[2] and parsed?[3])
+		pName = parsed[1]
+		if not accounts?[pName]
+			accounts[pName] = NewTally()			
+		bossKill = parsed?[2].trim().toLowerCase()
+		if not quickReport.monstersKilled[bossKill]
+			quickReport.monstersKilled[bossKill] = 0;
+		quickReport.monstersKilled[bossKill]++
+		accounts[pName].bossKills+= 1
+		return
+
 	parsed = search.exec(line)
 	if( parsed?[1] and parsed?[2] and parsed?[3] and parsed?[4])
 		pName = parsed[1]
@@ -349,9 +385,10 @@ ChartResult = (accounts, total) ->
 
 	data.addColumn('string', 'name')
 	data.addColumn('string', 'kills')
-	data.addColumn('string', 'keys')
-	data.addColumn('string', 'element bans')
-	data.addColumn('string', 'type bans')
+	data.addColumn('string', 'bosses')
+	data.addColumn('string', 'keys [x5]')
+	data.addColumn('string', 'el')
+	data.addColumn('string', 'type')
 	data.addColumn('number', 'points')
 
 	###runData = new google.visualization.DataTable()
@@ -381,6 +418,7 @@ ChartResult = (accounts, total) ->
 		SetRow( [
 				a.toString() 
 				t['kills'].toString()
+				t['bossKills'].toString()
 				t['keys'].toString()
 				t['banishElement'].toString()
 				t['banishType'].toString()
