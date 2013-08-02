@@ -36,7 +36,7 @@
 
   loseSearch = /(.+) was defeated .*\((\d+) turn/;
 
-  search = /(.+) defeated (\S+\s+\S+) .*\((\d+) turn/;
+  search = /(.+) defeated (\S+)\s+(\S+) .*\((\d+) turn/;
 
   elSearch = /(.+) made the (.+) less (\S+)/;
 
@@ -60,6 +60,14 @@
       vampires: 0,
       bugbears: 0,
       werewolves: 0
+    },
+    monstersKilled: {
+      zombie: 0,
+      ghost: 0,
+      skeleton: 0,
+      vampire: 0,
+      bugbear: 0,
+      werewolf: 0
     }
   };
 
@@ -95,6 +103,7 @@
     elementsLine(quickReport.castleElements, "Castle");
     banishedLine("skeletons");
     banishedLine("vampires");
+    html += "<br/>Total kills: " + quickReport.monstersKilled.toSource();
     return document.getElementById("sum").insertAdjacentHTML("beforeend", html);
   };
 
@@ -271,7 +280,7 @@
   };
 
   Process = function(line) {
-    var area, door, element, killed, monster, number, pName, parsed;
+    var area, door, element, elementKill, monster, number, pName, parsed, typeKill;
     parsed = keySearch.exec(line);
     if ((parsed != null ? parsed[1] : void 0) && (parsed != null ? parsed[2] : void 0)) {
       pName = parsed[1];
@@ -324,13 +333,15 @@
       return;
     }
     parsed = search.exec(line);
-    if ((parsed != null ? parsed[1] : void 0) && (parsed != null ? parsed[2] : void 0) && (parsed != null ? parsed[3] : void 0)) {
+    if ((parsed != null ? parsed[1] : void 0) && (parsed != null ? parsed[2] : void 0) && (parsed != null ? parsed[3] : void 0) && (parsed != null ? parsed[4] : void 0)) {
       pName = parsed[1];
       if (!(accounts != null ? accounts[pName] : void 0)) {
         accounts[pName] = NewTally();
       }
-      killed = parsed[2];
-      number = parsed[3];
+      elementKill = parsed[2];
+      typeKill = parsed[3];
+      number = parsed[4];
+      quickReport.monstersKilled[typeKill] += parseFloat(number);
       accounts[pName].kills += parseFloat(number);
     }
   };

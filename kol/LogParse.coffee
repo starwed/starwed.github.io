@@ -27,7 +27,7 @@ logit = (text) ->
 
 
 loseSearch = /(.+) was defeated .*\((\d+) turn/
-search = /(.+) defeated (\S+\s+\S+) .*\((\d+) turn/
+search = /(.+) defeated (\S+)\s+(\S+) .*\((\d+) turn/
 
 elSearch = /(.+) made the (.+) less (\S+)/
 
@@ -53,6 +53,16 @@ quickReport= {
 		vampires:0
 		bugbears:0
 		werewolves:0
+
+
+	}
+	monstersKilled:{
+		zombie:0,
+		ghost:0,
+		skeleton:0
+		vampire:0
+		bugbear:0
+		werewolf:0
 
 
 	}
@@ -92,6 +102,8 @@ instanceSummary = ()->
 	elementsLine(quickReport.castleElements, "Castle");
 	banishedLine("skeletons")
 	banishedLine("vampires")
+
+	html+= "<br/>Total kills: " + quickReport.monstersKilled.toSource()
 
 	document.getElementById("sum").insertAdjacentHTML("beforeend", html);
 
@@ -316,13 +328,14 @@ Process = (line) ->
 		return
 
 	parsed = search.exec(line)
-	if( parsed?[1] and parsed?[2] and parsed?[3])
+	if( parsed?[1] and parsed?[2] and parsed?[3] and parsed?[4])
 		pName = parsed[1]
 		if not accounts?[pName]
 			accounts[pName] = NewTally()			
-		
-		killed = parsed[2]
-		number = parsed[3]
+		elementKill = parsed[2]
+		typeKill = parsed[3]
+		number = parsed[4]
+		quickReport.monstersKilled[typeKill]+= parseFloat(number)	
 		accounts[pName].kills+= parseFloat(number)
 		return
 
