@@ -423,7 +423,7 @@
   };
 
   ChartResult = function(accounts, total) {
-    var AddRow, SetRow, account, cumData, data, distroArea, lootHtml, name, pointsOut, row, runData, score, table, tally, wishlink, _i, _len;
+    var AddRow, SetRow, account, cumArray, cumData, data, distroArea, lootHtml, name, pointsOut, row, runData, score, table, tally, wishlink, _i, _j, _len, _len1;
     data = new google.visualization.DataTable();
     data.addColumn('string', 'name');
     data.addColumn('string', 'kills');
@@ -464,13 +464,21 @@
     });
     pointsOut = "";
     row = 0;
+    cumArray = [];
     for (account in cumPoints) {
       score = cumPoints[account];
-      pointsOut += "" + account + "\t" + score + "\n";
       cumData.addRows(1);
       cumData.setValue(row, 0, account.toString());
       cumData.setValue(row, 1, parseFloat(score));
+      cumArray.push(account);
       row++;
+    }
+    cumArray.sort(function(a, b) {
+      return cumPoints[b] - cumPoints[a];
+    });
+    for (_i = 0, _len = cumArray.length; _i < _len; _i++) {
+      account = cumArray[_i];
+      pointsOut += "" + account + "\t" + cumPoints[account] + "\n";
     }
     table = new google.visualization.Table(document.getElementById('point_div'));
     table.draw(cumData, {
@@ -485,8 +493,8 @@
     });
     wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752";
     lootHtml = "<table id='lootTable'>";
-    for (_i = 0, _len = RunPlayers.length; _i < _len; _i++) {
-      name = RunPlayers[_i];
+    for (_j = 0, _len1 = RunPlayers.length; _j < _len1; _j++) {
+      name = RunPlayers[_j];
       account = name;
       score = thisRunPoints[account];
       lootHtml += "<tr><td><b>" + name + "</b> </td><td>" + score + "</td></tr>";

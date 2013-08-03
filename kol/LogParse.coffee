@@ -463,13 +463,17 @@ ChartResult = (accounts, total) ->
 	#Points['Total']=0	
 	#AddRow(total, 'Total')
 	row=0
-	for account, score of cumPoints
-		pointsOut+="#{account}\t#{score}\n"
+	cumArray = []
+	for account, score of cumPoints		
 		cumData.addRows 1
 		cumData.setValue(row, 0, account.toString() )
 		cumData.setValue( row, 1, parseFloat(score) )
+		cumArray.push(account)
 		row++
 
+	cumArray.sort( (a,b)-> cumPoints[b]-cumPoints[a]) 
+	for account in cumArray
+		pointsOut+="#{account}\t#{cumPoints[account]}\n"
 	table = new google.visualization.Table(document.getElementById('point_div'))
 	table.draw(cumData, {showRowNumber:false, sortColumn:1, sortAscending:false} )
 	document.getElementById('points-out').value = pointsOut
