@@ -12,6 +12,22 @@ PointValue = {
 	losses: 0,
 }
 
+###
+Blacklist of multis who don't get loot
+	Maestro of Mariachi (#1873125)
+	Sauciest Saucier (#1873222)
+	Tzar of Turtles (#1873176)
+###
+Blacklist = [1873125, 1873222, 1873176]
+
+checkBlacklist = (account)->
+	for num in Blacklist
+		if account.indexOf(num) > -1
+			logit("Blacklisted #{account}!")
+			return true
+
+	return false
+
 NewTally = () -> {
 			kills: 0, 
 			keys: 0,
@@ -37,10 +53,23 @@ keySearch = /(.+) unlocked (.+)\s+\(/
 
 banishSearch = /(.+) drove some (.+) out of the (.+)/
 
+playerSearch = /(.+\(#\d+\))/
+
 ElementList = ['stench', 'cold', 'hot', 'sleaze', 'spooky' ]
 
 MonsterList = ['skeleton', 'werewolf', 'zombie', 'ghost', 'vampire', 'bugbear']
 
+
+importantItems = {
+	banana:		/(.+) got a wax banana/
+	amber:		/(.+) acquired a chunk of moon-amber/
+	musicbox:	/(.+) made the forest less spooky/
+	roast:    	/(.+) got some roast beast/
+	agaric:  	/(.+) got some stinking agaric/ 
+	kiwi:		/(.+) got a blood kiwi/
+
+
+}
 
 
 quickReport= {
@@ -150,7 +179,7 @@ styleElement = (el)->
 sheetSearch = /(.+) got the carriageman (.+) sheet/
 
 miscNC = {
-	#woods
+	#woods	
 	baseball: "rare baseball card"
 	footlocker: "rifled through a footlocker"
 	newspapers: "recycled some newspapers"
@@ -222,7 +251,10 @@ window.Run = () ->
 	
 
 	total = NewTally()
+
+	# Calculate points
 	for account, tally of accounts
+		continue if checkBlacklist(account)
 		for action, times of tally
 			#logit("#{action} #{times}")
 			total[action]+=1.0*times
@@ -231,19 +263,13 @@ window.Run = () ->
 				RunPlayers.push(account)
 			Points[account]+=PointValue[action] * times
 	
-	logit(total)
+	# Now cumulative points
 	calcCum()
+
+	# Print to screen
 	ChartResult(accounts)
 	
 	return
-	# Calculate about how many of each monster is killed, according to the log
-	Kills = new Object()
-	for monster in MonsterList
-		Kills[monster] = 1.0 * total[monster] + KillValue["multi_#{monster}"] * 1.0 * total["multi_#{monster}"]
-		logit("#{monster} kills: #{Kills[monster]}")
-	
-
-	ChartResult(accounts, total)
 
 
 getAccountName = (account)->
@@ -267,7 +293,7 @@ getAccountName = (account)->
 				return name
 
 	
-	return account
+	return account.trim()
 		
 
 staff = new Object()
@@ -294,21 +320,29 @@ calcCum = () ->
 			AllPlayers.push(key)
 
 	for account, score of Points
+		continue if checkBlacklist(account)
 		if(cumPoints[account])
 			cumPoints[account] = cumPoints[account] * 1.0 + 1.0*score
 		else
 			cumPoints[account] = score
 		thisRunPoints[account] = cumPoints[account]
 
-	logit(cumPoints)
+
+
+
 
 Process = (line) ->
+	findAccount = (name)->
+		acc = getAccountName(name)
+		if not accounts?[acc]
+			accounts[acc] = NewTally()
+		return acc
+
 	parsed = keySearch.exec(line)
 	if (parsed?[1] and parsed?[2])
 		
-		pName = parsed[1];
-		if not accounts?[pName]
-			accounts[pName] = NewTally()	
+		pName = findAccount(parsed[1]);
+	
 		door = parsed[2];
 		quickReport.unlockedDoors.push(door)
 		accounts[pName].keys++
@@ -316,9 +350,7 @@ Process = (line) ->
 
 	parsed = elSearch.exec(line)
 	if (parsed?[1] and parsed?[2] and parsed?[3])
-		pName = parsed[1];
-		if not accounts?[pName]
-			accounts[pName] = NewTally()	
+		pName = findAccount(parsed[1]);
 		area = parsed[2];
 		if area is "vilage"	#Stupid bugs
 			area = "village"
@@ -329,9 +361,7 @@ Process = (line) ->
 
 	parsed = banishSearch.exec(line)
 	if (parsed?[1] and parsed?[2] and parsed?[3])
-		pName = parsed[1];
-		if not accounts?[pName]
-			accounts[pName] = NewTally()	
+		pName = findAccount(parsed[1]);
 		area = parsed[3];
 		if area is "vilage"	#Stupid bugs
 			area = "village"
@@ -343,9 +373,7 @@ Process = (line) ->
 
 	parsed = loseSearch.exec(line)
 	if parsed?[1] and parsed?[2]
-		pName = parsed[1]
-		if not accounts?[pName]
-			accounts[pName] = NewTally()
+		pName = findAccount(parsed[1]);
 		number = parsed[2]
 		accounts[pName].losses += parseFloat(number)
 		return
@@ -353,9 +381,7 @@ Process = (line) ->
 	
 	parsed = bossMatch.exec(line)
 	if (parsed?[1] and parsed?[2] and parsed?[3])
-		pName = parsed[1]
-		if not accounts?[pName]
-			accounts[pName] = NewTally()			
+		pName = findAccount(parsed[1]);			
 		bossKill = parsed?[2].trim().toLowerCase()
 		if not quickReport.monstersKilled[bossKill]
 			quickReport.monstersKilled[bossKill] = 0;
@@ -365,15 +391,17 @@ Process = (line) ->
 
 	parsed = search.exec(line)
 	if( parsed?[1] and parsed?[2] and parsed?[3] and parsed?[4])
-		pName = parsed[1]
-		if not accounts?[pName]
-			accounts[pName] = NewTally()			
+		pName = findAccount(parsed[1]);	
 		elementKill = parsed[2]
 		typeKill = parsed[3]
 		number = parsed[4]
 		quickReport.monstersKilled[typeKill]+= parseFloat(number)	
 		accounts[pName].kills+= parseFloat(number)
 		return
+
+	parsed = playerSearch.exec(line)
+	if (parsed?[1])
+		pName = findAccount(parsed[1]);	
 
 		
 
@@ -391,15 +419,11 @@ ChartResult = (accounts, total) ->
 	data.addColumn('string', 'type')
 	data.addColumn('number', 'points')
 
-	###runData = new google.visualization.DataTable()
+	runData = new google.visualization.DataTable()
 
 	runData.addColumn('string', 'name')
 	runData.addColumn('number', 'points')
-	runData.addColumn('string', 'OutfitMin')
-	runData.addColumn('string', 'OutfitMax')
-	runData.addColumn('string', 'StaffMin')
-	runData.addColumn('string', 'StaffMax')###
-	
+
 	cumData = new google.visualization.DataTable()
 
 	cumData.addColumn('string', 'name')
@@ -431,26 +455,48 @@ ChartResult = (accounts, total) ->
 	
 
 	table = new google.visualization.Table(document.getElementById('table_div'))
-	table.draw(data, {showRowNumber:false} )
+	table.draw(data, {showRowNumber:false, sortColumn:0} )
 
 
 
-
+	pointsOut = ""
 	#Points['Total']=0	
 	#AddRow(total, 'Total')
 	row=0
 	for account, score of cumPoints
+		pointsOut+="#{account}\t#{score}\n"
 		cumData.addRows 1
 		cumData.setValue(row, 0, account.toString() )
 		cumData.setValue( row, 1, parseFloat(score) )
 		row++
 
-
+	table = new google.visualization.Table(document.getElementById('point_div'))
+	table.draw(cumData, {showRowNumber:false, sortColumn:1, sortAscending:false} )
+	document.getElementById('points-out').value = pointsOut
 	#Create an ordered list by points
-	#orderedPoints = new Array()
-	#for account, score of thisRunPoints
-	table2 = new google.visualization.Table(document.getElementById('point_div'))
-	table2.draw(cumData, {showRowNumber:false} )
+
+
+	row = 0
+	RunPlayers.sort( (a, b)-> thisRunPoints[b] - thisRunPoints[a])
+	wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752"
+	lootHtml = "<table id='lootTable'>"
+	for name in RunPlayers
+
+		account = name
+		score = thisRunPoints[account]
+		lootHtml+= "<tr><td><b>#{name}</b> </td><td>#{score}</td></tr>"
+
+		
+			
+		row++
+		break if row>10
+
+	lootHtml+= "</table><br/><a target='_blank' href='#{wishlink}'>Wishlists</a>"
+	distroArea = document.getElementById('distro')
+	distroArea.insertAdjacentHTML("beforeend", lootHtml);
+
+
+
 
 
 	return
@@ -494,37 +540,6 @@ ChartResult = (accounts, total) ->
 	RunPlayers.sort( (a,b)-> sortEquip(b) - sortEquip(a) )
 	#RunPlayers.sort()
 
-	for name in RunPlayers
-		account = name
-		score = thisRunPoints[account]
-		runData.addRows 1
-		runData.setValue(row, 0, account.toString() )
-		runData.setValue( row, 1, 1.0*score )
-		if( hasOutfit(account) )
-			runData.setValue( row, 2, "-" )
-			runData.setValue( row, 3, "-" )
-		else
-			runData.setValue( row, 2, minO.toString() )
-			runData.setValue( row, 3, (minO+1.0*score-1).toString() )
-			minO=minO+1.0*score
-			
-		if( hasStaff(account))
-			runData.setValue( row, 4, "-" )
-			runData.setValue( row, 5, "-" )
-		else
-			runData.setValue( row, 4, minS.toString() )
-			runData.setValue( row, 5, (minS+1.0*score-1).toString() )
-			minS=minS+1.0*score
-			
-		row++
 	
-	table = new google.visualization.Table(document.getElementById('table_div'))
-	table.draw(data, {showRowNumber:false} )
-
-	
-
-	#, sortColumn: 1, sortAscending:false
-	table3 = new google.visualization.Table(document.getElementById('c_div'))
-	table3.draw(runData, {showRowNumber:false} )
 
 	
