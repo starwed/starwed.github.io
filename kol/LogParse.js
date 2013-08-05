@@ -13,7 +13,7 @@
   PointValue = {
     kills: 1,
     bossKills: 1,
-    keys: 5,
+    keys: 10,
     banishElement: 1,
     banishType: 1,
     losses: 0
