@@ -428,7 +428,7 @@
     data.addColumn('string', 'name');
     data.addColumn('string', 'kills');
     data.addColumn('string', 'bosses');
-    data.addColumn('string', 'keys [x5]');
+    data.addColumn('string', 'keys [x10]');
     data.addColumn('string', 'el');
     data.addColumn('string', 'type');
     data.addColumn('number', 'points');
