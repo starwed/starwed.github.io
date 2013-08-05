@@ -6,7 +6,7 @@ google.load('visualization', '1', {packages: ['table']})
 PointValue = {
 	kills: 1,
 	bossKills: 1,
-	keys: 5,
+	keys: 10,
 	banishElement: 1,
 	banishType: 1,
 	losses: 0,
@@ -17,8 +17,11 @@ Blacklist of multis who don't get loot
 	Maestro of Mariachi (#1873125)
 	Sauciest Saucier (#1873222)
 	Tzar of Turtles (#1873176)
+littlelolligagged:	
+	mommyneedssleep (#2051971)
+
 ###
-Blacklist = [1873125, 1873222, 1873176]
+Blacklist = [1873125, 1873222, 1873176, 2051971]
 
 checkBlacklist = (account)->
 	for num in Blacklist
@@ -414,7 +417,7 @@ ChartResult = (accounts, total) ->
 	data.addColumn('string', 'name')
 	data.addColumn('string', 'kills')
 	data.addColumn('string', 'bosses')
-	data.addColumn('string', 'keys [x5]')
+	data.addColumn('string', 'keys [x10]')
 	data.addColumn('string', 'el')
 	data.addColumn('string', 'type')
 	data.addColumn('number', 'points')
