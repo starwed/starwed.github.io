@@ -6,21 +6,23 @@ google.load('visualization', '1', {packages: ['table']})
 PointValue = {
 	kills: 1,
 	bossKills: 1,
-	keys: 10,
+	keys: 1,
 	banishElement: 1,
 	banishType: 1,
 	losses: 0,
+	tasks: 5
 }
 
 ###
 Blacklist of multis who don't get loot
+(clan multis)	
 	Maestro of Mariachi (#1873125)
 	Sauciest Saucier (#1873222)
 	Tzar of Turtles (#1873176)
-littlelolligagged:	
+(littlelolligagged)
 	mommyneedssleep (#2051971)
-
 ###
+
 Blacklist = [1873125, 1873222, 1873176, 2051971]
 
 checkBlacklist = (account)->
@@ -37,7 +39,8 @@ NewTally = () -> {
 			banishElement: 0,
 			banishType: 0,
 			losses: 0,
-			bossKills: 0
+			bossKills: 0,
+			tasks: 0
 		}
 
 
@@ -56,7 +59,9 @@ keySearch = /(.+) unlocked (.+)\s+\(/
 
 banishSearch = /(.+) drove some (.+) out of the (.+)/
 
-playerSearch = /(.+\(#\d+\))/
+distroSearch = /(.+) distributed/
+
+playerSearch = /(.+\(#\d+?\))/
 
 ElementList = ['stench', 'cold', 'hot', 'sleaze', 'spooky' ]
 
@@ -70,7 +75,49 @@ importantItems = {
 	roast:    	/(.+) got some roast beast/
 	agaric:  	/(.+) got some stinking agaric/ 
 	kiwi:		/(.+) got a blood kiwi/
+}
 
+
+worthyTasks = {
+	polish: /(.+) polished some moon-amber/
+	#replica: /(.+) made a complicated key/
+	flour: /(.+) made some bone flour/
+	impression: /(.+) made an impression of a complicated lock/
+}
+
+looters ={
+	pencils: /(.+) collected a ghost pencil /
+
+	newspapers: /(.+) recycled some newspapers/
+	locker: /(.+) rifled through a footlocker/
+	garbage: /(.+) found and sold a rare baseball card/
+	graves: /(.+) robbed some graves/
+	dresser: /(.+) raided a dresser/
+	ashes: /(.+) sifted through some ashes/
+	shack: /(.+) looted the tinker's shack/
+	till: /(.+) looted the blacksmith's till/
+}
+
+lootCount ={
+	pencils:0 
+
+	newspapers: 0
+	locker: 0
+	garbage: 0
+	graves: 0
+	dresser: 0
+	ashes: 0
+	shack: 0
+	till: 0
+}
+
+onceChecklist = {
+	banana: false
+	amber: false
+	musicbox: false
+	roast: false
+	agaric: false
+	kiwi: false
 
 }
 
@@ -108,7 +155,7 @@ monsterAlias = {
 }
 
 instanceSummary = ()->
-	html = ""
+	html =""
 	banishedLine = (name)->
 		html += "<br/>&nbsp;&nbsp;&nbsp;" + "<i>#{name}:</i> " + quickReport.monstersKilled[monsterAlias[name]] + " kills"
 		if monsters[name] is 1
@@ -129,7 +176,12 @@ instanceSummary = ()->
 	
 	monsters = quickReport.banishedMonsters;
 	mk = quickReport.monstersKilled
-	html += "<b>Doors unlocked:</b> <br/>&nbsp;&nbsp;&nbsp;" + quickReport.unlockedDoors.join(", ")
+	
+
+	
+
+
+
 	html += "<table style='font-size: 8px' id='zones'><tr><td>"
 	elementsLine(quickReport.forestElements, "Forest");	
 	banishedLine("bugbears")
@@ -160,6 +212,23 @@ instanceSummary = ()->
 
 
 	html += "</td><tr></table>"
+
+
+	html += "<br/><b>Doors unlocked:</b> <br/>&nbsp;&nbsp;&nbsp;" + quickReport.unlockedDoors.join(", ")
+	
+	html += "<br/> <b>1/dungeon tasks accomplished:</b> <br/>&nbsp;&nbsp;&nbsp;"
+	checks = []
+	for item, state of onceChecklist
+		style = if state is true then "color: green; font-weight: bold" else "color: grey"
+		checks.push("<span style='#{style}'>#{item}</span>")
+	html += checks.join(", ")
+
+	html += "<br/> <b>10/dungeon loot:</b> <br/>&nbsp;&nbsp;&nbsp;"
+	counts = []
+	for item, number of lootCount
+		style = if number is 10 then "color: grey; text-decoration: line-through" else "color: black"
+		counts.push("<span style='#{style}'>#{item}: #{number}</span>")
+	html+=counts.join(", ")
 	document.getElementById("sum").insertAdjacentHTML("beforeend", html);
 
 
@@ -402,6 +471,30 @@ Process = (line) ->
 		accounts[pName].kills+= parseFloat(number)
 		return
 
+	for item, itemSearch of importantItems
+		parsed = itemSearch.exec(line)
+		if (parsed?[1])
+			pName = findAccount(parsed[1]);	
+			onceChecklist[item] = true
+
+	for task, taskSearch of worthyTasks
+		parsed = taskSearch.exec(line)
+		if (parsed?[1])
+			pName = findAccount(parsed[1]);	
+			accounts[pName].tasks++
+			return
+
+	for lootedThing, lootSearch of looters
+		parsed = lootSearch.exec(line)
+		if (parsed?[1])
+			pName = findAccount(parsed[1]);	
+			lootCount[lootedThing]++
+			return
+
+	parsed = distroSearch.exec(line)
+	if (parsed?[1])
+		return
+
 	parsed = playerSearch.exec(line)
 	if (parsed?[1])
 		pName = findAccount(parsed[1]);	
@@ -417,9 +510,9 @@ ChartResult = (accounts, total) ->
 	data.addColumn('string', 'name')
 	data.addColumn('string', 'kills')
 	data.addColumn('string', 'bosses')
-	data.addColumn('string', 'keys [x10]')
-	data.addColumn('string', 'el')
-	data.addColumn('string', 'type')
+	data.addColumn('string', 'keys')
+	data.addColumn('string', 'banish')
+	data.addColumn('string', 'tasks(5)')
 	data.addColumn('number', 'points')
 
 	runData = new google.visualization.DataTable()
@@ -447,8 +540,8 @@ ChartResult = (accounts, total) ->
 				t['kills'].toString()
 				t['bossKills'].toString()
 				t['keys'].toString()
-				t['banishElement'].toString()
-				t['banishType'].toString()
+				(t.banishElement + t.banishType).toString()
+				t.tasks.toString()
 				parseFloat(Points[a])
 			])
 
@@ -502,50 +595,10 @@ ChartResult = (accounts, total) ->
 	distroArea = document.getElementById('distro')
 	distroArea.insertAdjacentHTML("beforeend", lootHtml);
 
-
-
-
-
 	return
 
 
 
-
-	### Everything below here was HSH specific
-	row=0
-	minO=1
-	minS=1
-	#for account, score of thisRunPoints
-	hasOutfit = (p) -> 
-		if outfit[p]==true 
-			return true 
-		else 
-			return false
-
-
-	hasStaff = (p) -> 
-		if staff[p]==true 
-			return true 
-		else 
-			return false
-
-
-
-	sortEquip = (p) -> 
-		sortpoint=1
-		if hasStaff(p)==true 
-			if hasOutfit(p)==true
-				return 0
-			else 
-				return 5
-		else
-			if hasOutfit(p)==true
-				return 1
-			else
-				return 3
-
-	RunPlayers.sort( (a,b)-> sortEquip(b) - sortEquip(a) )
-	#RunPlayers.sort()
 
 	
 
