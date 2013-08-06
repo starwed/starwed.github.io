@@ -223,11 +223,11 @@ instanceSummary = ()->
 		checks.push("<span style='#{style}'>#{item}</span>")
 	html += checks.join(", ")
 
-	html += "<br/> <b>10/dungeon loot:</b> <br/>&nbsp;&nbsp;&nbsp;"
+	html += "<br/> <b>10/dungeon loot left:</b> <br/>&nbsp;&nbsp;&nbsp;"
 	counts = []
 	for item, number of lootCount
 		style = if number is 10 then "color: grey; text-decoration: line-through" else "color: black"
-		counts.push("<span style='#{style}'>#{item}: #{number}</span>")
+		counts.push("<span style='#{style}'>#{item}: #{10-number}</span>")
 	html+=counts.join(", ")
 	document.getElementById("sum").insertAdjacentHTML("beforeend", html);
 
@@ -410,6 +410,13 @@ Process = (line) ->
 			accounts[acc] = NewTally()
 		return acc
 
+
+	for item, itemSearch of importantItems
+		parsed = itemSearch.exec(line)
+		if (parsed?[1])
+			pName = findAccount(parsed[1]);	
+			onceChecklist[item] = true
+
 	parsed = keySearch.exec(line)
 	if (parsed?[1] and parsed?[2])
 		
@@ -471,11 +478,7 @@ Process = (line) ->
 		accounts[pName].kills+= parseFloat(number)
 		return
 
-	for item, itemSearch of importantItems
-		parsed = itemSearch.exec(line)
-		if (parsed?[1])
-			pName = findAccount(parsed[1]);	
-			onceChecklist[item] = true
+	
 
 	for task, taskSearch of worthyTasks
 		parsed = taskSearch.exec(line)

@@ -227,12 +227,12 @@
       checks.push("<span style='" + style + "'>" + item + "</span>");
     }
     html += checks.join(", ");
-    html += "<br/> <b>10/dungeon loot:</b> <br/>&nbsp;&nbsp;&nbsp;";
+    html += "<br/> <b>10/dungeon loot left:</b> <br/>&nbsp;&nbsp;&nbsp;";
     counts = [];
     for (item in lootCount) {
       number = lootCount[item];
       style = number === 10 ? "color: grey; text-decoration: line-through" : "color: black";
-      counts.push("<span style='" + style + "'>" + item + ": " + number + "</span>");
+      counts.push("<span style='" + style + "'>" + item + ": " + (10 - number) + "</span>");
     }
     html += counts.join(", ");
     return document.getElementById("sum").insertAdjacentHTML("beforeend", html);
@@ -418,6 +418,14 @@
       }
       return acc;
     };
+    for (item in importantItems) {
+      itemSearch = importantItems[item];
+      parsed = itemSearch.exec(line);
+      if ((parsed != null ? parsed[1] : void 0)) {
+        pName = findAccount(parsed[1]);
+        onceChecklist[item] = true;
+      }
+    }
     parsed = keySearch.exec(line);
     if ((parsed != null ? parsed[1] : void 0) && (parsed != null ? parsed[2] : void 0)) {
       pName = findAccount(parsed[1]);
@@ -477,14 +485,6 @@
       quickReport.monstersKilled[typeKill] += parseFloat(number);
       accounts[pName].kills += parseFloat(number);
       return;
-    }
-    for (item in importantItems) {
-      itemSearch = importantItems[item];
-      parsed = itemSearch.exec(line);
-      if ((parsed != null ? parsed[1] : void 0)) {
-        pName = findAccount(parsed[1]);
-        onceChecklist[item] = true;
-      }
     }
     for (task in worthyTasks) {
       taskSearch = worthyTasks[task];
