@@ -591,7 +591,7 @@
       score = thisRunPoints[account];
       lootHtml += "<tr><td><b>" + name + "</b> </td><td>" + score + "</td></tr>";
       row++;
-      if (row > 10) {
+      if (row > 13) {
         break;
       }
     }

@@ -592,7 +592,7 @@ ChartResult = (accounts, total) ->
 		
 			
 		row++
-		break if row>10
+		break if row>13
 
 	lootHtml+= "</table><br/><a target='_blank' href='#{wishlink}'>Wishlists</a>"
 	distroArea = document.getElementById('distro')
