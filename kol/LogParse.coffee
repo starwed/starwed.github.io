@@ -3,6 +3,10 @@ google.load('visualization', '1', {packages: ['table']})
 
 
 
+window.toggleDistro = (target, name)->
+	logit("Distro toggle #{name}")
+	target.style.textDecoration = "line-through"
+
 PointValue = {
 	kills: 1,
 	bossKills: 1,
@@ -19,11 +23,14 @@ Blacklist of multis who don't get loot
 	Maestro of Mariachi (#1873125)
 	Sauciest Saucier (#1873222)
 	Tzar of Turtles (#1873176)
+	Potentate of Pasta (#1873602)
+	Duke of Disco (#1873203)
+	Scourge of Seals (#1873601)
 (littlelolligagged)
 	mommyneedssleep (#2051971)
 ###
 
-Blacklist = [1873125, 1873222, 1873176, 2051971]
+Blacklist = [1873125, 1873222, 1873176, 2051971, 1873602, 1873203, 1873601]
 
 checkBlacklist = (account)->
 	for num in Blacklist
@@ -48,6 +55,9 @@ NewTally = () -> {
 logit = (text) ->
 	if (typeof console == "object")
 		console.log(text)
+
+
+kissMatch = /(\d+) kisses earned in this dungeon so far./
 
 bossMatch = /(.+) defeated (The Great Wolf of the Air|the Zombie Homeowners' Association|The Unkillable Skeleton|Falls-From-Sky|Mayor Ghost|Count Drunkula)\s+\((\d+) turn/
 loseSearch = /(.+) was defeated .*\((\d+) turn/
@@ -80,7 +90,7 @@ importantItems = {
 
 worthyTasks = {
 	polish: /(.+) polished some moon-amber/
-	#replica: /(.+) made a complicated key/
+	replica: /(.+) made a complicated key/
 	flour: /(.+) made some bone flour/
 	impression: /(.+) made an impression of a complicated lock/
 }
@@ -123,6 +133,8 @@ onceChecklist = {
 
 
 quickReport= {
+	totalLosses: 0
+	totalKills: 0
 	villageElements: []
 	forestElements: []
 	castleElements: []
@@ -156,6 +168,7 @@ monsterAlias = {
 
 instanceSummary = ()->
 	html =""
+
 	banishedLine = (name)->
 		html += "<br/>&nbsp;&nbsp;&nbsp;" + "<i>#{name}:</i> " + quickReport.monstersKilled[monsterAlias[name]] + " kills"
 		if monsters[name] is 1
@@ -172,7 +185,7 @@ instanceSummary = ()->
 		else
 			html+=  "<br/>&nbsp;&nbsp;&nbsp;" + el.join(", ") + " elements removed" 
 
-
+	html+= "#{quickReport.totalKisses} total kisses, #{quickReport.totalKills} kills, #{quickReport.totalLosses} losses, #{parseFloat(quickReport.totalKisses) + quickReport.totalLosses} earned"
 	
 	monsters = quickReport.banishedMonsters;
 	mk = quickReport.monstersKilled
@@ -410,6 +423,11 @@ Process = (line) ->
 			accounts[acc] = NewTally()
 		return acc
 
+	parsed = kissMatch.exec(line)
+	if parsed?[1]
+		quickReport.totalKisses = parsed[1]
+		return
+
 
 	for item, itemSearch of importantItems
 		parsed = itemSearch.exec(line)
@@ -455,6 +473,7 @@ Process = (line) ->
 		pName = findAccount(parsed[1]);
 		number = parsed[2]
 		accounts[pName].losses += parseFloat(number)
+		quickReport.totalLosses++
 		return
 
 	
@@ -475,6 +494,7 @@ Process = (line) ->
 		typeKill = parsed[3]
 		number = parsed[4]
 		quickReport.monstersKilled[typeKill]+= parseFloat(number)	
+		quickReport.totalKills += parseFloat(number)	
 		accounts[pName].kills+= parseFloat(number)
 		return
 
@@ -587,12 +607,12 @@ ChartResult = (accounts, total) ->
 
 		account = name
 		score = thisRunPoints[account]
-		lootHtml+= "<tr><td><b>#{name}</b> </td><td>#{score}</td></tr>"
+		lootHtml+= """<tr><td onclick='toggleDistro(this, "#{name}")'><b>#{name}</b></td><td>#{score}</td></tr>"""
 
 		
 			
 		row++
-		break if row>13
+		break if row>20
 
 	lootHtml+= "</table><br/><a target='_blank' href='#{wishlink}'>Wishlists</a>"
 	distroArea = document.getElementById('distro')
