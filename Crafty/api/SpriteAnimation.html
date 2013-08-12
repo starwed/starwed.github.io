@@ -1,0 +1,331 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Crafty - JavaScript Game Engine</title>
+<link type="text/css" rel="stylesheet" href="../global.css"/>
+<link href='http://fonts.googleapis.com/css?family=Arvo:regular,bold' rel='stylesheet' type='text/css'>
+<link rel="shortcut icon" href="../favicon.ico"> 
+</head>
+<body>
+<div id="header">
+	<div id="inner">
+	<a href="http://craftyjs.com"><img id="logo" src="../images/logo.png" alt="Crafty - JavaScript Game Engine" /></a>
+	<ul>
+		<li><a href="http://buildnewgames.com/introduction-to-crafty/">Getting Started</a></li>
+		<li><a href="http://craftyjs.com/api/">Documentation</a></li>
+		<li><a href="https://groups.google.com/forum/#!forum/craftyjs">Forum</a></li>
+		<li><a href="http://craftycomponents.com/">Modules</a></li>
+		<li class="emph"><a href="http://craftyjs.com/release/0.5.4/crafty.js">Download</a></li>
+	</ul>
+	</div>
+</div>
+<div id="main">
+<div id="main-left"></div>
+<div id="main-right"></div>
+
+
+<!-- These divs are filled in by doc generator -->
+<div id="content">
+	<div id='doc-nav'><ul id='doc-level-one'><li><a href='events.html'>List of Events</a></li><li>Core<ul><li><a href='Crafty.html'>Crafty</a></li><li><a href='Crafty Core.html'>Crafty Core</a></li><li><a href='Crafty-extend.html'>Crafty.extend</a></li><li><a href='Crafty-init.html'>Crafty.init</a></li><li><a href='Crafty-getVersion.html'>Crafty.getVersion</a></li><li><a href='Crafty-stop.html'>Crafty.stop</a></li><li><a href='Crafty-pause.html'>Crafty.pause</a></li><li><a href='Crafty-isPaused.html'>Crafty.isPaused</a></li><li><a href='Crafty-e.html'>Crafty.e</a></li><li><a href='Crafty-c.html'>Crafty.c</a></li><li><a href='Crafty-trigger.html'>Crafty.trigger</a></li><li><a href='Crafty-bind.html'>Crafty.bind</a></li><li><a href='Crafty-uniqueBind.html'>Crafty.uniqueBind</a></li><li><a href='Crafty-one.html'>Crafty.one</a></li><li><a href='Crafty-unbind.html'>Crafty.unbind</a></li><li><a href='Crafty-frame.html'>Crafty.frame</a></li><li><a href='Crafty-settings.html'>Crafty.settings</a></li><li><a href='Crafty-clone.html'>Crafty.clone</a></li><li><a href='Crafty-support.html'>Crafty.support</a></li><li><a href='Crafty-stage.html'>Crafty.stage</a></li></ul></li><li>Game Loop<ul><li><a href='Crafty-timer.html'>Crafty.timer</a></li></ul></li><li>Events<ul><li><a href='Crafty-trigger.html'>Crafty.trigger</a></li><li><a href='Crafty-bind.html'>Crafty.bind</a></li><li><a href='Crafty-uniqueBind.html'>Crafty.uniqueBind</a></li><li><a href='Crafty-one.html'>Crafty.one</a></li><li><a href='Crafty-unbind.html'>Crafty.unbind</a></li><li><a href='Crafty-addEvent.html'>Crafty.addEvent</a></li><li><a href='Crafty-removeEvent.html'>Crafty.removeEvent</a></li></ul></li><li>2D<ul><li><a href='Crafty-HashMap.html'>Crafty.HashMap</a></li><li><a href='Crafty-map.html'>Crafty.map</a></li><li><a href='2D.html'>2D</a></li><li><a href='Gravity.html'>Gravity</a></li><li><a href='Crafty-polygon.html'>Crafty.polygon</a></li><li><a href='Crafty-circle.html'>Crafty.circle</a></li><li><a href='Collision.html'>Collision</a></li><li><a href='Crafty-isometric.html'>Crafty.isometric</a></li><li><a href='Crafty-diamondIso.html'>Crafty.diamondIso</a></li><li><a href='Crafty-math.html'>Crafty.math</a></li><li><a href='Crafty-math.Vector2D.html'>Crafty.math.Vector2D</a></li><li><a href='Crafty-math.Matrix2D.html'>Crafty.math.Matrix2D</a></li></ul></li><li>Graphics<ul><li><a href='DOM.html'>DOM</a></li><li><a href='Crafty-DOM.html'>Crafty.DOM</a></li><li><a href='HTML.html'>HTML</a></li><li><a href='Crafty-sprite.html'>Crafty.sprite</a></li><li><a href='Crafty-background.html'>Crafty.background</a></li><li><a href='Sprite.html'>Sprite</a></li><li><a href='Canvas.html'>Canvas</a></li><li><a href='Crafty-canvas.html'>Crafty.canvas</a></li><li><a href='Color.html'>Color</a></li><li><a href='Tint.html'>Tint</a></li><li><a href='Image.html'>Image</a></li><li><a href='Crafty-toRGB.html'>Crafty.toRGB</a></li><li><a href='Crafty-DrawManager.html'>Crafty.DrawManager</a></li><li><a href='Particles.html'>Particles</a></li><li><a href='Text.html'>Text</a></li></ul></li><li>Utilities<ul><li><a href='Storage.html'>Storage</a></li><li><a href='Delay.html'>Delay</a></li></ul></li><li>Misc<ul><li><a href='Crafty-support.html'>Crafty.support</a></li><li><a href='Crafty-addEvent.html'>Crafty.addEvent</a></li><li><a href='Crafty-removeEvent.html'>Crafty.removeEvent</a></li><li><a href='Crafty-device.html'>Crafty.device</a></li></ul></li><li>Stage<ul><li><a href='Crafty-background.html'>Crafty.background</a></li><li><a href='Crafty-viewport.html'>Crafty.viewport</a></li><li><a href='Crafty-scene.html'>Crafty.scene</a></li></ul></li><li>Input<ul><li><a href='Crafty-keys.html'>Crafty.keys</a></li><li><a href='Crafty-mouseButtons.html'>Crafty.mouseButtons</a></li><li><a href='Crafty-keydown.html'>Crafty.keydown</a></li><li><a href='Crafty-mouseDispatch.html'>Crafty.mouseDispatch</a></li><li><a href='Crafty-touchDispatch.html'>Crafty.touchDispatch</a></li><li><a href='KeyboardEvent.html'>KeyboardEvent</a></li><li><a href='Crafty-eventObject.html'>Crafty.eventObject</a></li><li><a href='Mouse.html'>Mouse</a></li><li><a href='Draggable.html'>Draggable</a></li><li><a href='Keyboard.html'>Keyboard</a></li><li><a href='Multiway.html'>Multiway</a></li><li><a href='Fourway.html'>Fourway</a></li><li><a href='Twoway.html'>Twoway</a></li></ul></li><li>Animation<ul><li><a href='SpriteAnimation.html'>SpriteAnimation</a></li><li><a href='Tween.html'>Tween</a></li></ul></li><li>Scenes<ul><li><a href='Crafty-scene.html'>Crafty.scene</a></li></ul></li><li>Audio<ul><li><a href='Crafty-audio.html'>Crafty.audio</a></li></ul></li><li>Assets<ul><li><a href='Crafty-assets.html'>Crafty.assets</a></li><li><a href='Crafty-asset.html'>Crafty.asset</a></li><li><a href='Crafty-image_whitelist.html'>Crafty.image_whitelist</a></li><li><a href='Crafty-loader.html'>Crafty.loader</a></li><li><a href='Crafty-modules.html'>Crafty.modules</a></li></ul></li><li>Debug<ul><li><a href='DebugCanvas.html'>DebugCanvas</a></li><li><a href='DebugRectangle.html'>DebugRectangle</a></li><li><a href='VisibleMBR.html'>VisibleMBR</a></li><li><a href='DebugPolygon.html'>DebugPolygon</a></li><li><a href='WiredHitBox.html'>WiredHitBox</a></li><li><a href='SolidHitBox.html'>SolidHitBox</a></li></ul></li></ul></div>
+	<div id='doc-content'><h1>SpriteAnimation</h1>
+<p>Used to animate sprites by treating a sprite map as a set of animation frames.
+Must be applied to an entity that has a sprite-map component.</p>
+<p>Note: All data recieved from events is only valid until the next event of that
+type takes place. If you wish to preserve the data, make a copy of it.</p>
+<h4>Events</h4>
+<dl><dt><span class='event-name'>AnimationEnd</span> [<span class='event-property-name'>Data</span>: <span class='event-property'>{ reelId: <reelID> }</span>]</dt><dd>When the animation finishes</dd>
+<dt><span class='event-name'>FrameChange</span> [<span class='event-property-name'>Data</span>: <span class='event-property'>{ reelId: <reelID>, frameNumber: &lt;New frame&#39;s number&gt; }</span>]</dt><dd>Each frame change</dd>
+</dl>
+<h4>See Also</h4>
+<ul><li><a href=crafty-sprite.html>crafty.sprite</a></li></ul><div class='doc-contents'><h4>Properties and Methods</h4><ul><li><a href='#-_reels'>._reels</a></li><li><a href='#-_currentReelId'>._currentReelId</a></li><li><a href='#-_isPlaying'>._isPlaying</a></li><li><a href='#-_frameChangeInfo'>._frameChangeInfo</a></li><li><a href='#-_animationEndInfo'>._animationEndInfo</a></li><li><a href='#-animate'>.animate</a></li><li><a href='#-playAnimation'>.playAnimation</a></li><li><a href='#-resumeAnimation'>.resumeAnimation</a></li><li><a href='#-updateSprite'>.updateSprite</a></li><li><a href='#-pauseAnimation'>.pauseAnimation</a></li><li><a href='#-resetAnimation'>.resetAnimation</a></li><li><a href='#-isPlaying'>.isPlaying</a></li><li><a href='#-getActiveReel'>.getActiveReel</a></li></ul></div>
+
+<div id='-_reels' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>._reels</h2>
+<p>A map in which the keys are the names assigned to animations defined using
+the component (also known as reelIDs), and the values are objects describing
+the animation and its state.</p>
+
+
+</div>
+
+
+
+<div id='-_currentReelId' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>._currentReelId</h2>
+<p>The reelID of the currently active reel (which is one of the elements in <code>this._reels</code>).
+This value is <code>null</code> if no reel is active. Some of the component&#39;s actions can be invoked
+without specifying a reel, in which case they will work on the active reel.</p>
+
+
+</div>
+
+
+
+<div id='-_isPlaying' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>._isPlaying</h2>
+<p>Whether or not an animation is currently playing.</p>
+
+
+</div>
+
+
+
+<div id='-_frameChangeInfo' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>._frameChangeInfo</h2>
+<p>Contains information about the latest frame change event.</p>
+
+
+</div>
+
+
+
+<div id='-_animationEndInfo' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>._animationEndInfo</h2>
+<p>Contains information about the latest animation end event.</p>
+
+
+</div>
+
+
+
+<div id='-animate' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.animate</h2>
+<p><code>public this .animate(String reelId, Number fromX, Number y, Number toX)</code> </p>
+<dl>
+<dt>reelId</dt><dd>ID of the animation reel being created</dd>
+<dt>fromX</dt><dd>Starting <code>x</code> position on the sprite map (x&#39;s unit is the horizontal size of the sprite in the sprite map).</dd>
+<dt>y</dt><dd><code>y</code> position on the sprite map (y&#39;s unit is the horizontal size of the sprite in the sprite map). Remains constant through the animation.</dd>
+<dt>toX</dt><dd>End <code>x</code> position on the sprite map. This can be smaller than <code>fromX</code>, in which case the frames will play in descending order.</dd>
+</dl>
+<code>public this .animate(String reelId, Array frames)</code> 
+
+<dl>
+<dt>reelId</dt><dd>ID of the animation reel being created</dd>
+<dt>frames</dt><dd>Array of arrays containing the <code>x</code> and <code>y</code> values of successive frames: [[x1,y1],[x2,y2],...] (the values are in the unit of the sprite map&#39;s width/height respectively).</dd>
+</dl>
+
+<p>Method to setup animation reels. Animation works by changing the sprites over
+a duration. Only works for sprites built with the Crafty.sprite methods.
+See the Tween component for animation of 2D properties.</p>
+<p>To setup an animation reel, pass the name of the reel (used to identify the reel and play it later), and either an
+array of absolute sprite positions or the start x on the sprite map, the y on the sprite map and then the end x on the sprite map.</p>
+<h4> Example </h4>
+
+<pre><code>\/\/ Define a sprite-map component
+Crafty.sprite(16, &quot;images/sprite.png&quot;, {
+    PlayerSprite: [0,0]
+});
+
+\/\/ Define an animation on the second row of the sprite map (y = 1)
+\/\/ from the left most sprite (fromX = 0) to the fourth sprite
+\/\/ on that row (toX = 3)
+Crafty.e(&quot;2D, DOM, SpriteAnimation, PlayerSprite&quot;).animate(&#39;PlayerRunning&#39;, 0, 1, 3);
+
+\/\/ This is the same animation definition, but using the alternative method
+Crafty.e(&quot;2D, DOM, SpriteAnimation, PlayerSprite&quot;).animate(&#39;PlayerRunning&#39;, [[0, 1], [1, 1], [2, 1], [3, 1]]);</code></pre>
+
+
+<p></div></p>
+<div id='-playAnimation' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.playAnimation</h2>
+<p><code>public this .playAnimation(String reelId, Number duration[, Number repeatCount, Number fromFrame])</code> </p>
+<dl>
+<dt>reelId</dt><dd>ID of the animation reel to play</dd>
+<dt>duration</dt><dd>Play the animation within a duration (in frames)</dd>
+<dt>repeatCount</dt><dd>Number of times to repeat the animation (it will play repeatCount + 1 times). Use -1 to repeat indefinitely.</dd>
+<dt>fromFrame</dt><dd>Frame to start the animation at. If not specified, resumes from the current reel position.</dd>
+</dl>
+
+<p>Play one of the reels previously defined by calling <code>.animate(...)</code>. Simply pass the name of the reel
+and the amount of frames the animations should take to play from start to finish. If you wish the
+animation to play multiple times in succession, pass in the amount of times as an additional parameter.
+To have the animation repeat indefinitely, pass in <code>-1</code>. Finally, you can start the animation at a specific
+frame by supplying an additional optional argument.</p>
+<p>If another animation is currently playing, it will be paused.</p>
+<p>If you simply wish to resume a previously paused animation without having to specify the duration again,
+supply <code>null</code> as the duration.</p>
+<p>Once an animation ends, it will remain at its last frame. Call <code>.resetAnimation(...)</code> to reset a reel to its first
+frame, or play the reel from a specific frame. Attempting to play the reel again otherwise will result in
+the animation ending immediately.</p>
+<p>If you play the animation from a certain frame and specify a repeat count, the animation will reset to its
+first frame when repeating (and not to the frame you started the animation at).</p>
+<h4> Example </h4>
+
+<pre><code>\/\/ Define a sprite-map component
+Crafty.sprite(16, &quot;images/sprite.png&quot;, {
+    PlayerSprite: [0,0]
+});
+
+\/\/ Play the animation across 20 frame (so each sprite in the 4 sprite animation should be seen for 5 frames) and repeat indefinitely
+Crafty.e(&quot;2D, DOM, SpriteAnimation, PlayerSprite&quot;)
+    .animate(&#39;PlayerRunning&#39;, 0, 0, 3) // setup animation
+    .playAnimation(&#39;PlayerRunning&#39;, 20, -1); // start animation</code></pre>
+
+
+</div>
+
+
+
+<div id='-resumeAnimation' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.resumeAnimation</h2>
+<p><code>public this .resumeAnimation([String reelId])</code> </p>
+<dl>
+<dt>reelId</dt><dd>ID of the animation to continue playing</dd>
+</dl>
+
+<p>This is simply a convenience method and is identical to calling <code>.playAnimation(reelId, null)</code>.
+You can call this method with no arguments to resume the last animation that played.</p>
+
+
+</div>
+
+
+
+<div id='-updateSprite' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.updateSprite</h2>
+<p><code>private void .updateSprite()</code> </p>
+<p>This method is called at every <code>EnterFrame</code> event when an animation is playing. It manages the animation
+as time progresses.</p>
+<p>You shouldn&#39;t call this method directly.</p>
+
+
+</div>
+
+
+
+<div id='-pauseAnimation' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.pauseAnimation</h2>
+<p><code>public this .pauseAnimation(void)</code> </p>
+<p>Pauses the currently playing animation, or does nothing if no animation is playing.</p>
+
+
+</div>
+
+
+
+<div id='-resetAnimation' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.resetAnimation</h2>
+<p><code>public this .resetAnimation([String reelId, Number frameToDisplay])</code> </p>
+<dl>
+<dt>reelId</dt><dd>ID of the animation to reset</dd>
+<dt>frameToDisplay</dt><dd>The frame to show after resetting the animation. 0 based.</dd>
+</dl>
+
+<p>Resets the specified animation and displays one of its frames. If no reelId is specified,
+resets the currently playing animation (or does nothing if no animation is playing).</p>
+<p>By default, will have the animation display its first frame. When playing an animation, it
+will continue from the frame it was reset to.</p>
+<p>Specify null as the reelId if you only want to specify the frame on the
+current animation.</p>
+<p>If an animation ends up being reset and an animation was playing, the animation that was
+playing will be paused.</p>
+<p>Keep in mind that resetting an animation will set the animation&#39;s state to the one it had
+just after defining it using <code>animate(...)</code>.</p>
+
+
+</div>
+
+
+
+<div id='-isPlaying' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.isPlaying</h2>
+<p><code>public Boolean .isPlaying([String reelId])</code> </p>
+<dl>
+<dt>reelId</dt><dd>The reelId of the reel we wish to examine</dd>
+</dl>
+
+<p>Determines if the specified animation is currently playing. If no reelId is specified,
+checks if any animation is playing.</p>
+<h4> Example </h4>
+
+<pre><code>myEntity.isPlaying() // is any animation playing
+myEntity.isPlaying(&#39;PlayerRunning&#39;) // is the PlayerRunning animation playing</code></pre>
+
+
+</div>
+
+
+
+<div id='-getActiveReel' class='docblock'>
+
+<a href='#doc-nav' class='doc-top'>Back to top</a><h2>.getActiveReel</h2>
+<p><code>public { id: String, frame: Number } .getActiveReel()</code> </p>
+<p>Returns information about the active reel, the one methods will work on when the reel ID is
+not specified.
+Returns an object containing the reel&#39;s ID and the number of the frame displayed at
+the time this method was called. If no reel is active, returns an object with a reel ID
+of null (this will only happen if no animation has been played yet).</p>
+
+
+</div>
+
+</div>
+</div>
+
+</div>
+
+
+<div class="clearer"></div>
+<div id="footer">
+
+  <div id="contact">
+    <a href="http://twitter.com/craftyjs">
+      <img src="/images/twitter.png" />
+      @craftyjs
+    </a>
+    <a href="http://webchat.freenode.net">
+      <img src="/images/comment.png" />
+      #crafty@freenode.net
+    </a>
+    <a href="https://groups.google.com/forum/#!forum/craftyjs">
+      <img src="/images/google.png" />
+      google groups
+    </a>
+    <a href="mailto:louis@craftyjs.com">
+      <img src="/images/email.png" />
+      louis@craftyjs.com
+    </a>
+    <a href="https://github.com/craftyjs/Crafty">
+      <img src="/images/github.png" />
+      github
+    </a>
+  </div>
+  <ul>
+    <li>
+      <a href="/api/">Documentation</a>
+    </li>
+    <li>
+      <a href="http://craftycomponents.com/">Modules</a>
+    </li>
+    <li>
+      <a href="https://groups.google.com/forum/#!forum/craftyjs">Forum</a>
+    </li>
+    <li>
+      <a href="/tutorial/">Tutorial</a>
+    </li>
+    <li>
+      <a href="http://craftycomponents.com/components/single/8/crafty">Download</a>
+    </li>
+  </ul>
+  <p>
+    &copy; Crafty 2010. Crafty is distributed under the <a href="http://en.wikipedia.org/wiki/MIT_License">MIT</a> or <a href="http://en.wikipedia.org/wiki/GNU_General_Public_License">GPL</a>
+    license.
+  </p>
+
+</div>
+</body>
+
+</body>
+</html>
