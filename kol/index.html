@@ -11,16 +11,92 @@
         <meta name="viewport" content="width=device-width">
 
         <link rel="stylesheet" href="../css/bootstrap.min.css">
+        
+        <link rel="stylesheet" href="../css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="../css/main.css">
         <style>
             body {
                 padding-top: 60px;
                 padding-bottom: 40px;
             }
-        </style>
-        <link rel="stylesheet" href="../css/bootstrap-responsive.min.css">
-        <link rel="stylesheet" href="../css/main.css">
 
-        <script src="../js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+            body { 
+             background: url('../img/gplaypattern.png');
+            }
+
+            .container div.sw-white {
+                background-color:rgba(180,200,200,0.5);
+            }
+
+            .well {
+                background-color:rgba(250,250,250,1);
+            }
+
+            #bounds {
+                background: url('img/bounds.png');
+                background-size: cover;
+                color: rgb(200, 250, 250)
+            }
+
+            #bounds p{
+                color: white;
+                text-shadow: black 1px 1px;
+
+            }
+
+            #kol {
+                
+                background: url('img/rightswordguy.gif');
+                background-size: cover;
+
+                
+            }
+
+             #kol p{
+                color: black;
+                text-shadow: white 1px 1px;
+                
+                width: 80%;
+            }
+
+            .image-container {
+                    position: relative ! important;
+                    margin: 0 auto;
+                    display: table;
+        
+                    
+
+            }
+
+            .overlay-text {
+                    padding-left: 2%;
+                    position:absolute;
+                    bottom:0px;
+                    right:0px;
+                    width: 98%;
+                    height:100%;
+                    background-color: rgba(255, 200, 200, 0.3);
+                    color: black;
+                    display: none;
+                 
+                    
+            }
+
+            .image-container:hover .overlay-text{
+                display: block;
+            }
+
+
+
+            .image-container img{
+                    height: 100%;
+                    width: 100%;
+                
+            }
+            
+        </style>
+
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
     <body>
 
@@ -34,8 +110,8 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </a>
-                    <a class="brand" href="#">Project name</a>
-                    <div class="nav-collapse collapse">
+                    <a class="brand" href="#">Ludonomicon</a>
+                    <!--div class="nav-collapse collapse">
                         <ul class="nav">
                             <li class="active"><a href="#">Home</a></li>
                             <li><a href="#about">About</a></li>
@@ -53,48 +129,77 @@
                                 </ul>
                             </li>
                         </ul>
-                        <form class="navbar-form pull-right">
-                            <input class="span2" type="text" placeholder="Email">
-                            <input class="span2" type="password" placeholder="Password">
-                            <button type="submit" class="btn">Sign in</button>
-                        </form>
-                    </div><!--/.nav-collapse -->
+                        
+                    </div--><!--/.nav-collapse -->
                 </div>
             </div>
         </div>
 
         <div class="container">
 
-            <!-- Main hero unit for a primary marketing message or call to action -->
-            <div class="hero-unit">
-                <h1>Hello, world!</h1>
-                <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-                <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-            </div>
-
+          
             <!-- Example row of columns -->
             <div class="row">
-                <div class="span4">
-                    <h2>Heading</h2>
-                    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                    <p><a class="btn" href="#">View details &raquo;</a></p>
+                <div class="span8 sw-white">
+                    <h2>Kol links...</h2>
+                    <ul>
+                        <li> <a href="LogParse.html">Dread log parser</a> </li>
+                        <li> <a href="CoffeeBayes.html">Multidrop spade tool</a> </li>
+                        <li> <a href="bayes.html">Single drop spade tool</a> </li>
+
+                    </ul>
+
+                    
                 </div>
-                <div class="span4">
-                    <h2>Heading</h2>
-                    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                    <p><a class="btn" href="#">View details &raquo;</a></p>
-               </div>
-                <div class="span4">
-                    <h2>Heading</h2>
-                    <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-                    <p><a class="btn" href="#">View details &raquo;</a></p>
-                </div>
+
+                <div class="span2"><div class="row">
+                    
+                    <a href="Bounds/bounds.html"><div class="span2 well well-small" id="bounds">
+                    <h3>Bounds</h3>
+                    <p>A game about jumping</p>
+                    </div></a>
+
+                    <a href="kol/"><div  class="span2 well well-small" id="kol">
+                    <h3>KoL</h3>
+                    <p>Tools for the Kingdom of Loathing</p>
+                    </div></a>
+                    
+
+                    <!--div class="span2 ">
+                    <h3>Blog</h3>
+                    <p>Rambling, etc.</p>
+                    </div>
+
+                    <div class="span2 ">
+                        <div class="image-container">
+                            <img src="img/bounds.png"/>
+                            <span class="overlay-text">
+                                <h3>Bounds</h3>
+                                <p>A game about jumping</p>
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <a href="kol/"><div  class="span2 " >
+                    
+                        <div class="image-container">
+                            <img src="img/rightswordguy.gif"/>
+                            <span class="overlay-text">
+                                <h3>KoL</h3>
+                                <p>Tools for the Kingdom of Loathing</p>
+                            </span>
+                        </div>
+                    </div></a-->
+
+
+                </div></div>
             </div>
 
             <hr>
 
             <footer>
-                <p>&copy; Company 2012</p>
+                <p> Ludonomicon.com</p>
             </footer>
 
         </div> <!-- /container -->
@@ -102,8 +207,8 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
 
-        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="../js/vendor/bootstrap.min.js"></script>
 
-        <script src="js/main.js"></script>
+        <script src="../js/main.js"></script>
     </body>
 </html>
