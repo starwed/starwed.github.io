@@ -52,7 +52,7 @@ Crafty.c("Snap", {
             snapCol = Math.round(this.x/xcell)
             this.x = snapCol * xcell
         else
-            snapCol= Math.round(this.x/32+.5)
+            snapCol= Math.round(this.x/xcell+.5)
             this.x = snapCol * xcell - xcell/2
 
         this.row = snapRow
@@ -61,6 +61,26 @@ Crafty.c("Snap", {
 
         this.addComponent("Friends")
         FindFriends()
+
+        return this
+
+
+    preplace: (r, c)->
+        console.log(r, c)
+        snapRow = r
+        this.y = snapRow * ycell
+        if (snapRow%2) is 0
+            snapCol = c
+            this.x = snapCol * xcell
+        else
+            snapCol= c
+            this.x = snapCol * xcell - xcell/2
+
+        this.row = snapRow
+        this.col = snapCol
+        setBlock(snapRow, snapCol, this)
+
+
 
         return this
 
@@ -104,6 +124,7 @@ Crafty.c("Snap", {
 
     checkBlock: (b)->
         console.log('ding')
+        return if typeof b is "undefined"
         if b?.type is this.type
             console.log("Friend! #{this.type}")
             b.addComponent("Friends")
@@ -118,6 +139,7 @@ Crafty.c("Snap", {
 FindFriends = (type)->
     Friends = Crafty("Friends")
     startNum = Friends.length
+    return if startNum is 0
     Friends.each( ()->this.checkAdjacent() );
     Friends = Crafty("Friends")
     if Friends.length > startNum
@@ -186,7 +208,7 @@ Crafty.c("Unmaker", {
 
         #this.bind("Moved", @_setOrientation)
 
-        Crafty.viewport.follow(this)
+        #Crafty.viewport.follow(this)
 
     _setOrientation: ()->
         this.rotation = 360/6.28*Math.atan2(this._vx, -this._vy)
@@ -257,7 +279,7 @@ newUnmaker = ()->
     if bail is true then return
     console.log('maker')
     u = Crafty.e("Unmaker")
-        .attr({x:64, y: 200})
+        .attr({x:64, y: 300})
         .umtype(randomType())
 
     if (u.hit("Block"))
@@ -270,20 +292,28 @@ checkUnmaker = ()->
         newUnmaker()
 
 
+fillBlocks = ()->
+    for r in [1..3]
+        for c in [3..9]
+            Crafty.e("Block")
+                .attr({x:r*xcell, y: c*ycell})
+                .blockType(randomType())
+                .preplace(r, c)
+
+
+
+
 setup = ()->
     Crafty.background('url("assets/cloudy_sky.png")')
     console.log('start')
     Crafty.e("2D, DOM, Color, Floor, Solid, Platform, Collision")
-        .attr({x: 32, y:320, h:64, w: 640})
+        .attr({x: 32, y:420, h:64, w: 640})
         .color("maroon")
         .css("border", "2px solid grey")
 
     newUnmaker()
-
-    Crafty.e("Block")
-        .attr({x:128, y: 50})
-        .blockType(randomType())
-        .snap()
+    fillBlocks();
+ 
 
     Crafty.bind("EnterFrame", checkUnmaker)
 
