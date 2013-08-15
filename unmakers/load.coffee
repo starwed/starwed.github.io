@@ -253,7 +253,7 @@ Crafty.c("Unmaker", {
         norm = Math.sqrt(dx*dx + dy*dy)
         dx = dx/norm
         dy = dy/norm
-        this.launch( dx*7, dy*7)
+        this.launch( dx*9, dy*9)
         @grounded = false
 
         return this
