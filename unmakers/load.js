@@ -28,10 +28,10 @@
 
   YOffset = 0;
 
-  typeList = ["white", "blue", "yellow"];
+  typeList = ["white", "blue", "yellow", "green", "red"];
 
   randomType = function() {
-    return typeList[Math.floor(Math.random() * 3)];
+    return typeList[Math.floor(Math.random() * 5)];
   };
 
   ycell = 28;
@@ -150,9 +150,9 @@
     } else {
       if (Friends.length > 2) {
         Friends.each(function() {
-          return this.destroy();
+          return this.disintegrate();
         });
-        return Crafty.audio.play("trill", 1, 0.6);
+        return Crafty.audio.play("trill", 1, 0.1);
       } else {
         Friends.each(function() {
           return this.removeComponent("Friends");
@@ -183,9 +183,23 @@
           break;
         case "blue":
           this.addComponent("bluebubble");
+          break;
+        case "green":
+          this.addComponent("greenbubble");
+          break;
+        case "red":
+          this.addComponent("redbubble");
       }
       this.h = this.w = 32;
       return this;
+    },
+    disintegrate: function() {
+      this.removeComponent("Block");
+      this.addComponent("AnimatedEffect");
+      this.setTween({
+        alpha: 0
+      });
+      return this.runAnimation(15);
     }
   });
 
@@ -254,6 +268,12 @@
           break;
         case "blue":
           this.addComponent("drop");
+          break;
+        case "green":
+          this.addComponent("leaf");
+          break;
+        case "red":
+          this.addComponent("flower");
       }
       this.h = this.w = 32;
       return this;
@@ -350,8 +370,20 @@
     Crafty.sprite(32, 32, "assets/yellow-bubble.gif", {
       yellowbubble: [0, 0]
     });
+    Crafty.sprite(32, 32, "assets/green-bubble.gif", {
+      greenbubble: [0, 0]
+    });
+    Crafty.sprite(32, 32, "assets/red-bubble.gif", {
+      redbubble: [0, 0]
+    });
     Crafty.sprite(16, 16, "assets/mistercloud.png", {
       cloud: [0, 0]
+    });
+    Crafty.sprite(16, 16, "assets/misterleaf.png", {
+      leaf: [0, 0]
+    });
+    Crafty.sprite(16, 16, "assets/misterflower.png", {
+      flower: [0, 0]
     });
     Crafty.sprite(16, 16, "assets/mistersun.png", {
       sun: [0, 0]
@@ -362,7 +394,7 @@
   };
 
   jumpSound = function() {
-    return Crafty.audio.play("jump" + Math.ceil(Math.random() * 4), 1, 0.6);
+    return Crafty.audio.play("jump" + Math.ceil(Math.random() * 4), 1, 0.3);
   };
 
   window.onload = function() {
@@ -374,7 +406,7 @@
     Crafty.DrawManager.debugDirty = false;
     window.addEventListener("click", clickControl);
     Crafty.scene("main", setup);
-    Crafty.load(["assets/white-bubble.gif", "assets/blue-bubble.gif", "assets/yellow-bubble.gif", "assets/misterdrop.png", "assets/mistersun.png", "assets/mistercloud.png", "assets/cloudy_sky.png"], function() {
+    Crafty.load(["assets/white-bubble.gif", "assets/misterleaf.png", "assets/blue-bubble.gif", "assets/green-bubble.gif", "assets/yellow-bubble.gif", "assets/misterdrop.png", "assets/mistersun.png", "assets/mistercloud.png", "assets/red-bubble.gif", "assets/misterflower.png", "assets/cloudy_sky.png"], function() {
       return Crafty.scene("main");
     });
     Crafty.audio.add("jump1", "assets/Jump17.wav");

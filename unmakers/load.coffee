@@ -23,9 +23,9 @@ YOffset = 0;
 
 
 
-typeList = ["white", "blue", "yellow"]
+typeList = ["white", "blue", "yellow", "green", "red"]
 
-randomType = ()-> typeList[ Math.floor(Math.random()*3)]
+randomType = ()-> typeList[ Math.floor(Math.random()*5)]
 
 
 ycell = 28
@@ -146,8 +146,8 @@ FindFriends = (type)->
         FindFriends(type)
     else
         if (Friends.length>2)
-            Friends.each( ()-> this.destroy() )
-            Crafty.audio.play("trill", 1, 0.6)
+            Friends.each( ()-> this.disintegrate() )
+            Crafty.audio.play("trill", 1, 0.1)
         else
             Friends.each( ()-> this.removeComponent("Friends"))
             Crafty.audio.play("place", 1, 0.2)
@@ -178,10 +178,19 @@ Crafty.c("Block", {
                 @addComponent("yellowbubble")
             when "blue"
                 @addComponent("bluebubble")
+            when "green"
+                @addComponent("greenbubble")
+            when "red"
+                @addComponent("redbubble")
         this.h=this.w=32
         #this.color(type)
         return this
 
+    disintegrate: ()->
+        this.removeComponent("Block")
+        this.addComponent("AnimatedEffect")
+        this.setTween({alpha: 0})
+        this.runAnimation(15)
 
 
 })
@@ -259,6 +268,10 @@ Crafty.c("Unmaker", {
                 @addComponent("sun")
             when "blue"
                 @addComponent("drop")
+            when "green"
+                @addComponent("leaf")
+            when "red"
+                @addComponent("flower")
         this.h=this.w=32
         return this
 
@@ -346,9 +359,25 @@ sliceSprites = ()->
         yellowbubble: [0,0]
     })
 
+    Crafty.sprite(32, 32, "assets/green-bubble.gif", {
+        greenbubble: [0,0]
+    })
+
+    Crafty.sprite(32, 32, "assets/red-bubble.gif", {
+        redbubble: [0,0]
+    })
+
    
     Crafty.sprite(16, 16, "assets/mistercloud.png", {
         cloud: [0,0]
+    })
+
+    Crafty.sprite(16, 16, "assets/misterleaf.png", {
+        leaf: [0,0]
+    })
+
+    Crafty.sprite(16, 16, "assets/misterflower.png", {
+        flower: [0,0]
     })
 
     Crafty.sprite(16, 16, "assets/mistersun.png", {
@@ -364,7 +393,7 @@ sliceSprites = ()->
 
 
 jumpSound = ()->
-    Crafty.audio.play("jump" + Math.ceil(Math.random()*4), 1, 0.6)
+    Crafty.audio.play("jump" + Math.ceil(Math.random()*4), 1, 0.3)
 
 window.onload = ()->
     WIDTH = 1200   
@@ -382,7 +411,10 @@ window.onload = ()->
 
     
     Crafty.scene("main", setup)
-    Crafty.load( ["assets/white-bubble.gif", "assets/blue-bubble.gif", "assets/yellow-bubble.gif", "assets/misterdrop.png", "assets/mistersun.png", "assets/mistercloud.png", "assets/cloudy_sky.png"], ()->Crafty.scene("main") )
+    Crafty.load( 
+        ["assets/white-bubble.gif", "assets/misterleaf.png", "assets/blue-bubble.gif", "assets/green-bubble.gif", 
+        "assets/yellow-bubble.gif", "assets/misterdrop.png", "assets/mistersun.png", "assets/mistercloud.png", 
+        "assets/red-bubble.gif", "assets/misterflower.png", "assets/cloudy_sky.png"], ()->Crafty.scene("main") )
     Crafty.audio.add("jump1", "assets/Jump17.wav")
     Crafty.audio.add("jump2", "assets/Jump17-2.wav")
     Crafty.audio.add("jump3", "assets/Jump17-3.wav")
