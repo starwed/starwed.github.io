@@ -247,7 +247,7 @@ Crafty.c("Solid", {
     _checkMove: (move)->
         
         if hitObjs = this.hit("Solid")
-            console.log("Cancelling move for #{this[0]}")
+            #console.log("Cancelling move for #{this[0]}")
             this.trigger("CancelMove", move)
 
             @collideInfo.objs = hitObjs
@@ -271,21 +271,25 @@ Crafty.c("BounceMethods", {
     init: ()-> 
     
     _bounce: (move)->
+        move = move.move;
+        console.log("collision " + move.toSource())
         # Should probably never be called if object is controlled
         if move.x isnt 0
+            console.log("Changing x speed")
             if Math.abs(this._vx) < @threshold 
                 @_vx = 0
             else 
                 this.trigger("Bounce", @_vx)
-                Crafty.audio.play(@sound, 1, Math.min(Math.abs(.1*@_vx), .8) ) if @sound
+                #Crafty.audio.play(@sound, 1, Math.min(Math.abs(.1*@_vx), .8) ) if @sound
                 @_vx = - Math.round(@_vx) * @restitution
                     
         if move.y isnt 0
+            console.log("Changing y speed")
             if Math.abs(@_vy) < @threshold
                 @_vy = 0
             else 
                 this.trigger("Bounce", @_vy)
-                Crafty.audio.play(@sound, 1, Math.min(Math.abs(.1*@_vy), .8)) if @sound
+                #Crafty.audio.play(@sound, 1, Math.min(Math.abs(.1*@_vy), .8)) if @sound
                 @_vy = - Math.round(@_vy) * @restitution
 
         return
@@ -564,14 +568,7 @@ Crafty.c("Ballistic", {
         if @_vy isnt 0
             @_moveVec.x = 0 
             @_moveVec.y = this._vy * t/T+ .5 * this._ay * (t/t)*(t/T)
-            ###if MYFLAG++ < 15
-                console.log("checking movevec #{MYFLAG}")
-                tester = this._vy * t/T+ .5 * this._ay * (t/t)*(t/T) 
-                #console.log("test is " + tester)
-                @_moveVec.y = tester
-                
-                console.log(@_moveVec)
-                console.log(@_moveVec.y)###
+ 
             this.trigger('Translate', @_moveVec)
 
     

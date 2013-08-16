@@ -207,7 +207,6 @@
     _checkMove: function(move) {
       var hitObjs;
       if (hitObjs = this.hit("Solid")) {
-        console.log("Cancelling move for " + this[0]);
         this.trigger("CancelMove", move);
         this.collideInfo.objs = hitObjs;
         this.collideInfo.move = move;
@@ -229,25 +228,23 @@
     threshold: .1,
     init: function() {},
     _bounce: function(move) {
+      move = move.move;
+      console.log("collision " + move.toSource());
       if (move.x !== 0) {
+        console.log("Changing x speed");
         if (Math.abs(this._vx) < this.threshold) {
           this._vx = 0;
         } else {
           this.trigger("Bounce", this._vx);
-          if (this.sound) {
-            Crafty.audio.play(this.sound, 1, Math.min(Math.abs(.1 * this._vx), .8));
-          }
           this._vx = -Math.round(this._vx) * this.restitution;
         }
       }
       if (move.y !== 0) {
+        console.log("Changing y speed");
         if (Math.abs(this._vy) < this.threshold) {
           this._vy = 0;
         } else {
           this.trigger("Bounce", this._vy);
-          if (this.sound) {
-            Crafty.audio.play(this.sound, 1, Math.min(Math.abs(.1 * this._vy), .8));
-          }
           this._vy = -Math.round(this._vy) * this.restitution;
         }
       }
@@ -571,16 +568,6 @@
       if (this._vy !== 0) {
         this._moveVec.x = 0;
         this._moveVec.y = this._vy * t / T + .5 * this._ay * (t / t) * (t / T);
-        /*if MYFLAG++ < 15
-            console.log("checking movevec #{MYFLAG}")
-            tester = this._vy * t/T+ .5 * this._ay * (t/t)*(t/T) 
-            #console.log("test is " + tester)
-            @_moveVec.y = tester
-            
-            console.log(@_moveVec)
-            console.log(@_moveVec.y)
-        */
-
         return this.trigger('Translate', this._moveVec);
       }
     }

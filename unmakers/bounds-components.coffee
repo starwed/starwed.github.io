@@ -32,7 +32,7 @@ Crafty.c("AnimatedEffect", {
         return this
 
 })
-
+    
 
 Crafty.c("UIText", {
     init: ()-> 

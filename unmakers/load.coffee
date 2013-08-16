@@ -25,7 +25,22 @@ YOffset = 0;
 
 typeList = ["white", "blue", "yellow", "green", "red"]
 
+typeExtant = (type)->
+    if Crafty("#{type}bubble").length>0 
+        return true
+    else
+        return false
+
+randomUnmakerType = ()->
+    type = randomType()
+    console.log(typeExtant(type))
+    if typeExtant(type)
+        return type
+    else
+        return randomUnmakerType()
+
 randomType = ()-> typeList[ Math.floor(Math.random()*5)]
+    
 
 
 ycell = 28
@@ -159,7 +174,7 @@ FindFriends = (type)->
 
 Crafty.c("Block", {
     init: ()->
-        this.requires("2D, Canvas, Sprite, Collision, Solid, Platform, Snap")
+        this.requires("2D, Canvas, Sprite, Collision, Platform, Snap")
         this.w = 32;
         this.h = 32;
         m = 8
@@ -198,13 +213,15 @@ Crafty.c("Block", {
 
 Crafty.c("Unmaker", {
     init: ()->
-        @requires("2D, Canvas, Sprite, Ballistic, Collision, KeyboardMan, Slider, Snap")
+        @requires("2D, DOM, Sprite, Ballistic, Collision, KeyboardMan, Snap, Solid, Bounce")
             .attr({h:32, w:32})
             #.color("purple")
             #.css("border", "1px solid grey")
             #.css("border-radius", "8px")
             .launch(0, -5)
             .accelerate(0, .2)
+
+        this.restitution = .9
 
         this.origin(16, 16)
         this.bind("Jump", @_jump)
@@ -213,7 +230,7 @@ Crafty.c("Unmaker", {
 
         this.bind("Move", @_checkCollisions)
             
-        this.bind("Moved", @_checkGround)
+        #this.bind("Moved", @_checkGround)
 
         #this.bind("Moved", @_setOrientation)
 
@@ -232,10 +249,17 @@ Crafty.c("Unmaker", {
             b.x = move._x;
             b.y = move._y;
             b.snap()
+
+        ###if (hits = this.hit("Barrier"))
+
+            this.x = move._x
+            this.y = move._y
+            this._vx = -0.5 * this._vx
+            this._vy = -0.5 * this._vy###
             
             ##Crafty.one("KeyDown", ()->Crafty.one("EnterFrame") )
 
-    _checkGround: (move)->
+    ###_checkGround: (move)->
         if (hits = this.hit("Platform") )
             if this._vy > 0 
                 this._vy = 0
@@ -243,7 +267,7 @@ Crafty.c("Unmaker", {
                 target = hits[0].obj
                 this.y = target.y - this.h
                 @grounded = true
-                @active = false
+                @active = false###
 
     leap: (data)->
         jumpSound()
@@ -290,11 +314,14 @@ bail = false
 
 newUnmaker = ()->
     if bail is true then return
+    if Crafty("Block").length == 0
+        clear=true;
+        return
     console.log('maker')
     u = Crafty.e("Unmaker")
         .attr({x:64, y: 300})
-        .umtype(randomType())
-
+        .umtype(randomUnmakerType())
+    console.log("types " + u.__c.toSource())
     if (u.hit("Block"))
         u.destroy()
         Crafty.unbind("EnterFrame", checkUnmaker)
@@ -306,27 +333,52 @@ checkUnmaker = ()->
 
 
 fillBlocks = ()->
+    
     for r in [1..3]
         for c in [3..9]
             Crafty.e("Block")
                 .attr({x:r*xcell, y: c*ycell})
                 .blockType(randomType())
                 .preplace(r, c)
-
+    
+    
+    console.log(typeExtant("red"))
+    Crafty("redbubble").each( ()->this.destroy())
+    console.log("red bubbles "  + Crafty("redbubble").length)
 
 
 
 setup = ()->
     Crafty.background('url("assets/cloudy_sky.png")')
     console.log('start')
-    Crafty.e("2D, DOM, Color, Floor, Solid, Platform, Collision")
-        .attr({x: 32, y:420, h:64, w: 640})
+    Crafty.e("2D, DOM, Color, Solid")
+        .attr({x: 32, y:420, h:32, w: 320})
         .color("maroon")
         .css("border", "2px solid grey")
 
-    newUnmaker()
+    Crafty.e("2D, DOM, Color, Solid")
+        .attr({x: 32, y:-16, h:32, w: 320})
+        .color("maroon")
+        .css("border", "2px solid grey")
+
+    Crafty.e("2D, DOM, Color, Solid")
+        .attr({x: 32, y:0, h:420, w: 32})
+        .color("maroon")
+        .css("border", "2px solid grey")
+
+    Crafty.e("2D, DOM, Color, Solid")
+        .attr({x: 320, y:0, h:420, w: 32})
+        .color("maroon")
+        .css("border", "2px solid grey")
+
+    Crafty.e("2D, DOM, Color, Solid")
+        .attr({x: 132, y:200, h:32, w: 64})
+        .color("maroon")
+        .css("border", "2px solid grey")
+
+    
     fillBlocks();
- 
+    newUnmaker()
 
     Crafty.bind("EnterFrame", checkUnmaker)
 
@@ -402,7 +454,7 @@ window.onload = ()->
     Crafty.extraZoom = 1;
     Crafty.init(WIDTH, HEIGHT)
     Crafty.DrawManager.debugDirty = false
-    #Crafty.timer.setMode("time")
+    Crafty.timer.steptype("semifixed")
 
     window.addEventListener("click", clickControl)
     #Crafty.viewport.clampToEntities = false
