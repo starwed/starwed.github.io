@@ -228,7 +228,7 @@
         h: 32,
         w: 32
       }).launch(0, -5).accelerate(0, .2);
-      this.restitution = .9;
+      this.restitution = .7;
       this.origin(16, 16);
       this.bind("Jump", this._jump);
       this.bind("BackgroundClick", this.leap);
@@ -324,7 +324,7 @@
     }
     console.log('maker');
     u = Crafty.e("Unmaker").attr({
-      x: 64,
+      x: 156,
       y: 300
     }).umtype(randomUnmakerType());
     console.log("types " + u.__c.toSource());
@@ -351,9 +351,6 @@
       }
     }
     console.log(typeExtant("red"));
-    Crafty("redbubble").each(function() {
-      return this.destroy();
-    });
     return console.log("red bubbles " + Crafty("redbubble").length);
   };
 
@@ -365,31 +362,37 @@
       y: 420,
       h: 32,
       w: 320
-    }).color("maroon").css("border", "2px solid grey");
+    }).color("maroon");
     Crafty.e("2D, DOM, Color, Solid").attr({
       x: 32,
       y: -16,
       h: 32,
       w: 320
-    }).color("maroon").css("border", "2px solid grey");
+    }).color("maroon");
     Crafty.e("2D, DOM, Color, Solid").attr({
       x: 32,
       y: 0,
       h: 420,
       w: 32
-    }).color("maroon").css("border", "2px solid grey");
+    }).color("maroon");
     Crafty.e("2D, DOM, Color, Solid").attr({
       x: 320,
       y: 0,
       h: 420,
       w: 32
-    }).color("maroon").css("border", "2px solid grey");
+    }).color("maroon");
     Crafty.e("2D, DOM, Color, Solid").attr({
-      x: 132,
+      x: 64,
       y: 200,
-      h: 32,
-      w: 64
-    }).color("maroon").css("border", "2px solid grey");
+      h: 16,
+      w: 32
+    }).color("maroon");
+    Crafty.e("2D, DOM, Color, Solid").attr({
+      x: 320 - 32,
+      y: 200,
+      h: 16,
+      w: 32
+    }).color("maroon");
     fillBlocks();
     newUnmaker();
     Crafty.bind("EnterFrame", checkUnmaker);
