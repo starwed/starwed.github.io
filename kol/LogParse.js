@@ -22,7 +22,8 @@
     banishElement: 1,
     banishType: 1,
     losses: 0,
-    tasks: 5
+    tasks: 5,
+    villageKills: 0
   };
 
   /*
@@ -61,7 +62,8 @@
       banishType: 0,
       losses: 0,
       bossKills: 0,
-      tasks: 0
+      tasks: 0,
+      villageKills: 0
     };
   };
 
@@ -505,6 +507,9 @@
       quickReport.monstersKilled[typeKill] += parseFloat(number);
       quickReport.totalKills += parseFloat(number);
       accounts[pName].kills += parseFloat(number);
+      if (typeKill === "zombie" || typeKill === "ghost") {
+        accounts[pName].villageKills += parseFloat(number);
+      }
       return;
     }
     for (task in worthyTasks) {
@@ -539,7 +544,10 @@
     var AddRow, SetRow, account, cumArray, cumData, data, distroArea, lootHtml, name, pointsOut, row, runData, score, table, tally, wishlink, _i, _j, _len, _len1;
     data = new google.visualization.DataTable();
     data.addColumn('string', 'name');
-    data.addColumn('string', 'kills');
+    data.addColumn('number', 'kills');
+    data.addColumn('number', 'village');
+    data.addColumn('number', 'not-village');
+    data.addColumn('number', 'ratio');
     data.addColumn('string', 'bosses');
     data.addColumn('string', 'keys');
     data.addColumn('string', 'banish');
@@ -563,7 +571,7 @@
     };
     AddRow = function(t, a) {
       data.addRows(1);
-      return SetRow([a.toString(), t['kills'].toString(), t['bossKills'].toString(), t['keys'].toString(), (t.banishElement + t.banishType).toString(), t.tasks.toString(), parseFloat(Points[a])]);
+      return SetRow([a.toString(), t['kills'], t['villageKills'], t.villageKills / t.kills, t['bossKills'].toString(), t['keys'].toString(), (t.banishElement + t.banishType).toString(), t.tasks.toString(), parseFloat(Points[a])]);
     };
     for (account in accounts) {
       tally = accounts[account];

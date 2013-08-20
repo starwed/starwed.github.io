@@ -14,63 +14,22 @@
         
         <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
         <link rel="stylesheet" href="css/main.css">
-        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Tangerine">
-        <link href='http://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:400,100,300' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Josefin+Slab' rel='stylesheet' type='text/css'>
-        <link href='http://fonts.googleapis.com/css?family=Quattrocento' rel='stylesheet' type='text/css'>
-
         <style>
-            div.sidelink {
-                font-size: 24px;
-
-
-            }
-
-
-            .sidelinks a {
-                color: black;
-            }
             body {
-                padding-top: 90px;
+                padding-top: 60px;
                 padding-bottom: 40px;
-                font-family: 'Josefin Sans', sans-serif;
-                font-weight: 400;
-                background-color: rgb(251, 251, 251) ! important;
-
             }
 
-
-
-            .about-me {
-                font-size: 16px;
-                font-weight: 300;
-                line-height: 200%;
-                letter-spacing: 0px;
-                text-align: justify;
-                font-family: 'Quattrocento', serif;
-
-
-            }
-            .about-me p{
-                padding-top: 12px;
-            }
-
-             h2 {
-                font-family: 'Josefin Sans', serif;
-                font-size: 48px;
-                font-weight: 300;
-                margin-top: 0px;
-                letter-spacing: 1px;
-              }
             body { 
-             background: white;
+             background: url('img/gplaypattern.png');
             }
 
-         
+            .container div.sw-white {
+                background-color:rgba(180,200,200,0.5);
+            }
 
             .well {
-                background-color:rgba(250,251,250,1);
+                background-color:rgba(250,250,250,1);
             }
 
             #bounds {
@@ -98,16 +57,6 @@
                 text-shadow: white 1px 1px;
                 
                 width: 80%;
-            }
-
-            #phys{
-                color: black;
-                font-weight: normal;
-            }
-
-            #teach{
-                color: black;
-                font-weight: normal;
             }
 
             .image-container {
@@ -153,7 +102,7 @@
 
         <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
 
-        <div class="navbar navbar-inverse navbar-fixed-bottom">
+        <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -162,7 +111,26 @@
                         <span class="icon-bar"></span>
                     </a>
                     <a class="brand" href="#">Ludonomicon</a>
-                    
+                    <!--div class="nav-collapse collapse">
+                        <ul class="nav">
+                            <li class="active"><a href="#">Home</a></li>
+                            <li><a href="#about">About</a></li>
+                            <li><a href="#contact">Contact</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Action</a></li>
+                                    <li><a href="#">Another action</a></li>
+                                    <li><a href="#">Something else here</a></li>
+                                    <li class="divider"></li>
+                                    <li class="nav-header">Nav header</li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                    </div--><!--/.nav-collapse -->
                 </div>
             </div>
         </div>
@@ -170,57 +138,65 @@
         <div class="container">
 
           
-
+            <!-- Example row of columns -->
             <div class="row">
-                <div class="span1"></div>
-                <div class="span5 sw-white">
-                    <h2>Timothy J. S. Martin</h2>
-                    <hr/>
+                <div class="span8 sw-white">
+                    <h2>Heading</h2>
 
 
-                    <div class="about-me"><p >
-                        I'm a <span id='phys'>physicist</span> & <span id='teach'>teacher</span> living in Lexington, KY.   I have a doctorate in physics from the University of Kentucky, and have experience teaching both physics and astronomy classes.
-                    </p>
-                    <p>  I kind of love Javascript, and am currently involved with the development of the HTML5 game framework <span>CraftyJS</span>.  Those links to the right have more info about various & sundry projects I've worked on. 
-                    </p>
+                    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                    
+                </div>
+
+                <div class="span2"><div class="row">
+                    
+                    <a href="Bounds/bounds.html"><div class="span2 well well-small" id="bounds">
+                    <h3>Bounds</h3>
+                    <p>A game about jumping</p>
+                    </div></a>
+
+                    <a href="kol/"><div  class="span2" id="kol">
+                    <h3>KoL</h3>
+                    <p>Tools for the Kingdom of Loathing</p>
+                    </div></a>
+                    
+
+                    <div class="span2 ">
+                    <h3>Blog</h3>
+                    <p>Rambling, etc.</p>
                     </div>
+
+                    <div class="span2 ">
+                        <div class="image-container">
+                            <img src="img/bounds.png"/>
+                            <span class="overlay-text">
+                                <h3>Bounds</h3>
+                                <p>A game about jumping</p>
+                            </span>
+                        </div>
+                    </div>
+
+
+                    <a href="kol/"><div  class="span2 " >
                     
-                </div>
-                <div class="span1"> </div>
-                <div class="span2 sidelinks">
-                    
-                    <a href="Bounds/bounds.html"><div class="span2 sidelink" >
-                    Bounds
-                    <hr>
+                        <div class="image-container">
+                            <img src="img/rightswordguy.gif"/>
+                            <span class="overlay-text">
+                                <h3>KoL</h3>
+                                <p>Tools for the Kingdom of Loathing</p>
+                            </span>
+                        </div>
                     </div></a>
 
-                     <a href="Bounds/bounds.html"><div class="span2 sidelink" >
-                    Academic CV<hr>
-                    </div></a>
 
-                    <a href="Bounds/bounds.html"><div class="span2 sidelink" >
-                    Publications<hr>
-                    </div></a>                    
-
-
-                    <a href="kol/"><div  class="span2 sidelink">
-                    KoL
-                    <hr>
-                    </div></a>
-
-                    <a href="kol/"><div  class="span2 sidelink">
-                    Crafty
-                    
-                    </div></a>
-                    
-
-
-
-                </div>
+                </div></div>
             </div>
 
+            <hr>
 
-     
+            <footer>
+                <p> Ludonomicon.com</p>
+            </footer>
 
         </div> <!-- /container -->
 
@@ -232,4 +208,3 @@
         <script src="js/main.js"></script>
     </body>
 </html>
-    

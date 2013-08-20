@@ -14,7 +14,8 @@ PointValue = {
 	banishElement: 1,
 	banishType: 1,
 	losses: 0,
-	tasks: 5
+	tasks: 5,
+	villageKills: 0
 }
 
 ###
@@ -47,7 +48,8 @@ NewTally = () -> {
 			banishType: 0,
 			losses: 0,
 			bossKills: 0,
-			tasks: 0
+			tasks: 0,
+			villageKills: 0
 		}
 
 
@@ -496,6 +498,8 @@ Process = (line) ->
 		quickReport.monstersKilled[typeKill]+= parseFloat(number)	
 		quickReport.totalKills += parseFloat(number)	
 		accounts[pName].kills+= parseFloat(number)
+		if typeKill is "zombie" or typeKill is "ghost"
+			accounts[pName].villageKills+= parseFloat(number)
 		return
 
 	
@@ -531,7 +535,10 @@ ChartResult = (accounts, total) ->
 
 
 	data.addColumn('string', 'name')
-	data.addColumn('string', 'kills')
+	data.addColumn('number', 'kills')
+	data.addColumn('number', 'village')
+	data.addColumn('number', 'not-village')
+	data.addColumn('number', 'vk/kills')
 	data.addColumn('string', 'bosses')
 	data.addColumn('string', 'keys')
 	data.addColumn('string', 'banish')
@@ -560,7 +567,9 @@ ChartResult = (accounts, total) ->
 		data.addRows 1
 		SetRow( [
 				a.toString() 
-				t['kills'].toString()
+				t['kills']
+				t['villageKills']
+				t.villageKills/t.kills
 				t['bossKills'].toString()
 				t['keys'].toString()
 				(t.banishElement + t.banishType).toString()
