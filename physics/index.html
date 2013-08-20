@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        
+        <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Tangerine">
+        <link href='http://fonts.googleapis.com/css?family=Special+Elite' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Josefin+Sans:400,100,300' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Josefin+Slab' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Quattrocento' rel='stylesheet' type='text/css'>
+
+        <style>
+            div.sidelink {
+                font-size: 24px;
+
+
+            }
+
+
+            .sidelinks a {
+                color: black;
+            }
+            body {
+                padding-top: 90px;
+                padding-bottom: 40px;
+                font-family: 'Josefin Sans', sans-serif;
+                font-weight: 400;
+                background-color: rgb(251, 251, 251) ! important;
+
+            }
+
+
+
+            .about-me {
+                font-size: 16px;
+                font-weight: 300;
+                line-height: 200%;
+                letter-spacing: 0px;
+                text-align: justify;
+                font-family: 'Quattrocento', serif;
+
+
+            }
+            .about-me p{
+                padding-top: 12px;
+            }
+
+             h2 {
+                font-family: 'Josefin Sans', serif;
+                font-size: 48px;
+                font-weight: 300;
+                margin-top: 0px;
+                letter-spacing: 1px;
+                color: skyblue;
+              }
+            body { 
+             background: white;
+            }
+
+         
+
+            .well {
+                background-color:rgba(250,251,250,1);
+            }
+
+            #bounds {
+                background: url('img/bounds.png');
+                background-size: cover;
+                color: rgb(200, 250, 250)
+            }
+
+            #bounds p{
+                color: white;
+                text-shadow: black 1px 1px;
+
+            }
+
+            #kol {
+                
+                background: url('img/rightswordguy.gif');
+                background-size: cover;
+
+                
+            }
+
+             #kol p{
+                color: black;
+                text-shadow: white 1px 1px;
+                
+                width: 80%;
+            }
+
+            #phys{
+                color: black;
+                font-weight: normal;
+            }
+
+            #teach{
+                color: black;
+                font-weight: normal;
+            }
+
+            .image-container {
+                    position: relative ! important;
+                    margin: 0 auto;
+                    display: table;
+            }
+
+            .overlay-text {
+                    padding-left: 2%;
+                    position:absolute;
+                    bottom:0px;
+                    right:0px;
+                    width: 98%;
+                    height:100%;
+                    background-color: rgba(255, 200, 200, 0.3);
+                    color: black;
+                    display: none;
+            }
+
+            .image-container:hover .overlay-text{
+                display: block;
+            }
+
+
+
+            .image-container img{
+                    height: 100%;
+                    width: 100%;
+                
+            }
+            
+        </style>
+
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+    </head>
+    <body>
+
+        <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
+
+        <div class="navbar navbar-inverse navbar-fixed-bottom">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </a>
+                    <a class="brand" href="#">Ludonomicon</a>
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="span1"></div>
+                <div class="span5 sw-white">
+
+                    <h2>Timothy J. S. Martin</h2>
+                    <hr/>
+
+
+                    <div class="about-me">
+                        <p >
+                            I'm a <span id='phys'>physicist</span> & <span id='teach'>teacher</span> living in Lexington, KY.   I have a doctorate in physics from the University of Kentucky, and have experience teaching both physics and astronomy classes.
+                        </p>
+                        <p>  
+                            I kind of love Javascript, and am currently involved with the development of the HTML5 game framework <span>CraftyJS</span>.  Those links to the right have more info about various & sundry projects I've worked on. 
+                        </p>
+                    </div>
+                    
+                </div>
+                <div class="span1"> </div>
+                <div class="span2 sidelinks">
+                    
+                    
+
+                     <a href="physics/Tim-CV.pdf"><div class="span2 sidelink" >
+                        Academic CV
+                        <hr>
+                    </div></a>
+
+                    <a href="physics/publications.html"><div class="span2 sidelink" >
+                        Publications
+                        <hr>
+                    </div></a>                    
+
+                    <a href="bounds/bounds.html"><div class="span2 sidelink" >
+                        Bounds
+                        <hr>
+                    </div></a>
+                    
+
+                    <a href="https://github.com/craftyjs/Crafty"><div  class="span2 sidelink">
+                        CraftyJS
+                        <hr>
+                    </div></a>
+
+                    <a href="blog/"><div  class="span2 sidelink">
+                        Blog
+                        <hr>
+                    </div></a>
+
+                    <a href="kol/"><div  class="span2 sidelink">
+                        KoL
+                    </div></a>
+                    
+
+
+
+                </div>
+            </div>
+
+
+     
+
+        </div> <!-- /container -->
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+
+        <script src="js/vendor/bootstrap.min.js"></script>
+
+        <script src="js/main.js"></script>
+    </body>
+</html>
+    
