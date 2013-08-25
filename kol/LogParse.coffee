@@ -607,6 +607,7 @@ ChartResult = (accounts, total) ->
 		pointsOut+="#{account}\t#{cumPoints[account]}\n"
 	table = new google.visualization.Table(document.getElementById('point_div'))
 	table.draw(cumData, {showRowNumber:false, sortColumn:1, sortAscending:false} )
+	pointsOut = "[code]\n"+pointsOut + "[/code]"
 	document.getElementById('points-out').value = pointsOut
 	#Create an ordered list by points
 

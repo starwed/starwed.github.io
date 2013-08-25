@@ -601,6 +601,7 @@
       sortColumn: 1,
       sortAscending: false
     });
+    pointsOut = "[code]\n" + pointsOut + "[/code]";
     document.getElementById('points-out').value = pointsOut;
     row = 0;
     RunPlayers.sort(function(a, b) {
