@@ -11,8 +11,8 @@ PointValue = {
 	kills: 1,
 	bossKills: 1,
 	keys: 1,
-	banishElement: 1,
-	banishType: 1,
+	banishElement: 10,
+	banishType: 10,
 	losses: 0,
 	tasks: 5
 }
@@ -31,6 +31,18 @@ Blacklist of multis who don't get loot
 ###
 
 Blacklist = [1873125, 1873222, 1873176, 2051971, 1873602, 1873203, 1873601]
+
+
+Wishlist = {
+
+
+
+
+}
+
+
+
+
 
 checkBlacklist = (account)->
 	for num in Blacklist
