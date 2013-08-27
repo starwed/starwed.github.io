@@ -607,7 +607,7 @@
     RunPlayers.sort(function(a, b) {
       return thisRunPoints[b] - thisRunPoints[a];
     });
-    wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752";
+    wishlink = "https://docs.google.com/spreadsheet/ccc?key=0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc#gid=0";
     lootHtml = "<table id='lootTable'>";
     for (_j = 0, _len1 = RunPlayers.length; _j < _len1; _j++) {
       name = RunPlayers[_j];
