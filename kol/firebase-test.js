@@ -44,7 +44,7 @@
     li = $("<li id='" + dropID + "'></li>").append("<b>" + drop.name + "</b>&nbsp;&nbsp; ");
     dropdown = $("<select>  </select>");
     for (i = _i = 0, _ref = drop.max; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
-      if (i === has) {
+      if (i === parseFloat(has)) {
         dropdown.append("<option selected='selected'>" + i + "</option>");
       } else {
         dropdown.append("<option>" + i + "</option>");

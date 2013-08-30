@@ -45,7 +45,7 @@ makeListElement = (drop, dropID, has)->
 		.append("<b>" + drop.name + "</b>&nbsp;&nbsp; ")
 	dropdown = $("""<select>  </select>""")
 	for i in [0..drop.max]
-		if i == has
+		if i == parseFloat(has)
 			dropdown.append("<option selected='selected'>#{i}</option>")
 		else
 			dropdown.append("<option>#{i}</option>")
