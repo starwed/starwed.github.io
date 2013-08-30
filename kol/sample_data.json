@@ -1,0 +1,21 @@
+{
+	"dread":
+		{
+			
+				"wishlists":{
+					"1345":{"player":"starwed",
+							"wants": {
+								"ghost_outfit":{"has":2, "priority":8},
+								"sash":{"has":0, "priority":3}}
+					},
+					"1346":{"player":"LotsOfPhil",
+							"wants": {
+								"ghost_outfit": {"has":1, "priority":-8},
+								"sash": {"has":0, "priority":3}
+							}
+					}
+
+				}
+			
+		}
+}

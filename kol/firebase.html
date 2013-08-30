@@ -1,0 +1,47 @@
+
+
+
+
+<html>
+  <head>
+		<script src='https://cdn.firebase.com/v0/firebase.js'></script>
+		<script src="firebase-test.js"> </script>
+		<link href="css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+
+		<script src="jquery-1.9.1.js"></script>
+		<script src="jquery-ui-1.10.3.custom.js"></script>
+
+		 <style>
+			.sortlist { list-style-type: none; margin: 0; padding: 0; width: 30%; min-height: 10em;}
+			.sortlist li {
+				 margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; 
+				 background-color: #F9F9F9; border: 1px dotted grey;
+			 }
+			.sortlist li span { position: absolute; margin-left: -1.3em; }
+		</style>
+		 <script>
+			$(function() {
+			$( "#sortable" ).sortable({connectWith:"#sortable2"});
+			$( "#sortable2" ).sortable({connectWith:"#sortable"});
+			Run()
+			});
+			</script>
+  </head>
+  <body>
+  		<div class="ui-widget">
+		<label for="tags">Player: </label>
+		<input id="tags" />
+		</div>
+  		<h6>Wanted</h6>
+  		<ul id="sortable" class="sortlist">
+			
+		</ul>
+		<h6>Unwanted</h6>
+		<ul id="sortable2" class="sortlist" >
+			
+			
+		</ul>
+
+		<button onclick="saveList()">Save List</button>
+  </body>
+</html>
