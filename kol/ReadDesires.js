@@ -45,7 +45,7 @@
         }
         text = text.trim().toLowerCase();
         if (text.indexOf("p") >= 0) {
-          pmatch = /p[\s-]+(\d+)/;
+          pmatch = /p[\s-]*(\d+)/;
           pnumber = pmatch.exec(text);
           if ((pnumber != null ? pnumber[1] : void 0) != null) {
             pnumber = pnumber[1];

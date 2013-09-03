@@ -33,7 +33,7 @@ createRowData = (tableData)->
 			text = text.trim().toLowerCase()
 			## Find priority
 			if text.indexOf("p") >=0  
-				pmatch = /p[\s-]+(\d+)/
+				pmatch = /p[\s-]*(\d+)/
 				pnumber = pmatch.exec(text)
 				if pnumber?[1]?
 					pnumber=pnumber[1]

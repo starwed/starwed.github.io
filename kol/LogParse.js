@@ -643,7 +643,7 @@
         break;
       }
     }
-    lootHtml += "</table><br/><a target='_blank' href='" + wishlink + "'>Wishlists</a>";
+    lootHtml += "</table><br/><a target='_blank' href='" + wishlink + "'>Wishlists</a><br/><small>Parsed wishlist will load at the bottom of the page</small>";
     distroArea = document.getElementById('distro');
     distroArea.insertAdjacentHTML("beforeend", lootHtml);
     $("#distro-blurb").text("(Loading wish list spreadsheet...)");
