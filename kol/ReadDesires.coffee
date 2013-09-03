@@ -1,3 +1,8 @@
+
+logit = (text) ->
+	if (typeof console == "object")
+		console.log(text)
+
 parseCells = (d)->
 	Table = []
 	add = (r, c, val)->
@@ -9,10 +14,8 @@ parseCells = (d)->
 		cell = entry.gs$cell;
 		#console.log(cell.$t)
 		add(cell.row, cell.col, cell.$t)
-	test = []
-	for row in Table
-		if row?
-			console.log(row)
+
+
 	
 	return Table;
 
@@ -110,7 +113,7 @@ createTable = (tableData, columns, distroList, lootList)->
 					data = wishes[item]
 					text = data.has
 				catch e
-					console.log("item: #{item}, account: #{name}")
+					logit("item: #{item}, account: #{name}")
 				if data.priority <0
 					if data.has >= dropList[item].max
 						cl = "has"
@@ -158,7 +161,7 @@ createTable = (tableData, columns, distroList, lootList)->
 	
 window.MakeDistroTable = (bossKills, distroList, Loot, callback)->
 	lootList = processLoot(Loot)
-	console.log(lootList)
+	
 	window.getWishes(distroList, bossKills, lootList, callback)
 
 
@@ -179,7 +182,7 @@ processLoot = (Loot) ->
 
 
 window.getWishes = (distroList, bossKills, lootList, callback)->
-	console.log("yo")
+	
 	columns = [0]
 	#bossKills = {forest:"bugbear", village:"ghost", castle:"vampire"}
 	if bossKills.forest is "wolf"
@@ -197,7 +200,6 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 	columns.push(25)
 
 	doitall = (d)->
-		console.log('hey')
 		table = parseCells(d)
 		rowList = createTable(table, columns, distroList, lootList)
 		getList = {}
@@ -205,7 +207,6 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 			getList[row.name] = row.gets
 		callback(getList)
 
-	console.log("Hey")
 	key = "0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc"
 	url = "https://spreadsheets.google.com/feeds/cells/#{key}/od6/public/values?alt=json-in-script&callback=?";
 	$.getJSON(url,{},  doitall);
