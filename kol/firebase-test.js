@@ -2,7 +2,7 @@
 (function() {
   var checkLists, createList, data, dropList, fishes, makeListElement, playerData, playerLookup, playerURL, sample_data, setAutoComplete, startUp, wishListURL;
 
-  playerURL = "https://afh.firebaseio.com/dread/wishlists/1345/wants";
+  playerURL = "";
 
   wishListURL = "https://afh.firebaseio.com/dread/wishlists/";
 
@@ -15,42 +15,127 @@
   dropList = {
     ghost_outfit: {
       name: "Ghost Outfit",
-      max: 3
+      max: 3,
+      image: "http://images.kingdomofloathing.com/otherimages/sigils/dvotat5.gif"
     },
     sash: {
       name: "Mayor Ghost's Sash",
-      max: 1
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_sash.gif"
     },
     gavel: {
       name: "Mayor Ghost's Gavel",
-      max: 1
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_gavel.gif"
     },
     scissors: {
       name: "Mayor Ghost's Scissors",
-      max: 1
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_scissors.gif"
     },
     zombie_outfit: {
       name: "Zombie HOA Outfit",
-      max: 3
+      max: 3,
+      image: "http://images.kingdomofloathing.com/otherimages/sigils/dvotat4.gif"
     },
     eyes: {
       name: "HOA zombie eyes",
-      max: 1
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/zh_eyes.gif"
+    },
+    ghost_outfit1: {
+      name: "Ghost Outfit",
+      max: 3,
+      image: "http://images.kingdomofloathing.com/otherimages/sigils/dvotat5.gif"
+    },
+    sash1: {
+      name: "Mayor Ghost's Sash",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_sash.gif"
+    },
+    gavel1: {
+      name: "Mayor Ghost's Gavel",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_gavel.gif"
+    },
+    scissors11: {
+      name: "Mayor Ghost's Scissors",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_scissors.gif"
+    },
+    zombie_outfit1: {
+      name: "Zombie HOA Outfit",
+      max: 3,
+      image: "http://images.kingdomofloathing.com/otherimages/sigils/dvotat4.gif"
+    },
+    eyes1: {
+      name: "HOA zombie eyes",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/zh_eyes.gif"
+    },
+    ghost_outfit22: {
+      name: "Ghost Outfit",
+      max: 3,
+      image: "http://images.kingdomofloathing.com/otherimages/sigils/dvotat5.gif"
+    },
+    sash2: {
+      name: "Mayor Ghost's Sash",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_sash.gif"
+    },
+    gavel2: {
+      name: "Mayor Ghost's Gavel",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_gavel.gif"
+    },
+    scissors2: {
+      name: "Mayor Ghost's Scissors",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/mg_scissors.gif"
+    },
+    zombie_outfit2: {
+      name: "Zombie HOA Outfit",
+      max: 3,
+      image: "http://images.kingdomofloathing.com/otherimages/sigils/dvotat4.gif"
+    },
+    eyes2: {
+      name: "HOA zombie eyes",
+      max: 1,
+      image: "http://images.kingdomofloathing.com/itemimages/zh_eyes.gif"
     }
   };
 
   makeListElement = function(drop, dropID, has) {
-    var dropdown, i, li, _i, _ref;
-    li = $("<li id='" + dropID + "'></li>").append("<b>" + drop.name + "</b>&nbsp;&nbsp; ");
+    var dropdown, i, li, max, onChange, span, _i;
+    li = $("<li id='" + dropID + "'></li>").append(("<span class='name'> <img height='24' width='24' src='" + drop.image + "'/> &nbsp;") + drop.name + "</span>");
     dropdown = $("<select>  </select>");
-    for (i = _i = 0, _ref = drop.max; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
+    max = drop.max;
+    for (i = _i = 0; 0 <= max ? _i <= max : _i >= max; i = 0 <= max ? ++_i : --_i) {
       if (i === parseFloat(has)) {
         dropdown.append("<option selected='selected'>" + i + "</option>");
       } else {
         dropdown.append("<option>" + i + "</option>");
       }
     }
-    li.append(dropdown);
+    span = $("<span/>").addClass("selection").append(dropdown);
+    li.append(span);
+    onChange = function() {
+      var isComplete, markedComplete;
+      console.log("changed!!!");
+      isComplete = $(this).val() >= max;
+      markedComplete = this.parentElement.parentElement.parentElement.id === "complete";
+      if (isComplete && !markedComplete) {
+        console.log("moving to complete");
+        return $("#complete").append(this.parentElement.parentElement);
+      } else if ((!isComplete) && markedComplete) {
+        $("#wanted").append(this.parentElement.parentElement);
+        return console.log("moving to wanted");
+      }
+    };
+    dropdown.bind("change", onChange);
+    if (parseFloat(has) >= parseFloat(drop.max)) {
+      li.addClass("complete");
+    }
     return li;
   };
 
@@ -93,8 +178,10 @@
 
   createList = function(snapshot) {
     var all, drop, has, item, li, priority, _i, _len, _results;
-    $("#sortable").empty();
-    $("#sortable2").empty();
+    $("#wanted").empty();
+    $("#unwanted").empty();
+    $("#complete").empty();
+    document.getElementById("content").hidden = false;
     for (drop in playerData) {
       console.log("fishes: " + drop);
     }
@@ -107,11 +194,11 @@
         has = 0;
         priority = Infinity;
       }
-      console.log(dropList[drop]);
       li = makeListElement(dropList[drop], drop, has);
       all.push({
         el: li,
-        priority: priority
+        priority: priority,
+        complete: has >= dropList[drop].max
       });
     }
     all.sort(function(a, b) {
@@ -120,10 +207,12 @@
     _results = [];
     for (_i = 0, _len = all.length; _i < _len; _i++) {
       item = all[_i];
-      if (item.priority < 0) {
-        _results.push($("#sortable2").append(item.el));
+      if (item.complete) {
+        _results.push($("#complete").append(item.el));
+      } else if (item.priority < 0) {
+        _results.push($("#unwanted").append(item.el));
       } else {
-        _results.push($("#sortable").append(item.el));
+        _results.push($("#wanted").append(item.el));
       }
     }
     return _results;
@@ -151,7 +240,7 @@
     }
   };
 
-  /* sortable design
+  /* wanted design
   	CreateList: creates an array of element ids from a list  <-- this is all I need!
   
   	CreateWishlist:
@@ -165,8 +254,9 @@
 
 
   window.saveList = function() {
-    var err, has, id, newWishList, playerWishes, priority, spurned_items, wanted_items, _i, _j, _len, _len1;
-    wanted_items = $("#sortable").sortable("toArray");
+    var complete_items, err, has, id, newWishList, playerWishes, priority, spurned_items, wanted_items, _i, _j, _k, _len, _len1, _len2;
+    $("#save_feedback").text("");
+    wanted_items = $("#wanted").sortable("toArray");
     priority = 1;
     newWishList = {};
     for (_i = 0, _len = wanted_items.length; _i < _len; _i++) {
@@ -178,7 +268,7 @@
       };
       priority++;
     }
-    spurned_items = $("#sortable2").sortable("toArray");
+    spurned_items = $("#unwanted").sortable("toArray");
     priority = -100;
     for (_j = 0, _len1 = spurned_items.length; _j < _len1; _j++) {
       id = spurned_items[_j];
@@ -189,11 +279,24 @@
       };
       priority++;
     }
+    complete_items = $("#complete").sortable("toArray");
+    priority = 10000;
+    for (_k = 0, _len2 = complete_items.length; _k < _len2; _k++) {
+      id = complete_items[_k];
+      has = $("#" + id).find("select").val();
+      newWishList[id] = {
+        has: has,
+        priority: priority
+      };
+      priority++;
+    }
     err = function(e) {
       if (e != null) {
-        return console.log('Data could not be saved.' + error);
+        console.log('Data could not be saved.' + error);
+        return $("#save_feedback").text("ERROR!  Wishlist not saved!");
       } else {
-        return console.log("data saved");
+        console.log("data saved");
+        return $("#save_feedback").text("Wishlist saved");
       }
     };
     playerWishes = new Firebase(playerURL);

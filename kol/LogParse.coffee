@@ -174,6 +174,14 @@ quickReport= {
 
 }
 
+
+bossKills = {
+	forest: null,
+	village: null,
+	castle: null
+
+
+}
 monsterAlias = {
 	zombies:"zombie", ghosts:"ghost", skeletons:"skeleton", vampires:"vampire", bugbears:"bugbear", werewolves: "werewolf"
 }
@@ -213,8 +221,10 @@ instanceSummary = ()->
 	banishedLine("werewolves")
 	if mk["the great wolf of the air"]
 		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Great Wolf slain</b>"
+		bossKills.forest = "wolf"
 	if mk["falls-from-sky"]
 		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Falls-From-Sky slain</b>"
+		bossKills.forest = "bugbear"
 
 	html += "</td><td>"
 	elementsLine(quickReport.villageElements, "Village");
@@ -222,8 +232,10 @@ instanceSummary = ()->
 	banishedLine("zombies")
 	if mk["mayor ghost"]
 		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Mayor Ghost slain</b>"
+		bossKills.village = "ghost"
 	if mk["the zombie homeowners' association"]
 		html+="<br/>&nbsp;&nbsp;&nbsp;<b>ZHO slain</b>"
+		bossKills.village = "zombie"
 
 
 	html += "</td><td>"
@@ -232,8 +244,10 @@ instanceSummary = ()->
 	banishedLine("vampires")
 	if mk["count drunkula"]
 		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Count slain</b>"
+		bossKills.village = "vampire"
 	if mk["the unkillable skeleton"]
 		html+="<br/>&nbsp;&nbsp;&nbsp;<b>Skelly slain</b>"
+		bossKills.village = "skeleton"
 
 
 	html += "</td><tr></table>"
@@ -325,6 +339,7 @@ accounts = new Object()
 
 Points = new Object()
 
+Loot = ""
 window.Run = () ->
 	#pointOverride = document.getElementById('points').value
 	#if(pointOverride.length>1)
@@ -333,15 +348,21 @@ window.Run = () ->
 	RunPlayers= new Array()
 	AllPlayers = new Array()
 
+
 	accounts = new Object()
 	Points = new Object()
 	text =document.getElementById('in').value
 	text = text.replace("(unknown action: v_cold)", " made the village less cold")
+
+	Loot = document.getElementById('dropped_loot').value
+
 	textArray = text.split('\n')
 	for line in textArray
 		Process(line)
 	#logit(accounts)
 	instanceSummary()
+
+
 
 
 	
@@ -591,8 +612,7 @@ ChartResult = (accounts, total) ->
 
 
 	pointsOut = ""
-	#Points['Total']=0	
-	#AddRow(total, 'Total')
+
 	row=0
 	cumArray = []
 	for account, score of cumPoints		
@@ -603,8 +623,12 @@ ChartResult = (accounts, total) ->
 		row++
 
 	cumArray.sort( (a,b)-> cumPoints[b]-cumPoints[a]) 
+
+	base_match = /(.+)\(/
+	distroList = []
 	for account in cumArray
 		pointsOut+="#{account}\t#{cumPoints[account]}\n"
+		
 	table = new google.visualization.Table(document.getElementById('point_div'))
 	table.draw(cumData, {showRowNumber:false, sortColumn:1, sortAscending:false} )
 	pointsOut = "[code]\n"+pointsOut + "[/code]"
@@ -615,14 +639,22 @@ ChartResult = (accounts, total) ->
 	row = 0
 	RunPlayers.sort( (a, b)-> thisRunPoints[b] - thisRunPoints[a])
 	#wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752"
+	
 	wishlink = "https://docs.google.com/spreadsheet/ccc?key=0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc#gid=0"
 	lootHtml = "<table id='lootTable'>"
 	for name in RunPlayers
 
 		account = name
 		score = thisRunPoints[account]
-		lootHtml+= """<tr><td onclick='toggleDistro(this, "#{name}")'><b>#{name}</b></td><td>#{score}</td></tr>"""
+		
+		base_name = base_match.exec(account)
+		if base_name?[1]?
+			base_name = base_name[1].trim().toLowerCase().replace(/\s/g, "_")
+			distroList.push(base_name)
+		else
+			base_name = "0"
 
+		lootHtml+= """<tr><td onclick='toggleDistro(this, "#{name}")'><b>#{name}</b></td><td>#{score}</td><td class='loot-suggestion' id='loot-#{base_name}'></td></tr>"""
 		
 			
 		row++
@@ -631,12 +663,36 @@ ChartResult = (accounts, total) ->
 	lootHtml+= "</table><br/><a target='_blank' href='#{wishlink}'>Wishlists</a>"
 	distroArea = document.getElementById('distro')
 	distroArea.insertAdjacentHTML("beforeend", lootHtml);
+	$("#distro-blurb").text("(Loading wish list spreadsheet...)")
+	window.MakeDistroTable(bossKills, distroList, Loot, (list)->MakeLootTable(RunPlayers, list))
 
 	return
 
 
 
 
+MakeLootTable = (RunPlayers, getList)->
+
+	lootHtml = "<table id='lootTable'>"
+	wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752"
+	base_match = /(.+)\(/
+	row = 0
+	for name in RunPlayers
+
+		account = name
+		
+		base_name = base_match.exec(account)
+		if base_name[1]?
+			base_name = base_name[1].trim().toLowerCase().replace(/\s/g, "_")
+			gets = getList[base_name]
+		else
+			gets = "???"
+		$("#loot-#{base_name}").text(gets)		
+			
+		row++
+		break if row>20
+	$("#distro-blurb").text("(Items are suggestions only)")
 	
+
 
 	

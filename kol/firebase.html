@@ -5,24 +5,46 @@
 <html>
   <head>
 		<script src='https://cdn.firebase.com/v0/firebase.js'></script>
-		<script src="firebase-test.js"> </script>
+		<script src="wish-manager.js"> </script>
 		<link href="css/ui-lightness/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
 
 		<script src="jquery-1.9.1.js"></script>
 		<script src="jquery-ui-1.10.3.custom.js"></script>
 
 		 <style>
-			.sortlist { list-style-type: none; margin: 0; padding: 0; width: 30%; min-height: 10em;}
+		 	body{font-family: sans-serif; margin: 2em;}
+			.sortlist { list-style-type: none; margin: 0; padding: 0; width: 90%; min-height: 30em;}
 			.sortlist li {
-				 margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 18px; 
-				 background-color: #F9F9F9; border: 1px dotted grey;
+				 margin: 0 3px 3px 3px; padding: 0.2em; padding-left: 1.5em; font-size: 1em; height: 24px;
+				  width: 100%;
+				 position: relative; 
 			 }
-			.sortlist li span { position: absolute; margin-left: -1.3em; }
+
+			 #wanted li {border: 1px dotted blue; background-color: #F0F8FF; }
+			 #unwanted li {border: 1px dotted grey; background-color: #F9F9F9; }
+			 #complete li {border: 1px dotted green; background-color: #E0FFF0; }
+
+			.sortlist li span.name { float: left;vertical-align: middle; }
+			.sortlist li span.selection {float: right;}
+
+			img {vertical-align: middle;}
+			#complete-cell {
+				border-left: 1px solid black;
+			}
+
+			
+			table: {width:80%; }
+			td {width: 25%;}
+			#content {
+				margin-top: 1em;
+			}
+
 		</style>
 		 <script>
 			$(function() {
-			$( "#sortable" ).sortable({connectWith:"#sortable2"});
-			$( "#sortable2" ).sortable({connectWith:"#sortable"});
+			$( "#wanted" ).sortable({connectWith:"#unwanted"});
+			$( "#unwanted" ).sortable({connectWith:"#wanted"});
+			$( "#complete" ).sortable({connectWith:"#wanted"}).sortable("disable");
 			Run()
 			});
 			</script>
@@ -31,17 +53,33 @@
   		<div class="ui-widget">
 		<label for="tags">Player: </label>
 		<input id="tags" />
-		</div>
-  		<h6>Wanted</h6>
-  		<ul id="sortable" class="sortlist">
-			
-		</ul>
-		<h6>Unwanted</h6>
-		<ul id="sortable2" class="sortlist" >
-			
-			
-		</ul>
-
 		<button onclick="saveList()">Save List</button>
+		<span id="save_feedback"></span>
+		</div>
+		<div id = 'content' hidden="true"><table>
+		<tr><th>Wanted</th> <th>Unwanted</th> <th>Complete</th> </tr>
+		<tr>
+  		<td>
+	  		<ul id="wanted" class="sortlist">
+				
+			</ul>
+		</td>
+		<td>
+
+			
+			<ul id="unwanted" class="sortlist" >
+				
+				
+			</ul>
+		</td>
+		<td id="complete-cell">
+
+			<ul id="complete" class="sortlist" >
+				
+				
+			</ul>
+		</td>
+		</tr></table></div>
+
   </body>
 </html>

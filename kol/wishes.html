@@ -1,0 +1,172 @@
+
+
+
+
+<html>
+  <head>
+		<script src='https://cdn.firebase.com/v0/firebase.js'></script>
+		<script src="wish-manager.js"> </script>
+		<link href="css/smoothness/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+				<!--link type="text/css" href="jMetro/css/jquery-ui.css" rel="stylesheet" /-->	
+
+		<script src="jquery-1.9.1.js"></script>
+		<script src="jquery-ui-1.10.3.custom.js"></script>
+
+		 <style>
+		 	body{font-family: sans-serif; margin: 2em;}
+			.sortlist { 
+				list-style-type: none; margin: 0; padding: 0; width: 90%; min-height: 30em;
+			}
+			.sortlist li {
+				 margin: 0 3px 3px 3px; padding: 0.4em; padding-left: 1.5em; font-size: 1em; height: 24px;
+				  width: 100%;
+				 position: relative; 
+			 }
+
+			 #wanted li {border: 1px dotted blue; background-color: #F0F8FF; }
+			 #unwanted li {border: 1px dotted grey; background-color: #F9F9F9; }
+			 #complete li {border: 1px dotted green; background-color: #E0FFF0; }
+
+			.sortlist li span.name {
+				 float: left;
+				 vertical-align: middle;
+				 font-weight: bold
+			 }
+			.sortlist li span.selection {float: right;}
+
+			.vampire img{
+				border: 2px solid darkred;
+			}
+
+			.skeleton img{
+				border: 2px dashed blue;
+			}
+			.bugbear img{
+				border: 2px dashed  black;
+			}
+			.wolf img{
+				border: 2px dotted  brown;
+			}
+			.ghost img{
+				border: 2px dotted  grey;
+			}
+			.zombie img{
+				border: 2px solid  green;
+			}
+			.special img{
+				border: 2px solid  violet;
+			}
+
+			img {vertical-align: middle;}
+
+			#complete-cell {
+				border-left: 2px solid black;
+				padding-left: 1em;
+			}
+
+			
+			#list-table: {width:80%; }
+
+			#list-table td {
+				width: 25%;
+				vertical-align: top;
+			}
+
+			#content {
+				margin-top: 1em;
+			}
+
+			#new{
+				border: 1px solid lightgrey;
+				box-shadow: 10px 5px 5px black;
+				width: 30%;
+				padding: 1em;
+				background-color: #FBFBFB;
+				position: absolute;
+				top: 10em;
+				left: 20%;
+			}
+
+			input:invalid {
+  border: 1px solid red;
+}
+
+input:valid {
+  border: 1px solid green;
+}
+
+		</style>
+		 <script>
+			$(function() {
+			$( "#wanted" ).sortable({connectWith:"#unwanted"});
+			$( "#unwanted" ).sortable({connectWith:"#wanted"});
+			$( "#complete" ).sortable({connectWith:"#wanted"}).sortable("disable");
+			Run()
+			$("button").button()
+
+
+			});
+
+
+
+			</script>
+  </head>
+  <body>
+  		<div class="ui-widget">
+		<label for="tags">Player: </label>
+		<input id="tags" />
+		<button id="saveList" hidden="true" onclick="saveList()">Save List</button>
+		<button id ="showNew" onclick="showNewPlayer()">New Player</button>
+		<span id="save_feedback"></span>
+		</div>
+		<div id='new' >
+			<b>New Wishlist</b>
+			<hr/>
+			<table id="new-player">
+				<tr>
+					<td><label>Player ID</label></td>
+					<td> <input type="number" pattern="\d+" id="new-pid" type="text"/></td>
+				</tr>
+				<tr>
+					<td><label>Name</label></td>
+					<td> <input id="new-name" type="text"/></td>
+				</tr>
+				<tr>
+					<td><label>Prioritize HM loot</label></td>
+					<td> <input id="hardmode" type="checkbox"/></td>
+				</tr>
+
+				<tr>
+					<td><label>Default to unwanted</label></td>
+					<td> <input id="spurn" type="checkbox"/> </td>
+				</tr>
+
+			</table>
+			<hr/>
+			<span>
+			<button style="float:left">Create Wishlist</button>
+			<button style="float:right" onclick="hideNewPlayer()">Cancel</button>
+		</span>
+		</div>
+
+
+
+		<div id = 'content' hidden="true">
+
+			<table id="list-table" valign='top'>
+				<tr><th>Wanted</th> <th>Unwanted</th> <th>Complete</th> </tr>
+				<tr>
+		  		<td>
+			  		<ul id="wanted" class="sortlist"> </ul>
+				</td>
+				<td>
+					<ul id="unwanted" class="sortlist">	</ul>
+				</td>
+				<td id="complete-cell">
+					<ul id="complete" class="sortlist"> </ul>
+				</td></tr>
+			</table>
+		</div>
+
+  </body>
+</html>

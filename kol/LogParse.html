@@ -9,8 +9,57 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> 
     	<!--script type="text/javascript" src="coffee-script.js"></script-->
 		<!--script type="text/coffeescript" src="SuperBayes.coffee"></script-->
+        <script src="jquery-1.9.1.js"></script>
         <script type="text/javascript" src="LogParse.js"></script>
+        <script type="text/javascript" src="ReadDesires.js"></script>
         <style>
+            .vampire{
+                color: darkred;
+            }
+
+            .skeleton{
+                color: blue;
+            }
+            .bugbear{
+                color: black;
+            }
+            .wolf{
+                color:  brown;
+            }
+            .ghost{
+                color:  grey;
+            }
+            .zombie{
+                color:  green;
+            }
+            .special{
+                color:  violet;
+            }
+
+            td.wanted {
+                color: blue;
+                background-color: lightgreen;
+            }
+
+            td.unwanted {
+                color: grey;
+            }
+            td.has {
+                color: green;
+            }
+            td.priority{
+                background-color: yellow;
+            }
+
+            table{
+                border-collapse:  collapse;
+            }
+            th {
+                border-bottom: 1px solid black;
+                border-top: 1px solid black;
+                padding-left: 3px;
+                padding-right: 3px;
+            }
 
         	label {
         		margin: 0px;
@@ -24,6 +73,7 @@
         		vertical-align: middle;
         	}
         	td{ padding: 3px; vertical-align: top;}
+
         	
         	#zones{
         		font-size: 13px ! important; 
@@ -43,6 +93,9 @@
         		margin: 0px;
 
         	}
+            #lootTable td.loot-suggestion{
+                padding-left: 3px;
+            }
 
         	#sum {
         		border: 1px solid black;
@@ -69,6 +122,8 @@
 					<textarea  style="width:20em" rows="5"  id="in"></textarea>
 					<br/><small><code>Paste saved points here.</code></small><br/>
 					<textarea style="width:20em" rows="5" id="prior" ></textarea>
+                    <br/><small><code>Paste items to distro here.</code></small><br/>
+                    <textarea style="width:20em" rows="5" id="dropped_loot" ></textarea>
 	                <br/><button onclick="Run()">Parse Data</button>
             	</div>
                 <!--textarea style="width:20em" rows="5" id="points"></textarea-->
@@ -100,7 +155,10 @@
 		</td>
 
 		<td style="padding: 1em; font-size: smallest">
-				<div id='distro'> </div>
+				<div id='distro'>
+                        <small><code id='distro-blurb'></code></small>
+
+                 </div>
 				<h3>Cumulative Points</h3>
 			<small><code>Copy cumulative points from here -- clicking should auto select all</code></small><br/>
 			<textarea  onclick="this.select()" readonly='true' style="width:15em" rows="3" id="points-out" ></textarea>
