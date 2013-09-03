@@ -239,11 +239,11 @@
     banishedLine("vampires");
     if (mk["count drunkula"]) {
       html += "<br/>&nbsp;&nbsp;&nbsp;<b>Count slain</b>";
-      bossKills.village = "vampire";
+      bossKills.castle = "vampire";
     }
     if (mk["the unkillable skeleton"]) {
       html += "<br/>&nbsp;&nbsp;&nbsp;<b>Skelly slain</b>";
-      bossKills.village = "skeleton";
+      bossKills.castle = "skeleton";
     }
     html += "</td><tr></table>";
     html += "<br/><b>Doors unlocked:</b> <br/>&nbsp;&nbsp;&nbsp;" + quickReport.unlockedDoors.join(", ");

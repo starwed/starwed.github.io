@@ -12,11 +12,7 @@ parseCells = (d)->
 	cells = d.feed.entry;
 	for entry in cells
 		cell = entry.gs$cell;
-		#console.log(cell.$t)
 		add(cell.row, cell.col, cell.$t)
-
-
-	
 	return Table;
 
 
@@ -185,7 +181,7 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 	
 	columns = [0]
 	#bossKills = {forest:"bugbear", village:"ghost", castle:"vampire"}
-	if bossKills.forest is "wolf"
+	if bossKills.forest is "bugbear"
 		columns.push(1, 2, 3,4)
 	else
 		columns.push(5,6,7,8)
@@ -193,7 +189,7 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 		columns.push(9,10,11,12)
 	else
 		columns.push(13, 14, 15, 16)
-	if bossKills.castle is "vampire"
+	if bossKills.castle is "skeleton"
 		columns.push(17, 18, 19, 20)
 	else
 		columns.push(21, 22, 23, 24)
@@ -224,14 +220,14 @@ spreadsheet_key = [
 	"ghost_outfit", "scissors", "sash", "gavel",
 	"zombie_outfit", "book", "eyes", "pad",
 	"skeleton_outfit", "sword", "leg", "shield",
-	"vampire_outfit", "ring", "glass", "bell",
+	"vampire_outfit",  "glass", "bell", "ring"
 	"capacitor"]
 
 
 
 dropList = {
 	capacitor: {
-		name: "Skull capacitor"
+		name: "skull capacitor"
 		shortname: "Capacitor"
 		max: 5
 		image:  "http://images.kingdomofloathing.com/itemimages/dv_skullcap.gif"

@@ -213,7 +213,7 @@
   window.getWishes = function(distroList, bossKills, lootList, callback) {
     var columns, doitall, key, url;
     columns = [0];
-    if (bossKills.forest === "wolf") {
+    if (bossKills.forest === "bugbear") {
       columns.push(1, 2, 3, 4);
     } else {
       columns.push(5, 6, 7, 8);
@@ -223,7 +223,7 @@
     } else {
       columns.push(13, 14, 15, 16);
     }
-    if (bossKills.castle === "vampire") {
+    if (bossKills.castle === "skeleton") {
       columns.push(17, 18, 19, 20);
     } else {
       columns.push(21, 22, 23, 24);
@@ -245,11 +245,11 @@
     $.getJSON(url, {}, doitall);
   };
 
-  spreadsheet_key = ["name", "bugbear_outfit", "pyj", "qys", "hys", "wolf_outfit", "lice", "rocket", "trousers", "ghost_outfit", "scissors", "sash", "gavel", "zombie_outfit", "book", "eyes", "pad", "skeleton_outfit", "sword", "leg", "shield", "vampire_outfit", "ring", "glass", "bell", "capacitor"];
+  spreadsheet_key = ["name", "bugbear_outfit", "pyj", "qys", "hys", "wolf_outfit", "lice", "rocket", "trousers", "ghost_outfit", "scissors", "sash", "gavel", "zombie_outfit", "book", "eyes", "pad", "skeleton_outfit", "sword", "leg", "shield", "vampire_outfit", "glass", "bell", "ring", "capacitor"];
 
   dropList = {
     capacitor: {
-      name: "Skull capacitor",
+      name: "skull capacitor",
       shortname: "Capacitor",
       max: 5,
       image: "http://images.kingdomofloathing.com/itemimages/dv_skullcap.gif",
