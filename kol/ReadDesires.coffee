@@ -40,7 +40,7 @@ createRowData = (tableData)->
 					pnumber=pnumber[1]
 				else
 				 	pnumber = 1
-			else if text.indexOf("n") >=0
+			else if /\bno?\b/.exec(text) isnt null  # Matches "n" or "no" if they're not just part of a word
 				pnumber = -100
 			else
 				if dropList[item].max is 3
@@ -90,7 +90,11 @@ createTable = (tableData, columns, distroList, lootList)->
 			$thr.append("<th>Name</th>")
 		else
 			drop = dropList[item]
-			$thr.append("<th class='#{drop.cat}'>#{drop.shortname}</th>")
+			if lootList[item]>1
+				num = " (x" + lootList[item] + ")"
+			else
+				num = ''
+			$thr.append("<th class='#{drop.cat}'>#{drop.shortname}#{num}</th>")
 	$thr.append("<th class='loot'>Distro</th>")
 	$table.append($thr)
 	row_list = []
@@ -184,7 +188,12 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 	
 	columns = [0]
 	#bossKills = {forest:"bugbear", village:"ghost", castle:"vampire"}
-	if bossKills.forest is "bugbear"
+
+	for item, i in spreadsheet_key
+		if lootList[item]?
+			columns.push(i)
+
+	###if bossKills.forest is "bugbear"
 		columns.push(1, 2, 3,4)
 	else
 		columns.push(5,6,7,8)
@@ -196,7 +205,7 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 		columns.push(17, 18, 19, 20)
 	else
 		columns.push(21, 22, 23, 24)
-	columns.push(25)
+	columns.push(25)###
 
 	doitall = (d)->
 		table = parseCells(d)

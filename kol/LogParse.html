@@ -11,12 +11,11 @@
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script> 
         <script src="bootstrap/js/bootstrap.min.js"></script>
 
-    	<!--script type="text/javascript" src="coffee-script.js"></script-->
-		<!--script type="text/coffeescript" src="SuperBayes.coffee"></script-->
 
         <script src="jquery-1.9.1.js"></script>
         <script type="text/javascript" src="LogParse.js"></script>
         <script type="text/javascript" src="ReadDesires.js"></script>
+
         <style> 
             .my-fluid-container {
                   padding-left: 15px;
@@ -143,91 +142,88 @@
         </style>
 
 <div class="my-fluid-container">
-  
+
     
-    	<!--div class="row">
-            <div id='left-header' class="col-xs-2" style="background-color: pink"><h3>Raw Data</h3></div>
-            <div class="col-xs-7"  style="background-color: palegreen"><h3>Parsed Data</h3></div>
-    	   <div class="col-xs-3" style="background-color: lavender"><h3>Distro</h3></div>
-        </div-->
-    
-	   <div class="row" >	    
-			     
-            <div id='left_div' class="col-xs-2">
+   <div class="row" >	    
+		     
+        <div id='left_div' class="col-xs-2">
 
-                    <h2 style="border-bottom: 7px solid pink">Raw Data</h2>
-                
-					<small>Paste raw log here</small><br/>
-					<textarea  class="form-control" rows="4"  id="in"></textarea>
-					<br/><small>Paste saved points here.</small><br/>
-					<textarea class="form-control" rows="4" id="prior" ></textarea>
-                    <br/><small>Paste items to distro here.</small><br/>
-                    <textarea class="form-control" rows="4" id="dropped_loot" ></textarea>
-	                <br/><button onclick="Run()">Parse Data</button>
-            	   
-                <!--textarea style="width:20em" rows="5" id="points"></textarea-->
-			 </div>
-	
-			<!--div>
-				<b>Raw Ouput:</b><br/>
-				<textarea  style="background-color: #EEEEEE" readonly='readonly' width="100" height="500" id="out" > </textarea>
-			</div-->
+            <h2 style="border-bottom: 7px solid pink">Raw Data</h2>
+        
+			<small>Paste raw log here</small><br/>
+			<textarea  class="form-control" rows="4"  id="in"></textarea>
 
-		   
-	       <div class="col-xs-7">
-                <h2 style="border-bottom: 7px solid lightgreen">Parsed Data</h2>
-            <div class="alert alert-info"><b>New:</b> if you paste in a loot list in the third box on the left, it'll suggest a distro on the right!  Please don't follow this blindly, since it's a new feature and needs testing!</div>
-			After parsing, distro and new loot point totals will be on the right.  Paste the totals back into the <a href="http://alliancefromhell.com/viewtopic.php?f=62&t=5753" target="_blank">forum thread</a>, <i>remembering to zero out anyone who got loot!</i><br/>
-            <!--span style="color:red"><u>New:</u> Remember to <b>update</b> the wishlist <b>spreadsheet</b> after distro</span-->
-			
+			<br/><small>Paste saved points here.</small><br/>
+			<textarea class="form-control" rows="4" id="prior" ></textarea>
 
-            <div class="panel panel-default">
-			 <div class="panel-heading" data-toggle="collapse" data-target="#sum"> 
-                <h3 class="panel-title">Instance Summary</h3>
-             </div>
-			 <div class="panel-body  collapse in" id = "sum"></div>
-			</div>
-            <div class="panel panel-default">
-             <div class="panel-heading" data-toggle="collapse" data-target="#table_div_outer"> 
-                <h3 class="panel-title">Full data from this instance</h3>
-             </div>
-             <div class="panel-body collapse" id = "table_div_outer">
-                    <small>Do not use this to award loot</small>
-                    <div id="table_div"></div>
-             </div>
+            <br/><small>Paste items to distro here.</small><br/>
+            <textarea class="form-control" rows="4" id="dropped_loot" ></textarea>
+
+            <br/><button onclick="Run()">Parse Data</button>
+        	   
+            
+		 </div>
+	   
+       <div class="col-xs-7">
+            <h2 style="border-bottom: 7px solid lightgreen">Parsed Data</h2>
+            <div class="alert alert-info">
+                <b>New:</b> if you paste in a loot list in the third box on the left, it'll suggest a distro on the right!  Please don't follow this blindly, since it's a new feature and needs testing!
             </div>
-           
-            <div class="panel panel-default">
+
+    		<div>
+                After parsing, distro and new loot point totals will be on the right.  Paste the totals back into the <a href="http://alliancefromhell.com/viewtopic.php?f=62&t=5753" target="_blank">forum thread</a>, <i>remembering to zero out anyone who got loot!</i>
+            </div>
+            
+		
+
+        <div class="panel panel-default">
+            <div class="panel-heading" data-toggle="collapse" data-target="#sum"> 
+                <h3 class="panel-title">Instance Summary</h3>
+            </div>
+            <div class="panel-body  collapse in" id = "sum"></div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading" data-toggle="collapse" data-target="#table_div_outer"> 
+                <h3 class="panel-title">Full data from this instance</h3>
+            </div>
+            <div class="panel-body collapse" id = "table_div_outer">
+                <small>Do not use this to award loot</small>
+                <div id="table_div"></div>
+            </div>
+        </div>
+       
+        <div class="panel panel-default">
             <div class="panel-heading" data-toggle="collapse" data-target="#point_div"> 
                 <h3 class="panel-title">Cumulative Points (Readable)</h3>
-             </div>
-             <div class="panel-body collapse" id = "point_div">
-    
-             </div>
             </div>
-	
+            <div class="panel-body collapse" id = "point_div"></div>
+        </div>
 
-		      </div>
-            <div class="col-xs-3">
-		          <h2 style="border-bottom: 7px solid lavender">Distro</h2>
-				<div id='distro'>
-                        <small id= 'distro-blurb'></small>
-
-                 </div>
-				<h3>Cumulative Points</h3>
-			<small>Copy cumulative points from here -- clicking should auto select all</small><br/>
-			<textarea  class="form-control" onclick="this.select()" readonly='true' style="width:15em" rows="3" id="points-out" ></textarea>
-				<br/>
-				
-		  </div>
-	   
 
 	</div>
-    <div class="row">
-        
-        <div class="col-xs-12 " id="loot-table-holder"></div>
+    
+    <div class="col-xs-3">
+        <h2 style="border-bottom: 7px solid lavender">Distro</h2>
+		<div id='distro'>
+            <small id= 'distro-blurb'></small>
+
+        </div>
+		
+        <h3>Cumulative Points</h3>
+		<small>Copy cumulative points from here -- clicking should auto select all</small><br/>
+		<textarea  class="form-control" onclick="this.select()" readonly='true' rows="3" id="points-out" ></textarea>
+			
     </div>
-    <small> Original coffeescript: <a href="LogParse.coffee">LogParse.coffee</a>, <a href="ReadDesires.coffee">ReadDesires.coffee</a>
+	   
+
+</div>
+
+<div class="row">
+        
+    <div class="col-xs-12 " id="loot-table-holder"></div>
+</div>
+
+<small> Original coffeescript: <a href="LogParse.coffee">LogParse.coffee</a>, <a href="ReadDesires.coffee">ReadDesires.coffee</a></small>
 
 
 </div>

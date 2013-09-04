@@ -53,7 +53,7 @@
           } else {
             pnumber = 1;
           }
-        } else if (text.indexOf("n") >= 0) {
+        } else if (/\bno?\b/.exec(text) !== null) {
           pnumber = -100;
         } else {
           if (dropList[item].max === 3) {
@@ -93,7 +93,7 @@
   };
 
   createTable = function(tableData, columns, distroList, lootList) {
-    var $table, $thr, $tr, accounts, cl, currentPriority, data, distroPriority, drop, gets, i, item, lastcat, name, row, row_list, text, wishes, _i, _j, _k, _len, _len1, _len2, _ref;
+    var $table, $thr, $tr, accounts, cl, currentPriority, data, distroPriority, drop, gets, i, item, lastcat, name, num, row, row_list, text, wishes, _i, _j, _k, _len, _len1, _len2, _ref;
     $table = $("<table/>");
     $table.addClass("table").addClass("table-striped");
     $thr = $("<tr/>");
@@ -105,7 +105,12 @@
         $thr.append("<th>Name</th>");
       } else {
         drop = dropList[item];
-        $thr.append("<th class='" + drop.cat + "'>" + drop.shortname + "</th>");
+        if (lootList[item] > 1) {
+          num = " (x" + lootList[item] + ")";
+        } else {
+          num = '';
+        }
+        $thr.append("<th class='" + drop.cat + "'>" + drop.shortname + num + "</th>");
       }
     }
     $thr.append("<th class='loot'>Distro</th>");
@@ -214,31 +219,36 @@
   };
 
   window.getWishes = function(distroList, bossKills, lootList, callback) {
-    var columns, doitall, key, url;
+    var columns, doitall, i, item, key, url, _i, _len;
     columns = [0];
-    if (bossKills.forest === "bugbear") {
-      columns.push(1, 2, 3, 4);
-    } else {
-      columns.push(5, 6, 7, 8);
+    for (i = _i = 0, _len = spreadsheet_key.length; _i < _len; i = ++_i) {
+      item = spreadsheet_key[i];
+      if (lootList[item] != null) {
+        columns.push(i);
+      }
     }
-    if (bossKills.village === "ghost") {
-      columns.push(9, 10, 11, 12);
-    } else {
-      columns.push(13, 14, 15, 16);
-    }
-    if (bossKills.castle === "skeleton") {
-      columns.push(17, 18, 19, 20);
-    } else {
-      columns.push(21, 22, 23, 24);
-    }
-    columns.push(25);
+    /*if bossKills.forest is "bugbear"
+    		columns.push(1, 2, 3,4)
+    	else
+    		columns.push(5,6,7,8)
+    	if bossKills.village is "ghost"
+    		columns.push(9,10,11,12)
+    	else
+    		columns.push(13, 14, 15, 16)
+    	if bossKills.castle is "skeleton"
+    		columns.push(17, 18, 19, 20)
+    	else
+    		columns.push(21, 22, 23, 24)
+    	columns.push(25)
+    */
+
     doitall = function(d) {
-      var getList, row, rowList, table, _i, _len;
+      var getList, row, rowList, table, _j, _len1;
       table = parseCells(d);
       rowList = createTable(table, columns, distroList, lootList);
       getList = {};
-      for (_i = 0, _len = rowList.length; _i < _len; _i++) {
-        row = rowList[_i];
+      for (_j = 0, _len1 = rowList.length; _j < _len1; _j++) {
+        row = rowList[_j];
         getList[row.name] = row.gets;
       }
       return callback(getList);
