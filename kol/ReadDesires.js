@@ -43,7 +43,9 @@
           text = "";
         }
         text = text.trim().toLowerCase();
-        if (text.indexOf("p") >= 0) {
+        if (text.indexOf("low") >= 0) {
+          pnumber = Infinity;
+        } else if (text.indexOf("p") >= 0) {
           pmatch = /p[\s-]*(\d+)/;
           pnumber = pmatch.exec(text);
           if ((pnumber != null ? pnumber[1] : void 0) != null) {
@@ -55,7 +57,7 @@
           pnumber = -100;
         } else {
           if (dropList[item].max === 3) {
-            pnumber = Infinity;
+            pnumber = 10000000;
           } else if (dropList[item].max === 5) {
             pnumber = 100000;
           } else {

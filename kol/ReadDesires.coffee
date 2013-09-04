@@ -31,7 +31,9 @@ createRowData = (tableData)->
 			text = "" if not text?
 			text = text.trim().toLowerCase()
 			## Find priority
-			if text.indexOf("p") >=0  
+			if text.indexOf("low")>=0
+				pnumber = Infinity
+			else if text.indexOf("p") >=0  
 				pmatch = /p[\s-]*(\d+)/
 				pnumber = pmatch.exec(text)
 				if pnumber?[1]?
@@ -42,7 +44,7 @@ createRowData = (tableData)->
 				pnumber = -100
 			else
 				if dropList[item].max is 3
-					pnumber = Infinity
+					pnumber = 10000000
 				else if dropList[item].max is 5
 					pnumber = 100000
 				else
