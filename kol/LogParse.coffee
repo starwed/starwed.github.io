@@ -641,7 +641,7 @@ ChartResult = (accounts, total) ->
 	#wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752"
 	
 	wishlink = "https://docs.google.com/spreadsheet/ccc?key=0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc#gid=0"
-	lootHtml = "<table id='lootTable'>"
+	lootHtml = "<table class='table table-striped' id='lootTable'>"
 	for name in RunPlayers
 
 		account = name

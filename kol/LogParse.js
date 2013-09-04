@@ -625,7 +625,7 @@
       return thisRunPoints[b] - thisRunPoints[a];
     });
     wishlink = "https://docs.google.com/spreadsheet/ccc?key=0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc#gid=0";
-    lootHtml = "<table id='lootTable'>";
+    lootHtml = "<table class='table table-striped' id='lootTable'>";
     for (_j = 0, _len1 = RunPlayers.length; _j < _len1; _j++) {
       name = RunPlayers[_j];
       account = name;

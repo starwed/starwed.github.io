@@ -80,6 +80,7 @@ createRowData = (tableData)->
 
 createTable = (tableData, columns, distroList, lootList)->
 	$table = $("<table/>")
+	$table.addClass("table").addClass("table-striped")
 	
 	$thr = $("<tr/>")
 	lastcat = null
@@ -152,7 +153,7 @@ createTable = (tableData, columns, distroList, lootList)->
 
 
 
-	$("body").append($table)
+	$("#loot-table-holder").append($table)
 	return row_list
 
 

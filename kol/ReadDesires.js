@@ -95,6 +95,7 @@
   createTable = function(tableData, columns, distroList, lootList) {
     var $table, $thr, $tr, accounts, cl, currentPriority, data, distroPriority, drop, gets, i, item, lastcat, name, row, row_list, text, wishes, _i, _j, _k, _len, _len1, _len2, _ref;
     $table = $("<table/>");
+    $table.addClass("table").addClass("table-striped");
     $thr = $("<tr/>");
     lastcat = null;
     for (_i = 0, _len = columns.length; _i < _len; _i++) {
@@ -182,7 +183,7 @@
       row.gets = gets;
       $table.append(row.el);
     }
-    $("body").append($table);
+    $("#loot-table-holder").append($table);
     return row_list;
   };
 
