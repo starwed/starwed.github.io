@@ -129,6 +129,7 @@
         if (i === 0) {
           cl = "name";
           text = name;
+          item = "name";
         } else {
           distroPriority = distroList.indexOf(name);
           item = spreadsheet_key[i];
@@ -153,7 +154,7 @@
           }
           text = data.text;
         }
-        $tr.append("<td class='" + cl + "'>" + text + "</td>");
+        $tr.append("<td id='" + name + "-" + item + "' class='" + cl + "'>" + text + "</td>");
       }
       row_list.push({
         el: $tr,
@@ -162,6 +163,7 @@
         name: name
       });
     }
+    $("#loot-table-holder").append($table);
     row_list.sort(function(a, b) {
       return a.priority - b.priority;
     });
@@ -183,12 +185,13 @@
         gets = "--";
       } else {
         lootList[gets]--;
+        $("#" + row.name + "-" + gets, row.el).addClass("default-distro");
+        console.log("" + row.name + "-" + gets);
       }
       row.el.append("<td>" + gets + "</td>");
       row.gets = gets;
       $table.append(row.el);
     }
-    $("#loot-table-holder").append($table);
     return row_list;
   };
 

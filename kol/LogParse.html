@@ -38,6 +38,10 @@
             }
         </style>      
         <style>
+            td.default-distro {
+                border: 2px dashed black ! important;
+            }
+
             .vampire{
                 color: darkred;
             }
@@ -159,7 +163,7 @@
             <br/><small>Paste items to distro here.</small><br/>
             <textarea class="form-control" rows="4" id="dropped_loot" ></textarea>
 
-            <br/><button onclick="Run()">Parse Data</button>
+            <br/><button class="btn btn-primary btn-block" onclick="Run()">Parse Data</button>
         	   
             
 		 </div>

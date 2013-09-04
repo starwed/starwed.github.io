@@ -109,6 +109,7 @@ createTable = (tableData, columns, distroList, lootList)->
 			if i is 0 
 				cl = "name"
 				text = name
+				item = "name"
 			else 
 				distroPriority = distroList.indexOf(name)
 				item = spreadsheet_key[i]
@@ -129,12 +130,12 @@ createTable = (tableData, columns, distroList, lootList)->
 				else 	
 					cl = "wanted"
 				text = data.text #Return to original text
-			$tr.append("<td class='#{cl}'>#{text}</td>")
+			$tr.append("<td id='#{name}-#{item}' class='#{cl}'>#{text}</td>")
 
 		row_list.push({el:$tr, priority:distroPriority, wishes:wishes, name:name})
 
 
-		
+	$("#loot-table-holder").append($table)
 	row_list.sort( (a, b)-> a.priority-b.priority)
 	for row in row_list
 		
@@ -147,17 +148,22 @@ createTable = (tableData, columns, distroList, lootList)->
 					gets = item
 		if not gets?
 			gets = "--" 
+
 		else
 			lootList[gets]--
+			$("##{row.name}-#{gets}", row.el).addClass("default-distro")
+			console.log("#{row.name}-#{gets}")
+			
 		row.el.append("<td>#{gets}</td>")
 		row.gets = gets
+
 		
 
 		$table.append(row.el)
 
 
 
-	$("#loot-table-holder").append($table)
+	
 	return row_list
 
 
