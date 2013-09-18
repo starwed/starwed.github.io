@@ -193,29 +193,15 @@ processLoot = (Loot) ->
 window.getWishes = (distroList, bossKills, lootList, callback)->
 	
 	columns = [0]
-	#bossKills = {forest:"bugbear", village:"ghost", castle:"vampire"}
 
 	for item, i in spreadsheet_key
 		if lootList[item]?
 			columns.push(i)
 
-	###if bossKills.forest is "bugbear"
-		columns.push(1, 2, 3,4)
-	else
-		columns.push(5,6,7,8)
-	if bossKills.village is "ghost"
-		columns.push(9,10,11,12)
-	else
-		columns.push(13, 14, 15, 16)
-	if bossKills.castle is "skeleton"
-		columns.push(17, 18, 19, 20)
-	else
-		columns.push(21, 22, 23, 24)
-	columns.push(25)###
 
 	doitall = (d)->
-		table = parseCells(d)
-		rowList = createTable(table, columns, distroList, lootList)
+		tableData = parseCells(d)
+		rowList = createTable(tableData, columns, distroList, lootList)
 		getList = {}
 		for row in rowList
 			getList[row.name] = row.gets
@@ -242,8 +228,8 @@ spreadsheet_key = [
 	"capacitor"]
 
 
-
-dropList = {
+# Properties of the boss drops to be distributed
+window.dropList = dropList = {
 	capacitor: {
 		name: "skull capacitor"
 		shortname: "Capacitor"

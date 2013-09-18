@@ -28,9 +28,10 @@ Blacklist of multis who don't get loot
 	Scourge of Seals (#1873601)
 (littlelolligagged)
 	mommyneedssleep (#2051971)
+	Rises From Earth (#2423706)
 ###
 
-Blacklist = [1873125, 1873222, 1873176, 2051971, 1873602, 1873203, 1873601]
+Blacklist = [1873125, 1873222, 1873176, 2051971, 1873602, 1873203, 1873601, 2423706]
 
 
 Wishlist = {
@@ -186,8 +187,12 @@ monsterAlias = {
 	zombies:"zombie", ghosts:"ghost", skeletons:"skeleton", vampires:"vampire", bugbears:"bugbear", werewolves: "werewolf"
 }
 
+#scope cumArray
+cumArray = null
+savedGetList = null
+
 instanceSummary = ()->
-	html =""
+	html = ""
 
 	banishedLine = (name)->
 		html += "<br/>&nbsp;&nbsp;&nbsp;" + "<i>#{name}:</i> " + quickReport.monstersKilled[monsterAlias[name]] + " kills"
@@ -611,7 +616,6 @@ ChartResult = (accounts, total) ->
 
 
 
-	pointsOut = ""
 
 	row=0
 	cumArray = []
@@ -626,13 +630,12 @@ ChartResult = (accounts, total) ->
 
 	base_match = /(.+)\(/
 	distroList = []
-	for account in cumArray
-		pointsOut+="#{account}\t#{cumPoints[account]}\n"
+	
+	MakePointsOut(cumArray)
 		
 	table = new google.visualization.Table(document.getElementById('point_div'))
 	table.draw(cumData, {showRowNumber:false, sortColumn:1, sortAscending:false} )
-	pointsOut = "[code]\n"+pointsOut + "[/code]"
-	document.getElementById('points-out').value = pointsOut
+	
 	#Create an ordered list by points
 
 
@@ -670,20 +673,28 @@ ChartResult = (accounts, total) ->
 
 
 
+getBaseName = (account)->
+	base_match = /(.+)\(/
+	base_name = base_match.exec(account)
+	if base_name[1]?
+		return base_name[1].trim().toLowerCase().replace(/\s/g, "_")
+	else
+		return null
+
 
 MakeLootTable = (RunPlayers, getList)->
-
-	lootHtml = "<table id='lootTable'>"
 	wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752"
-	base_match = /(.+)\(/
+	
+	lootHtml = "<table id='lootTable'>"
+	
 	row = 0
 	for name in RunPlayers
 
 		account = name
+		base_name = getBaseName(account)
+
 		
-		base_name = base_match.exec(account)
-		if base_name[1]?
-			base_name = base_name[1].trim().toLowerCase().replace(/\s/g, "_")
+		if base_name
 			gets = getList[base_name]
 		else
 			gets = "???"
@@ -692,7 +703,40 @@ MakeLootTable = (RunPlayers, getList)->
 		row++
 		break if row>20
 	$("#distro-blurb").text("(Items are suggestions only)")
+	savedGetList = getList
+	if document.getElementById("zero").checked is true
+		zeroOut(true)
 	
+
+window.zeroOut = (state)->
+	if state is true and savedGetList?
+		MakePointsOut(cumArray, savedGetList)
+	else
+		MakePointsOut(cumArray)
+
+
+
+MakePointsOut = (cumArray, getList)->
+	pointsOut = ""
+	base_match = /(.+)\(/
+	preamble = ""
+	for account in cumArray
+		points = cumPoints[account]
+		if getList?
+			base_name = getBaseName(account)
+			gets = getList[base_name]
+			if gets? and gets isnt "--"
+				points = Math.max(points - 1000, 0)
+				drop = dropList[gets].name
+				if gets is "capacitor"
+					drop = "[b]#{drop}[/b]"
+
+				preamble += "\n #{account} gets #{drop}"
+
+		pointsOut+="#{account}\t#{points}\n"
+
+	pointsOut = "#{preamble}\n\n[code]\n#{pointsOut}[/code]"
+	document.getElementById('points-out').value = pointsOut
 
 
 	
