@@ -170,12 +170,10 @@
 	   
        <div class="col-xs-7">
             <h2 style="border-bottom: 7px solid lightgreen">Parsed Data</h2>
-            <div class="alert alert-info">
-                <b>New:</b> if you paste in a loot list in the third box on the left, it'll suggest a distro on the right!  Please don't follow this blindly, since it's a new feature and needs testing!
-            </div>
+            
 
-    		<div>
-                After parsing, distro and new loot point totals will be on the right.  Paste the totals back into the <a href="http://alliancefromhell.com/viewtopic.php?f=62&t=5753" target="_blank">forum thread</a>, <i>remembering to zero out anyone who got loot!</i>
+    		<div class="alert alert-info">
+                <div><p>After parsing, distro and new loot point totals will be on the right.  Paste the totals back into the <a href="http://alliancefromhell.com/viewtopic.php?f=62&t=5861" target="_blank" ><b>forum thread</b></a>.  By default, it will automatically adjust points based on the proposed loot distro.</p></div>
             </div>
             
 		
@@ -216,9 +214,11 @@
         <h3>Cumulative Points</h3>
 		<small>Copy cumulative points from here -- clicking should auto select all</small><br/>
 		<textarea  class="form-control" onclick="this.select()" readonly='true' rows="3" id="points-out" ></textarea>
-        <label class="pull-right">
-            <input id="zero" onclick="zeroOut(this.checked)" type="checkbox" checked="true"> auto-zero accounts who get loot
-        </label>
+        <div class="checkbox">
+            <label class="pull-right">
+                <input id="zero" onclick="zeroOut(this.checked)" type="checkbox" checked="true"> auto-adjust accounts who get loot
+            </label>
+        </div>
 			
     </div>
 	   

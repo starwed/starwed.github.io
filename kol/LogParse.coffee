@@ -726,14 +726,14 @@ MakePointsOut = (cumArray, getList)->
 			base_name = getBaseName(account)
 			gets = getList[base_name]
 			if gets? and gets isnt "--"
-				points = Math.max(points - 1000, 0)
+				newpoints = Math.max(points - 1000, 0)
 				drop = dropList[gets].name
 				if gets is "capacitor"
 					drop = "[b]#{drop}[/b]"
 
-				preamble += "\n #{account} gets #{drop}"
+				preamble += "\n #{account} gets #{drop} for #{points-newpoints} points"
 
-		pointsOut+="#{account}\t#{points}\n"
+		pointsOut+="#{account}\t#{newpoints}\n"
 
 	pointsOut = "#{preamble}\n\n[code]\n#{pointsOut}[/code]"
 	document.getElementById('points-out').value = pointsOut

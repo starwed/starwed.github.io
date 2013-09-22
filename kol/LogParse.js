@@ -698,7 +698,7 @@
   };
 
   MakePointsOut = function(cumArray, getList) {
-    var account, base_match, base_name, drop, gets, points, pointsOut, preamble, _i, _len;
+    var account, base_match, base_name, drop, gets, newpoints, points, pointsOut, preamble, _i, _len;
     pointsOut = "";
     base_match = /(.+)\(/;
     preamble = "";
@@ -709,15 +709,15 @@
         base_name = getBaseName(account);
         gets = getList[base_name];
         if ((gets != null) && gets !== "--") {
-          points = Math.max(points - 1000, 0);
+          newpoints = Math.max(points - 1000, 0);
           drop = dropList[gets].name;
           if (gets === "capacitor") {
             drop = "[b]" + drop + "[/b]";
           }
-          preamble += "\n " + account + " gets " + drop;
+          preamble += "\n " + account + " gets " + drop + " for " + (points - newpoints) + " points";
         }
       }
-      pointsOut += "" + account + "\t" + points + "\n";
+      pointsOut += "" + account + "\t" + newpoints + "\n";
     }
     pointsOut = "" + preamble + "\n\n[code]\n" + pointsOut + "[/code]";
     return document.getElementById('points-out').value = pointsOut;
