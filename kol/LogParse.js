@@ -504,7 +504,7 @@
       pName = findAccount(parsed[1]);
       number = parsed[2];
       accounts[pName].losses += parseFloat(number);
-      quickReport.totalLosses++;
+      quickReport.totalLosses += parseFloat(number);
       return;
     }
     parsed = bossMatch.exec(line);
@@ -704,7 +704,7 @@
     preamble = "";
     for (_i = 0, _len = cumArray.length; _i < _len; _i++) {
       account = cumArray[_i];
-      points = cumPoints[account];
+      newpoints = points = cumPoints[account];
       if (getList != null) {
         base_name = getBaseName(account);
         gets = getList[base_name];

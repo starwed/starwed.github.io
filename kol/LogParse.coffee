@@ -511,7 +511,7 @@ Process = (line) ->
 		pName = findAccount(parsed[1]);
 		number = parsed[2]
 		accounts[pName].losses += parseFloat(number)
-		quickReport.totalLosses++
+		quickReport.totalLosses+= parseFloat(number)
 		return
 
 	
@@ -721,7 +721,8 @@ MakePointsOut = (cumArray, getList)->
 	base_match = /(.+)\(/
 	preamble = ""
 	for account in cumArray
-		points = cumPoints[account]
+		newpoints = points = cumPoints[account]
+
 		if getList?
 			base_name = getBaseName(account)
 			gets = getList[base_name]
@@ -732,6 +733,7 @@ MakePointsOut = (cumArray, getList)->
 					drop = "[b]#{drop}[/b]"
 
 				preamble += "\n #{account} gets #{drop} for #{points-newpoints} points"
+
 
 		pointsOut+="#{account}\t#{newpoints}\n"
 
