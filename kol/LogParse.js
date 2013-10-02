@@ -638,7 +638,7 @@
       }
       lootHtml += "<tr><td onclick='toggleDistro(this, \"" + name + "\")'><b>" + name + "</b></td><td>" + score + "</td><td class='loot-suggestion' id='loot-" + base_name + "'></td></tr>";
       row++;
-      if (row > 20) {
+      if (row > 30) {
         break;
       }
     }
