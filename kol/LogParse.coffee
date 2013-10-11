@@ -190,6 +190,7 @@ monsterAlias = {
 #scope cumArray
 cumArray = null
 savedGetList = null
+savedLeftovers = null
 
 instanceSummary = ()->
 	html = ""
@@ -667,7 +668,7 @@ ChartResult = (accounts, total) ->
 	distroArea = document.getElementById('distro')
 	distroArea.insertAdjacentHTML("beforeend", lootHtml);
 	$("#distro-blurb").text("(Loading wish list spreadsheet...)")
-	window.MakeDistroTable(bossKills, distroList, Loot, (list)->MakeLootTable(RunPlayers, list))
+	window.MakeDistroTable(bossKills, distroList, Loot, (list, leftover)->MakeLootTable(RunPlayers, list, leftover))
 
 	return
 
@@ -682,7 +683,7 @@ getBaseName = (account)->
 		return null
 
 
-MakeLootTable = (RunPlayers, getList)->
+MakeLootTable = (RunPlayers, getList, leftover)->
 	wishlink = "http://alliancefromhell.com/viewtopic.php?f=13&t=5752"
 	
 	lootHtml = "<table id='lootTable'>"
@@ -695,7 +696,7 @@ MakeLootTable = (RunPlayers, getList)->
 
 		
 		if base_name
-			gets = getList[base_name]
+			gets = getList[base_name].join(", ")
 		else
 			gets = "???"
 		$("#loot-#{base_name}").text(gets)		
@@ -704,38 +705,60 @@ MakeLootTable = (RunPlayers, getList)->
 		break if row>20
 	$("#distro-blurb").text("(Items are suggestions only)")
 	savedGetList = getList
+	
+	
+	if leftover.length>0
+		savedLeftovers = leftover
+		$(document.getElementById("smash-list")).text(leftover)
+		document.getElementById("smash-div").hidden = false
+
 	if document.getElementById("zero").checked is true
 		zeroOut(true)
+
 	
 
 window.zeroOut = (state)->
 	if state is true and savedGetList?
-		MakePointsOut(cumArray, savedGetList)
+		MakePointsOut(cumArray, savedGetList, savedLeftovers)
 	else
 		MakePointsOut(cumArray)
 
 
 
-MakePointsOut = (cumArray, getList)->
+
+
+
+MakePointsOut = (cumArray, getList, leftover)->
 	pointsOut = ""
 	base_match = /(.+)\(/
 	preamble = ""
+
 	for account in cumArray
 		newpoints = points = cumPoints[account]
 
 		if getList?
 			base_name = getBaseName(account)
 			gets = getList[base_name]
-			if gets? and gets isnt "--"
+			if gets.length>0
 				newpoints = Math.max(points - 1000, 0)
-				drop = dropList[gets].name
-				if gets is "capacitor"
-					drop = "[b]#{drop}[/b]"
+				drops = [];
+				#drop = dropList[gets].name
+				for item in gets
+					drop = dropList[item].name
+				
+					if item is "capacitor"
+						drop = "[b]#{drop}[/b]"
+					drops.push(drop)
 
-				preamble += "\n #{account} gets #{drop} for #{points-newpoints} points"
-
+				if drops.length>1
+					drops = "(#{drops.join(', ')})"
+				else
+					drops = drops[0]
+				preamble += "\n #{account} gets #{drops} for #{points-newpoints} points"
 
 		pointsOut+="#{account}\t#{newpoints}\n"
+	if leftover?.length>0
+		preamble += "\n\n [b]The following loot had no home:[/b] #{leftover}"
 
 	pointsOut = "#{preamble}\n\n[code]\n#{pointsOut}[/code]"
 	document.getElementById('points-out').value = pointsOut

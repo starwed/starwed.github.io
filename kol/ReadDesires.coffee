@@ -17,14 +17,23 @@ parseCells = (d)->
 
 
 
+clanWants = {
+	
+}
+
+percentagesComplete = {}
+clanSize = 0
+
 
 createRowData = (tableData)->
 	accounts = {}
+	clanSize = 0
 	for row in tableData
 		
 		continue if not row?[0]?
 		name = row[0].trim().toLowerCase().replace(/\s/g, "_")
 		accounts[name] = {}
+		clanSize++
 		for i in [1..25]
 			item = spreadsheet_key[i]
 			text = row[i]
@@ -54,7 +63,7 @@ createRowData = (tableData)->
 			#Find number
 			havematch = /have\s*(\d+)/
 			match = havematch.exec(text)
-			if match?[1]?
+			if match?[1]?	
 				has = match[1]
 			else
 				numbermatch = /(\d+)/
@@ -63,20 +72,66 @@ createRowData = (tableData)->
 					has = 0
 				else if match?[1]?
 					has = match[1]
-				else
+				else if pnumber < 0
+					has = dropList[item].max
+				else 
 					has = 0
+
+
 
 			if has >= dropList[item].max
 				pnumber = -100
+			else
+				if not clanWants[item]?
+					clanWants[item] = 0
+				clanWants[item] += (dropList[item].max - has)
 
 			accounts[name][item]={has:has, priority:pnumber, text:text}
+
+
+	# Measure clan completion
+	catsComplete = {}
+	for item, wants of clanWants
+		logit("#{item}:#{wants}")
+		max = dropList[item].max
+		percentagesComplete[item] = 1 - wants / (max * clanSize)
+		cat = dropList[item].cat
+		if not catsComplete[cat]?
+			catsComplete[cat] = {size: 0, wanted:0, hmsize:0, hmwanted:0, outfitsize:0, outfitwanted:0}
+		if max is 1
+			catsComplete[cat].hmsize += clanSize
+			catsComplete[cat].hmwanted += wants
+		else if max is 3
+			catsComplete[cat].outfitsize += clanSize * 3
+			catsComplete[cat].outfitwanted += wants
+
+		catsComplete[cat].size += max*clanSize
+		catsComplete[cat].wanted += wants
+	logit(percentagesComplete)
+	for cat, info of catsComplete
+		completion = 1 - info.wanted/info.size
+		completion = Math.floor( completion*1000)/10
+		
+		if info.hmsize>0
+			hmcompletion = 1 - info.hmwanted/info.hmsize
+			hmcompletion = Math.floor( hmcompletion*1000)/10
+			#console.log("HM #{cat} is at #{completion}% completion")
+		if info.outfitsize > 0
+			outfitcompletion = 1 - info.outfitwanted/info.outfitsize
+			outfitcompletion = Math.floor( outfitcompletion*1000)/10
+			logit("#{cat}\t #{outfitcompletion}\t#{hmcompletion}\t#{completion}")
+		else
+			logit("Capacitor is at #{completion}% completion")
 
 	return accounts
 				
 			
 
-
-
+displayGet = (gets)->
+		if gets.length>0
+			return gets.toString()
+		else
+			return "--"
 
 createTable = (tableData, columns, distroList, lootList)->
 	$table = $("<table/>")
@@ -100,6 +155,8 @@ createTable = (tableData, columns, distroList, lootList)->
 	row_list = []
 	accounts = createRowData(tableData)
 
+
+	# step through and interpret the data; create a table and figure out priorities
 	for name, wishes of accounts
 		distroPriority = distroList.indexOf(name)
 		continue if distroPriority<0
@@ -132,39 +189,65 @@ createTable = (tableData, columns, distroList, lootList)->
 				text = data.text #Return to original text
 			$tr.append("<td id='#{name}-#{item}' class='#{cl}'>#{text}</td>")
 
-		row_list.push({el:$tr, priority:distroPriority, wishes:wishes, name:name})
+		row_list.push({el:$tr, priority:distroPriority, wishes:wishes, name:name, gets:[]})
 
 
 	$("#loot-table-holder").append($table)
 	row_list.sort( (a, b)-> a.priority-b.priority)
+
+	countLootLeft = (list)->
+		n = 0
+		for item, number of list
+			n+=number
+		return n
+	l = countLootLeft(lootList)
+
+	# Loop while we have loot left
+	leftover = []
+	
+	while(l>0)
+		assignLoot(row_list, lootList, $table)
+		# Break if no loot was distributed this time, because we're done!
+		if (countLootLeft(lootList)==l)
+			for item, number of lootList
+				leftover.push("#{item} (#{number})") if number >0
+			break;
+		else
+			l = countLootLeft(lootList)
+
+	
+
+	# after all loot has been assigne
+	for row in row_list
+		row.el.append("<td>#{displayGet(row.gets)}</td>")
+		$table.append(row.el)
+
+
+
+	
+	return [row_list, leftover]
+
+
+assignLoot= (row_list, lootList, $table)->
 	for row in row_list
 		
 		gets = null
 		currentPriority = Infinity
 		for item, data of row.wishes
 			if lootList[item]? and lootList[item] > 0
-				if data.priority<=currentPriority and data.priority>=0
+				if data.priority<=currentPriority and data.priority>=0 and row.gets.indexOf(item)<0
 					currentPriority = data.priority
 					gets = item
-		if not gets?
-			gets = "--" 
-
-		else
+		if gets?
 			lootList[gets]--
 			$("##{row.name}-#{gets}", row.el).addClass("default-distro")
-			console.log("#{row.name}-#{gets}")
+			logit("#{row.name}-#{gets}")
+			row.gets.push(gets)
 			
-		row.el.append("<td>#{gets}</td>")
-		row.gets = gets
-
+		
+		
 		
 
-		$table.append(row.el)
-
-
-
-	
-	return row_list
 
 
 	
@@ -201,11 +284,14 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 
 	doitall = (d)->
 		tableData = parseCells(d)
-		rowList = createTable(tableData, columns, distroList, lootList)
+		[rowList, leftover] = createTable(tableData, columns, distroList, lootList)
 		getList = {}
 		for row in rowList
 			getList[row.name] = row.gets
-		callback(getList)
+		loot_left = leftover.join(", ")
+		
+		
+		callback(getList, loot_left)
 
 	key = "0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc"
 	url = "https://spreadsheets.google.com/feeds/cells/#{key}/od6/public/values?alt=json-in-script&callback=?";
@@ -216,7 +302,7 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 
 #$( ()->window.getWishes())
 
-
+# these match the columns of the psreadsheet to the correct items
 spreadsheet_key = [
 	"name"
 	"bugbear_outfit", "pyj", "qys", "hys",

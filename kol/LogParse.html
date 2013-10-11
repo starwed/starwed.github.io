@@ -130,6 +130,14 @@
                 padding-left: 3px;
             }
 
+            #smash-list {
+                font-weight: bold;
+                margin-left: 3em;
+            }
+            #smash-div {
+                font-size: smaller;
+            }
+
         	#sum {
         		
         		font-size: 12px;
@@ -208,8 +216,13 @@
         <h2 style="border-bottom: 7px solid lavender">Distro</h2>
 		<div id='distro'>
             <small id= 'distro-blurb'></small>
+            <div class="alert alert-danger" hidden="true" id="smash-div">
+                The following loot has no home!  Smashy smashy:
+                <div id="smash-list"></div>
+            </div>
 
         </div>
+        
 		
         <h3>Cumulative Points</h3>
 		<small>Copy cumulative points from here -- clicking should auto select all</small><br/>
