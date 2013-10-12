@@ -695,7 +695,7 @@ MakeLootTable = (RunPlayers, getList, leftover)->
 		base_name = getBaseName(account)
 
 		
-		if base_name
+		if base_name? and getList[base_name]?
 			gets = getList[base_name].join(", ")
 		else
 			gets = "???"
@@ -739,7 +739,7 @@ MakePointsOut = (cumArray, getList, leftover)->
 		if getList?
 			base_name = getBaseName(account)
 			gets = getList[base_name]
-			if gets.length>0
+			if gets?.length>0
 				newpoints = Math.max(points - 1000, 0)
 				drops = [];
 				#drop = dropList[gets].name

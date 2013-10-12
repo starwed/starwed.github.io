@@ -673,7 +673,7 @@
       name = RunPlayers[_i];
       account = name;
       base_name = getBaseName(account);
-      if (base_name) {
+      if ((base_name != null) && (getList[base_name] != null)) {
         gets = getList[base_name].join(", ");
       } else {
         gets = "???";
@@ -715,7 +715,7 @@
       if (getList != null) {
         base_name = getBaseName(account);
         gets = getList[base_name];
-        if (gets.length > 0) {
+        if ((gets != null ? gets.length : void 0) > 0) {
           newpoints = Math.max(points - 1000, 0);
           drops = [];
           for (_j = 0, _len1 = gets.length; _j < _len1; _j++) {
