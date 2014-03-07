@@ -1,0 +1,67 @@
+
+<html lang="en">
+
+    <head>
+        <title>Queue manipulation analysis</title>
+
+    </head>
+<body style="font-family: 'Helvetica', 'Verdana', sans-serif;">
+		
+        <script type="text/javascript" src="Qcalc.js"></script>
+        <script>
+        	window.onload = function(){
+        		document.getElementById("submodels").value = 
+        			'{\n\t"ignore the queue":0,\n\t"normal queue":0.75\n}'
+        		analyze();
+        	}
+
+        </script>
+  
+    <table style="padding: 1em"><tr>
+    	<th style="background-color: pink">Raw Data</th>
+        <th style="background-color: palegreen">Model It!</th>
+    	<th style="background-color: lavender" >Results</th>
+    	</tr>
+    	<tr>
+	    <td >
+		    
+			<div style="width: 20em">
+				
+				<small><code>[{"monsters":[1,1,1], "stream":[0, 1, 0, 2]}]</code></small><br/>
+				<textarea style="width:20em" rows="10"  id="data"></textarea>
+			</div>
+
+		   
+		</td>
+
+         <td style="vertical-align: top">
+            <button onclick="window.runit()" >Analyze</button>
+            <br/>
+            <small><code>Possible rejection types for trailed monster</code></small><br/>
+            <TEXTAREA id="submodels" rows="10" cols="40"></TEXTAREA>
+        </td>
+		<td  style="padding: 2em" >
+			<div id="table_div">
+					<TEXTAREA rows="10" cols="50" id = "output"></TEXTAREA>
+			</div>
+		</td>
+	   
+
+	</tr></table>
+    
+
+    <div style="width: 75%; margin: 2em">
+    <hr/>
+    <h3>Instructions</h3>
+    <p>This is a tool for comparing possible models of olfaciton-like effects.</p>
+    <p>Assign an index to each regular monster, with the monster being trailed having index 0.</p>
+    <p>In the left-most text area, enter the raw data.  It will be an array of objects; one object for each data set.  Objects have two fields: <code>"monster"</code> is a list of how many copies of each monster are normally in the zone, and <code>"stream"</code> is an ordered list of which monsters you encountered in regular combat.</p>
+    <p>Optionally, you can investigate nonstandard rejection rates for the trailed monster; add a description and rate to the middle textbox.</p>
+   <p><small>Here are the original coffeescript files: <a href="Qcalc.coffee">Qcalc.coffee</a>.</small></p>
+   
+    </div>
+</body>
+</html>
+
+
+
