@@ -293,7 +293,8 @@ window.getWishes = (distroList, bossKills, lootList, callback)->
 		
 		callback(getList, loot_left)
 
-	key = "0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc"
+	key = "0AvrVWFdz4jg1dGp3RnVtUGZkak12dnFyVjBXYjlkdHc"
+		  
 	url = "https://spreadsheets.google.com/feeds/cells/#{key}/od6/public/values?alt=json-in-script&callback=?";
 	$.getJSON(url,{},  doitall);
 	return

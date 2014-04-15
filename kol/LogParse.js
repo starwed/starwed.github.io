@@ -625,7 +625,7 @@
     RunPlayers.sort(function(a, b) {
       return thisRunPoints[b] - thisRunPoints[a];
     });
-    wishlink = "https://docs.google.com/spreadsheet/ccc?key=0AkCuuVp5c_x-dFBRdHFQMnQyTGZINWVZaDkySWdnWHc#gid=0";
+    wishlink = "https://docs.google.com/spreadsheet/ccc?key=0AvrVWFdz4jg1dGp3RnVtUGZkak12dnFyVjBXYjlkdHc#gid=0";
     lootHtml = "<table class='table table-striped' id='lootTable'>";
     for (_i = 0, _len = RunPlayers.length; _i < _len; _i++) {
       name = RunPlayers[_i];
