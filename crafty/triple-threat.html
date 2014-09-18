@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Crafty.js - jsFiddle demo</title>
+  
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+  
+  
+  
+  
+    
+      <script type='text/javascript' src="crafty.js"></script>
+    
+  
+  <style type='text/css'>
+    
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+    function run(){
+
+      Crafty.sprite(200, 200, "runner.png", {
+        runstart: [0,0],
+        runmid: [0, 1]
+      })
+      Crafty.background("magenta");
+
+      Crafty.sprite(8, 8, "greenlegs.png", {
+        greenlegs: [0,0],
+        greenlegs2: [1,1]
+      });
+
+
+      Crafty.sprite(500, 255, "grad.png", {
+        grad: [0,0]
+      });
+
+      
+      Crafty.c("JumpMan", {
+
+        init: function(){
+          this.requires("runstart, SpriteAnimation, Tween");
+          this.h = this.w = 64;
+          this.reel("running", 500, [ 
+            [0, 0], [1, 0], [2, 0],
+            [0, 1], [1, 1], [2, 1],
+            [0, 2], [1, 2] 
+          ])
+          this.animate("running", -1);
+        }
+      });
+
+      Crafty.pixelart(true);
+      var comps = ["WebGL", "DOM",  "Canvas"]
+      for (var m=0; m<3; m++){
+        console.log("hey " + m)
+
+        x_0 = 100
+        y_0 = 50 + m * 100
+        comp = "2D, " + comps[m] + ", ";
+        console.log(comp)
+        
+        // Image component
+        Crafty.e(comp +", Image, Tween")
+         .attr({x:x_0, y: y_0, h:50, w:50})
+         .origin("center")
+         .image("greenlegs.png", "repeat")
+         .tween({rotation: 720}, 3000);
+
+         // Rotating red square
+        var test2 = Crafty.e(comp +"Color, Tween").attr({
+          x:x_0 + 200, y:y_0 + 25, h:50, w: 50, z:10
+
+        }).color("red");
+
+        test2.origin("center");
+        test2.tween({x:x_0 + 310, rotation: 360}, 3000);
+        test2.alpha=0.7;
+
+        // Jumpman
+
+        var j = Crafty.e(comp + "JumpMan").attr({x:x_0 + 200, y: y_0 + 16, z:2}).tween({x:x_0 + 400}, 2200);
+        j.alpha = 0.5;
+
+        // moving gradient
+        Crafty.e(comp + "grad, Tween").attr({x:x_0 + 100, y:y_0, w:100, h:100}).tween({x: 400}, 10000).origin("center");
+
+      }
+
+
+
+  
+    
+      return
+
+
+
+
+
+
+
+
+
+      var scale = 0.5;
+      Crafty.viewport.clampToEntities = false
+      Crafty.viewport.follow(j3);
+      Crafty.bind("EnterFrame", function(){
+        scale+=0.01;
+        Crafty.viewport.scale(scale);  
+      })
+      
+
+      /*var sprite = Crafty.e("2D, WebGL, runmid, Tween").attr({
+        x:300, y:350, h:100, w:100, z:5
+
+      });*/
+
+
+     
+
+
+
+
+      return;
+
+
+    };
+
+    function loadScene(){
+
+    };
+    $(window).load(function(){
+      // Init Crafty:
+      Crafty.init();
+      //Crafty.webgl.init();
+
+      Crafty.timer.steptype("variable");
+      Crafty.load( ["greenlegs.png", "runner.png", "grad.png"], run) 
+
+   
+    });//]]>  
+
+</script>
+
+
+</head>
+<body>
+  
+  
+</body>
+
+
+</html>
+
