@@ -340,7 +340,6 @@
       x: 156 + ox,
       y: 300 + oy
     }).umtype(randomUnmakerType());
-    console.log("types " + u.__c.toSource());
     if (u.hit("Block")) {
       u.destroy();
       Crafty.unbind("EnterFrame", checkUnmaker);
