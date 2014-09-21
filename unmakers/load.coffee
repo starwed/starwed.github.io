@@ -81,7 +81,7 @@ Crafty.c("Snap", {
 
 
     preplace: (r, c)->
-        console.log(r, c)
+        #console.log(r, c)
         snapRow = r
         this.y = snapRow * ycell
         if (snapRow%2) is 0
@@ -100,7 +100,7 @@ Crafty.c("Snap", {
         return this
 
     checkAdjacent: ()->
-        console.log("Checking adjacent")
+        #console.log("Checking adjacent")
         this.friends.length = 0
 
         b = getBlock(this.row, this.col-1)
@@ -138,7 +138,7 @@ Crafty.c("Snap", {
 
 
     checkBlock: (b)->
-        console.log('ding')
+        #console.log('ding')
         return if typeof b is "undefined"
         if b?.type is this.type
             console.log("Friend! #{this.type}")
@@ -163,9 +163,16 @@ FindFriends = (type)->
         if (Friends.length>2)
             Friends.each( ()-> this.disintegrate() )
             Crafty.audio.play("trill", 1, 0.1)
+            CheckSupport()
         else
             Friends.each( ()-> this.removeComponent("Friends"))
             Crafty.audio.play("place", 1, 0.2)
+
+
+
+CheckSupport = ()->
+    blocks = Crafty("Block")
+    
 
 
 
@@ -213,7 +220,7 @@ Crafty.c("Block", {
 
 Crafty.c("Unmaker", {
     init: ()->
-        @requires("2D, DOM, Sprite, Ballistic, Collision, KeyboardMan, Snap, Solid, Bounce")
+        @requires("2D, WebGL, Ballistic, Collision, KeyboardMan, Snap, Solid, Bounce")
             .attr({h:32, w:32})
             #.color("purple")
             #.css("border", "1px solid grey")
@@ -270,6 +277,7 @@ Crafty.c("Unmaker", {
                 @active = false###
 
     leap: (data)->
+        Crafty.trigger("JumpPower")
         jumpSound()
         o = {x: this._x + this._w/2, y: this._y + this._h/2}
         dx = data.x - o.x
@@ -285,6 +293,7 @@ Crafty.c("Unmaker", {
 
     umtype: (type)->
         this.type = type
+        console.log("Type #{type}")
         switch type
             when "white" 
                 @addComponent("cloud")
@@ -297,10 +306,12 @@ Crafty.c("Unmaker", {
             when "red"
                 @addComponent("flower")
         this.h=this.w=32
+        console.log(this.program)
         return this
 
 
     _jump: ()->
+        Crafty.trigger("JumpPower")
         jumpSound()
         @grounded = false
         this.launch(@_vx, -7)
@@ -312,14 +323,14 @@ Crafty.c("Unmaker", {
 
 bail = false
 
-newUnmaker = ()->
+newUnmaker = (ox=0, oy=0)->
     if bail is true then return
     if Crafty("Block").length == 0
         clear=true;
         return
     console.log('maker')
     u = Crafty.e("Unmaker")
-        .attr({x:156, y: 300})
+        .attr({x:156+ox, y: 300+oy})
         .umtype(randomUnmakerType())
     console.log("types " + u.__c.toSource())
     if (u.hit("Block"))
@@ -345,6 +356,8 @@ fillBlocks = ()->
     console.log(typeExtant("red"))
     #Crafty("redbubble").each( ()->this.destroy())
     console.log("red bubbles "  + Crafty("redbubble").length)
+
+
 
 
 
@@ -382,14 +395,26 @@ setup = ()->
         .color("maroon")
         
 
+    scoreCard = Crafty.e("2D, DOM, Text")
+        .attr({x: 500, y: 100})
+        .textFont({size: "30px"})
+    score = 50;
+    scoreCard.text(score)
+    Crafty.bind("JumpPower", 
+        ()-> 
+            score--
+            scoreCard.text(score)
+    )
+
 
     
     fillBlocks();
     newUnmaker()
 
+
     Crafty.bind("EnterFrame", checkUnmaker)
 
-    Crafty.bind("BackgroundClick", (data)->console.log("clicked #{data.x}, #{data.y}") )
+    #Crafty.bind("BackgroundClick", (data)->console.log("clicked #{data.x}, #{data.y}") )
  
 
 clickControl = (mouseData)->
@@ -459,7 +484,8 @@ window.onload = ()->
     HEIGHT = 800
     # Initialize Crafty
     Crafty.extraZoom = 1;
-    Crafty.init(WIDTH, HEIGHT)
+    Crafty.init(WIDTH, HEIGHT);
+    Crafty.pixelart(true);
     Crafty.DrawManager.debugDirty = false
     Crafty.timer.steptype("semifixed")
 

@@ -272,10 +272,10 @@ Crafty.c("BounceMethods", {
     
     _bounce: (move)->
         move = move.move;
-        console.log("collision " + move.toSource())
+        #console.log("collision " + move.toSource())
         # Should probably never be called if object is controlled
         if move.x isnt 0
-            console.log("Changing x speed")
+            #console.log("Changing x speed")
             if Math.abs(this._vx) < @threshold 
                 @_vx = 0
             else 
@@ -284,7 +284,7 @@ Crafty.c("BounceMethods", {
                 @_vx = - Math.round(@_vx) * @restitution
                     
         if move.y isnt 0
-            console.log("Changing y speed")
+            #console.log("Changing y speed")
             if Math.abs(@_vy) < @threshold
                 @_vy = 0
             else 
