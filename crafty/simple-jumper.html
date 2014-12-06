@@ -9,6 +9,7 @@
     <script type='text/javascript'>//<![CDATA[ 
  window.onload = function() {
     Crafty.init(600, 300);
+    Crafty.bind("BackgroundClick", function(){Crafty.trigger("KeyDown")})
     Crafty.timer.steptype("variable");
     Crafty.pixelart(false);
     Crafty.timer.FPS(30);
@@ -140,7 +141,8 @@
 
 
 
-    Crafty.bind("EnterFrame", spawnGoomba)
+    Crafty.bind("EnterFrame", spawnGoomba);
+    //Crafty.bind("BackgroundClick", function(){jm.trigger("KeyDown")} );
     
 };
 
