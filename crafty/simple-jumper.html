@@ -11,12 +11,18 @@
   
 
     <script type='text/javascript'>//<![CDATA[ 
+
+
+    function jump_ease(){
+        return this.time()*this.time()*(2- this.time()*this.time())
+    }
+
  window.onload = function() {
     Crafty.init(600, 300);
     Crafty.bind("BackgroundClick", function(){Crafty.trigger("KeyDown")})
     Crafty.timer.steptype("variable");
     Crafty.pixelart(false);
-    Crafty.timer.FPS(30);
+    Crafty.timer.FPS(50);
     Crafty.scene("play", startgame);
     Crafty.load(
     {
@@ -57,16 +63,16 @@
 
     //Jumpman
 
-    var jm = Crafty.e("Player, 2D, WebGL, runstart, Keyboard, Tween, Collision, SpriteAnimation")
+    var jm = Crafty.e("Player, 2D, WebGL, runstart, Keyboard, Tween, Collision, SpriteAnimation, WiredHitBox")
         //.color("blue")
         .attr({x:200, y:200, h:50, w:50})
         .origin(25, 25)
         .bind("KeyDown", function(){
             if (this.y > 199){
-                this.tween({y: 50, rotation:180}, 1000/VELOCITY);
+                this.tween({y: 50, rotation:180}, 1000/VELOCITY, jump_ease);
                 this._flipX = true;
             } else if (this.y < 51) {
-                this.tween({y: 200, rotation:0}, 1000/VELOCITY);
+                this.tween({y: 200, rotation:0}, 1000/VELOCITY, jump_ease);
                 this._flipX = false;
             }
         }).bind("EnterFrame", function(){
@@ -100,6 +106,7 @@
         _onEnterFrame: function(frameData){
             this.x-= VELOCITY * frameData.dt / 20;
             if (this.x<0){
+                this.trigger("OffLeft")
                 this.destroy();
             }
         },
@@ -132,6 +139,11 @@
             //this.color("yellow")
             this.attr({h:40, w:40, x:600});
             this.bind("EnterFrame", this._checkHits);
+            this.bind("OffLeft", this._offLeft)
+        },
+
+        _offLeft: function(){
+
         },
 
         _checkHits: function(){
