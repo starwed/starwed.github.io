@@ -27,12 +27,17 @@
       Crafty.init();
       Crafty.stage.fullscreen = true
       //Crafty.webgl.init();
-
+      var counter = 0;
       Crafty.timer.steptype("semifixed");
-      Crafty.e("2D, WebGL, Color").color("red").attr({x:100, y:100, w:50, h:50})
+      var e = Crafty.e("2D, WebGL, Color").color("red").attr({x:100, y:100, w:50, h:50})
         .bind("EnterFrame", function(){
+          counter++;
           this.rotation += 5;
+          if (counter>3){
+            throw("Done for now")
+          }
         })
+      e.rotation = 45;
 
    
     });//]]>
