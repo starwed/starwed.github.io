@@ -1,0 +1,2740 @@
+[
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nCollection of mostly private methods to draw entities on a canvas element."
+            }
+        ],
+        "name": "Crafty.canvasLayer",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.canvasLayer.add(ent)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "ent",
+                        "description": "The entity to add"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nAdd an entity to the list of Canvas objects to draw"
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.canvasLayer.add",
+        "comp": "Crafty.canvasLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nThis will return the 2D context of the main canvas element.\nThe value returned from `Crafty.canvasLayer._canvas.getContext('2d')`."
+            }
+        ],
+        "name": "Crafty.canvasLayer.context",
+        "comp": "Crafty.canvasLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nMain Canvas element"
+            }
+        ],
+        "name": "Crafty.canvasLayer._canvas",
+        "comp": "Crafty.canvasLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.canvasLayer.init(void)",
+                "contents": []
+            },
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "NoCanvas",
+                        "description": "triggered if `Crafty.support.canvas` is false",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nCreates a `canvas` element inside `Crafty.stage.elem`. Must be called\nbefore any entities with the Canvas component can be drawn."
+            },
+            {
+                "type": "raw",
+                "value": "\nThis method will automatically be called if no `Crafty.canvasLayer.context` is\nfound."
+            }
+        ],
+        "name": "Crafty.canvasLayer.init",
+        "comp": "Crafty.canvasLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.canvasLayer.drawDirty()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\n- Triggered by the \"RenderScene\" event\n- If the number of rects is over 60% of the total number of objects\n do the naive method redrawing `Crafty.canvasLayer.drawAll` instead\n- Otherwise, clear the dirty regions, and redraw entities overlapping the dirty regions."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Canvas.draw"
+                ]
+            }
+        ],
+        "name": "Crafty.canvasLayer.drawDirty",
+        "comp": "Crafty.canvasLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.canvasLayer.drawAll([Object rect])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "rect",
+                        "description": "a rectangular region {_x: x_val, _y: y_val, _w: w_val, _h: h_val}"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\n- If rect is omitted, redraw within the viewport\n- If rect is provided, redraw within the rect"
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.canvasLayer.drawAll",
+        "comp": "Crafty.canvasLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "_clean: function () {\nvar rect, obj, i, l,\nchanged = this._changedObjs;\nfor (i = 0, l = changed.length; i < l; i++) {\nobj = changed[i];\nrect = obj._mbr || obj;\nif (typeof obj.staleRect === 'undefined')\nobj.staleRect = {};\nobj.staleRect._x = rect._x;\nobj.staleRect._y = rect._y;\nobj.staleRect._w = rect._w;\nobj.staleRect._h = rect._h;"
+            },
+            {
+                "type": "raw",
+                "value": "\nobj._changed = false;\n}\nchanged.length = 0;\nthis._dirtyRects.length = 0;\nthis._dirtyViewport = false;"
+            },
+            {
+                "type": "raw",
+                "value": "\n},"
+            },
+            {
+                "type": "raw",
+                "value": "\n/* Takes the current and previous position of an object, and pushes the dirty regions onto the stack\n If the entity has only moved/changed a little bit, the regions are squashed together */\n_createDirty: function (obj) {"
+            },
+            {
+                "type": "raw",
+                "value": "\nvar rect = obj._mbr || obj,\ndirty = this._dirtyRects,\nrectManager = Crafty.rectManager;"
+            },
+            {
+                "type": "raw",
+                "value": "\nif (obj.staleRect) {\n//If overlap, merge stale and current position together, then return\n//Otherwise just push stale rectangle\nif (rectManager.overlap(obj.staleRect, rect)) {\nrectManager.merge(obj.staleRect, rect, obj.staleRect);\ndirty.push(obj.staleRect);\nreturn;\n} else {\ndirty.push(obj.staleRect);\n}\n}"
+            },
+            {
+                "type": "raw",
+                "value": "\n// We use the intermediate \"currentRect\" so it can be modified without messing with obj\nobj.currentRect._x = rect._x;\nobj.currentRect._y = rect._y;\nobj.currentRect._w = rect._w;\nobj.currentRect._h = rect._h;\ndirty.push(obj.currentRect);"
+            },
+            {
+                "type": "raw",
+                "value": "\n},"
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "raw",
+                "value": "\n// Resize the canvas element to the current viewport\n_resize: function() {\nvar c = Crafty.canvasLayer._canvas;\nc.width = Crafty.viewport.width;\nc.height = Crafty.viewport.height;"
+            },
+            {
+                "type": "raw",
+                "value": "\n},"
+            },
+            {
+                "type": "raw",
+                "value": "\n_setPixelart: function(enabled) {\nvar context = Crafty.canvasLayer.context;\ncontext.imageSmoothingEnabled = !enabled;\ncontext.mozImageSmoothingEnabled = !enabled;\ncontext.webkitImageSmoothingEnabled = !enabled;\ncontext.oImageSmoothingEnabled = !enabled;\ncontext.msImageSmoothingEnabled = !enabled;\n}"
+            },
+            {
+                "type": "raw",
+                "value": "\n}"
+            }
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Draw",
+                        "description": "when the entity is ready to be drawn to the stage",
+                        "objName": "Data",
+                        "objProp": "{type: \"canvas\", pos, co, ctx}"
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "NoCanvas",
+                        "description": "if the browser does not support canvas",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nWhen this component is added to an entity it will be drawn to the global canvas element. The canvas element (and hence all Canvas entities) is always rendered below any DOM entities."
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.canvasLayer.init() will be automatically called if it is not called already to initialize the canvas element."
+            },
+            {
+                "type": "raw",
+                "value": "\nCreate a canvas entity like this\n~~~\nvar myEntity = Crafty.e(\"2D, Canvas, Color\")\n     .color(\"green\")\n     .attr({x: 13, y: 37, w: 42, h: 42});\n~~~"
+            }
+        ],
+        "name": "Canvas",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .draw([[Context ctx, ]Number x, Number y, Number w, Number h])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "ctx",
+                        "description": "Canvas 2D context if drawing on another canvas is required"
+                    },
+                    {
+                        "type": "param",
+                        "name": "x",
+                        "description": "X offset for drawing a segment"
+                    },
+                    {
+                        "type": "param",
+                        "name": "y",
+                        "description": "Y offset for drawing a segment"
+                    },
+                    {
+                        "type": "param",
+                        "name": "w",
+                        "description": "Width of the segment to draw"
+                    },
+                    {
+                        "type": "param",
+                        "name": "h",
+                        "description": "Height of the segment to draw"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nMethod to draw the entity on the canvas element. Can pass rect values for redrawing a segment of the entity."
+                    }
+                ]
+            }
+        ],
+        "name": ".draw",
+        "comp": "Canvas"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "Crafty.assignColor(color[, assignee])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "color",
+                        "description": "a string represenation of the color to assign, in any valid HTML format"
+                    },
+                    {
+                        "type": "param",
+                        "name": "assignee",
+                        "description": "an object to use instead of creating one from scratch"
+                    },
+                    {
+                        "type": "return",
+                        "value": "An object with `_red`, `_green`, and `_blue` properties assigned."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "          Potentially with `_strength` representing the alpha channel.\n          If the assignee parameter is passed, that object will be assigned those values and returned."
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.assignColor",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "Draw a colored rectangle."
+            }
+        ],
+        "name": "Color",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Invalidate",
+                        "description": "when the color changes",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nWill assign the color and opacity, either through a string shorthand, or through explicit rgb values."
+            },
+            {
+                "type": "method",
+                "signature": "public this .color(String color[, Float strength])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "color",
+                        "description": "Color of the rectangle"
+                    },
+                    {
+                        "type": "param",
+                        "name": "strength",
+                        "description": "the opacity of the rectangle"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .color(r, g, b[, strength])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "r",
+                        "description": "value for the red channel"
+                    },
+                    {
+                        "type": "param",
+                        "name": "g",
+                        "description": "value for the green channel"
+                    },
+                    {
+                        "type": "param",
+                        "name": "b",
+                        "description": "value for the blue channel"
+                    },
+                    {
+                        "type": "param",
+                        "name": "strength",
+                        "description": "the opacity of the rectangle"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public String .color()",
+                "contents": [
+                    {
+                        "type": "return",
+                        "value": "A string representing the current color as a CSS property."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "```\nvar c = Crafty.e(\"2D, DOM, Color\");\nc.color(\"#FF0000\");\nc.color(\"red\");\nc.color(255, 0, 0);\nc.color(\"rgb(255, 0, 0\")\n```\nThree different ways of assign the color red.\n```\nvar c = Crafty.e(\"2D, DOM, Color\");\nc.color(\"#00FF00\", 0.5);\nc.color(\"rgba(0, 255, 0, 0.5)\");\n```\nTwo ways of assigning a transparent green color."
+            }
+        ],
+        "name": ".color",
+        "comp": "Color"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nCollection of mostly private methods to represent entities using the DOM."
+            }
+        ],
+        "name": "Crafty.domLayer",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.domLayer.debug()",
+                "contents": []
+            }
+        ],
+        "name": "Crafty.domLayer.debug",
+        "comp": "Crafty.domLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.domLayer.render()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nWhen \"RenderScene\" is triggered, draws all DOM entities that have been flagged"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "DOM.draw"
+                ]
+            }
+        ],
+        "name": "Crafty.domLayer._render",
+        "comp": "Crafty.domLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.domLayer.add(ent)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "ent",
+                        "description": "The entity to add"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nAdd an entity to the list of DOM object to draw"
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.domLayer.add",
+        "comp": "Crafty.domLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "Draws entities as DOM nodes, specifically `<DIV>`s."
+            }
+        ],
+        "name": "DOM",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "The DOM element used to represent the entity."
+            }
+        ],
+        "name": "._element",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "Avoids using of CSS 3D Transform for positioning when true. Default value is false."
+            }
+        ],
+        "name": ".avoidCss3dTransforms",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .getId()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nGet the Id of the DOM element used to represent the entity."
+                    }
+                ]
+            }
+        ],
+        "name": ".getDomId",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Draw",
+                        "description": "when the entity is ready to be drawn to the stage",
+                        "objName": "Data",
+                        "objProp": "{ style:String, type:\"DOM\", co}"
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .DOM(HTMLElement elem)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "elem",
+                        "description": "HTML element that will replace the dynamically created one"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nPass a DOM element to use rather than one created. Will set `._element` to this value. Removes the old element."
+                    }
+                ]
+            }
+        ],
+        "name": ".DOM",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .draw(void)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nUpdates the CSS properties of the node to draw on the stage."
+                    }
+                ]
+            }
+        ],
+        "name": ".draw",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .undraw(void)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nRemoves the element from the stage."
+                    }
+                ]
+            }
+        ],
+        "name": ".undraw",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public css(String property, String value)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "property",
+                        "description": "CSS property to modify"
+                    },
+                    {
+                        "type": "param",
+                        "name": "value",
+                        "description": "Value to give the CSS property"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public  css(Object map)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "map",
+                        "description": "Object where the key is the CSS property and the value is CSS value"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nApply CSS styles to the element."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nCan pass an object where the key is the style property and the value is style value."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nFor setting one style, simply pass the style as the first argument and the value as the second."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThe notation can be CSS or JS (e.g. `text-align` or `textAlign`)."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nTo return a value, pass the property."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nNote: For entities with \"Text\" component, some css properties are controlled by separate functions\n`.textFont()` and `.textColor()`, and ignore `.css()` settings. See Text component for details."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nthis.css({'text-align': 'center', 'text-decoration': 'line-through'});\nthis.css(\"textAlign\", \"center\");\nthis.css(\"text-align\"); //returns center\n~~~"
+            }
+        ],
+        "name": ".css",
+        "comp": "DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.pixelart(Boolean enabled)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nSets the image smoothing for drawing images (for both DOM and Canvas).\nSetting this to true disables smoothing for images, which is the preferred\nway for drawing pixel art. Defaults to false."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis feature is experimental and you should be careful with cross-browser compatibility.\nThe best way to disable image smoothing is to use the Canvas render method and the Sprite component for drawing your entities."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf you want to switch modes in the middle of a scene,\nbe aware that canvas entities won't be drawn in the new style until something else invalidates them.\n(You can manually invalidate all canvas entities with `Crafty(\"Canvas\").trigger(\"Invalidate\");`)"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nNote that Firefox_26 currently has a [bug](https://bugzilla.mozilla.org/show_bug.cgi?id=696630)\nwhich prevents disabling image smoothing for Canvas entities that use the Image component. Use the Sprite\ncomponent instead.\nNote that Webkit (Chrome & Safari) currently has a bug [link1](http://code.google.com/p/chromium/issues/detail?id=134040)\n[link2](http://code.google.com/p/chromium/issues/detail?id=106662) that prevents disabling image smoothing\nfor DOM entities."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "This is the preferred way to draw pixel art with the best cross-browser compatibility.\n~~~\nCrafty.canvasLayer.init();\nCrafty.pixelart(true);"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.sprite(imgWidth, imgHeight, \"spriteMap.png\", {sprite1:[0,0]});\nCrafty.e(\"2D, Canvas, sprite1\");\n~~~"
+            }
+        ],
+        "name": "Crafty.pixelart",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "Component allow for insertion of arbitrary HTML into an entity"
+            }
+        ],
+        "name": "HTML",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .replace(String html)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "html",
+                        "description": "arbitrary html"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis method will replace the content of this entity with the supplied html"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "Create a link\n~~~\nCrafty.e(\"HTML\")\n   .attr({x:20, y:20, w:100, h:100})\n   .replace(\"<a href='index.html'>Index</a>\");\n~~~"
+            }
+        ],
+        "name": ".replace",
+        "comp": "HTML"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .append(String html)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "html",
+                        "description": "arbitrary html"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis method will add the supplied html in the end of the entity"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "Create a link\n~~~\nCrafty.e(\"HTML\")\n   .attr({x:20, y:20, w:100, h:100})\n   .append(\"<a href='index.html'>Index</a>\");\n~~~"
+            }
+        ],
+        "name": ".append",
+        "comp": "HTML"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .prepend(String html)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "html",
+                        "description": "arbitrary html"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis method will add the supplied html in the beginning of the entity"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "Create a link\n~~~\nCrafty.e(\"HTML\")\n   .attr({x:20, y:20, w:100, h:100})\n   .prepend(\"<a href='index.html'>Index</a>\");\n~~~"
+            }
+        ],
+        "name": ".prepend",
+        "comp": "HTML"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "Draw an image with or without repeating (tiling)."
+            }
+        ],
+        "name": "Image",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Invalidate",
+                        "description": "when the image is loaded",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .image(String url[, String repeat])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "url",
+                        "description": "URL of the image"
+                    },
+                    {
+                        "type": "param",
+                        "name": "repeat",
+                        "description": "If the image should be repeated to fill the entity."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nDraw specified image. Repeat follows CSS syntax (`\"no-repeat\", \"repeat\", \"repeat-x\", \"repeat-y\"`);"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\n*Note: Default repeat is `no-repeat` which is different to standard DOM (which is `repeat`)*"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf the width and height are `0` and repeat is set to `no-repeat` the width and\nheight will automatically assume that of the image. This is an\neasy way to create an image without needing sprites."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf set to `no-repeat` and given dimensions larger than that of the image, the exact appearance will depend on what renderer (WebGL, DOM, or Canvas) is used."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "Will default to no-repeat. Entity width and height will be set to the images width and height\n~~~\nvar ent = Crafty.e(\"2D, DOM, Image\").image(\"myimage.png\");\n~~~\nCreate a repeating background.\n~~~\nvar bg = Crafty.e(\"2D, DOM, Image\")\n             .attr({w: Crafty.viewport.width, h: Crafty.viewport.height})\n             .image(\"bg.png\", \"repeat\");\n~~~"
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Crafty.sprite"
+                ]
+            }
+        ],
+        "name": ".image",
+        "comp": "Image"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "ParticleEnd",
+                        "description": "when the particle animation has finished",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "Based on Parcycle by Mr. Speaker, licensed under the MIT, Ported by Leo Koppelkamm\n**This is canvas only & won't do anything if the browser doesn't support it!**\nTo see how this works take a look in https://github.com/craftyjs/Crafty/blob/master/src/particles.js"
+            }
+        ],
+        "name": "Particles",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .particles(Object options)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "options",
+                        "description": "Map of options that specify the behavior and look of the particles."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nvar options = {\n\tmaxParticles: 150,\n\tsize: 18,\n\tsizeRandom: 4,\n\tspeed: 1,\n\tspeedRandom: 1.2,\n\t// Lifespan in frames\n\tlifeSpan: 29,\n\tlifeSpanRandom: 7,\n\t// Angle is calculated clockwise: 12pm is 0deg, 3pm is 90deg etc.\n\tangle: 65,\n\tangleRandom: 34,\n\tstartColour: [255, 131, 0, 1],\n\tstartColourRandom: [48, 50, 45, 0],\n\tendColour: [245, 35, 0, 0],\n\tendColourRandom: [60, 60, 60, 0],\n\t// Only applies when fastMode is off, specifies how sharp the gradients are drawn\n\tsharpness: 20,\n\tsharpnessRandom: 10,\n\t// Random spread from origin\n\tspread: 10,\n\t// How many frames should this last\n\tduration: -1,\n\t// Will draw squares instead of circle gradients\n\tfastMode: false,\n\tgravity: { x: 0, y: 0.1 },\n\t// sensible values are 0-3\n\tjitter: 0\n}"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D,Canvas,Particles\").particles(options);\n~~~"
+            }
+        ],
+        "name": ".particles",
+        "comp": "Particles"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "StartAnimation",
+                        "description": "When an animation starts playing, or is resumed from the paused state",
+                        "objName": "Data",
+                        "objProp": "{Reel}"
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "AnimationEnd",
+                        "description": "When the animation finishes",
+                        "objName": "Data",
+                        "objProp": "{ Reel }"
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "FrameChange",
+                        "description": "Each time the frame of the current reel changes",
+                        "objName": "Data",
+                        "objProp": "{ Reel }"
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "ReelChange",
+                        "description": "When the reel changes",
+                        "objName": "Data",
+                        "objProp": "{ Reel }"
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nUsed to animate sprites by treating a sprite map as a set of animation frames.\nMust be applied to an entity that has a sprite-map component."
+            },
+            {
+                "type": "raw",
+                "value": "\nTo define an animation, see the `reel` method.  To play an animation, see the `animate` method."
+            },
+            {
+                "type": "raw",
+                "value": "\nA reel is an object that contains the animation frames and current state for an animation.  The reel object has the following properties:"
+            },
+            {
+                "type": "param",
+                "name": "id: (String)",
+                "description": "the name of the reel"
+            },
+            {
+                "type": "param",
+                "name": "frames: (Array)",
+                "description": "A list of frames in the format [xpos, ypos]"
+            },
+            {
+                "type": "param",
+                "name": "currentFrame: (Number)",
+                "description": "The index of the current frame"
+            },
+            {
+                "type": "param",
+                "name": "easing: (Crafty.easing object)",
+                "description": "The object that handles the internal progress of the animation."
+            },
+            {
+                "type": "param",
+                "name": "duration: (Number)",
+                "description": "The duration in milliseconds."
+            },
+            {
+                "type": "raw",
+                "value": "\nMany animation related events pass a reel object as data.  As typical with events, this should be treated as read only data that might be later altered by the entity.  If you wish to preserve the data, make a copy of it."
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Crafty.sprite"
+                ]
+            }
+        ],
+        "name": "SpriteAnimation",
+        "cateogries": [
+            "Animation"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nThe playback rate of the animation.  This property defaults to 1."
+            }
+        ],
+        "name": ".animationSpeed",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "Used to define reels, to change the active reel, and to fetch the id of the active reel."
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "method",
+                "signature": "public this .reel(String reelId, Duration duration, Number fromX, Number fromY, Number frameCount)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "Defines a reel by starting and ending position on the sprite sheet."
+                    },
+                    {
+                        "type": "param",
+                        "name": "reelId",
+                        "description": "ID of the animation reel being created"
+                    },
+                    {
+                        "type": "param",
+                        "name": "duration",
+                        "description": "The length of the animation in milliseconds."
+                    },
+                    {
+                        "type": "param",
+                        "name": "fromX",
+                        "description": "Starting `x` position on the sprite map (x's unit is the horizontal size of the sprite in the sprite map)."
+                    },
+                    {
+                        "type": "param",
+                        "name": "fromY",
+                        "description": "`y` position on the sprite map (y's unit is the horizontal size of the sprite in the sprite map). Remains constant through the animation."
+                    },
+                    {
+                        "type": "param",
+                        "name": "frameCount",
+                        "description": "The number of sequential frames in the animation.  If negative, the animation will play backwards."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .reel(String reelId, Duration duration, Array frames)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "Defines a reel by an explicit list of frames"
+                    },
+                    {
+                        "type": "param",
+                        "name": "reelId",
+                        "description": "ID of the animation reel being created"
+                    },
+                    {
+                        "type": "param",
+                        "name": "duration",
+                        "description": "The length of the animation in milliseconds."
+                    },
+                    {
+                        "type": "param",
+                        "name": "frames",
+                        "description": "An array of arrays containing the `x` and `y` values of successive frames: [[x1,y1],[x2,y2],...] (the values are in the unit of the sprite map's width/height respectively)."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .reel(String reelId)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "Switches to the specified reel.  The sprite will be updated to that reel's current frame"
+                    },
+                    {
+                        "type": "param",
+                        "name": "reelID",
+                        "description": "the ID to switch to"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public Reel .reel()",
+                "contents": [
+                    {
+                        "type": "return",
+                        "value": "The id of the current reel"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nA method to handle animation reels.  Only works for sprites built with the Crafty.sprite methods.\nSee the Tween component for animation of 2D properties."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nTo setup an animation reel, pass the name of the reel (used to identify the reel later), and either an\narray of absolute sprite positions or the start x on the sprite map, the y on the sprite map and then the end x on the sprite map."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\n// Define a sprite-map component\nCrafty.sprite(16, \"images/sprite.png\", {\n    PlayerSprite: [0,0]\n});"
+            },
+            {
+                "type": "raw",
+                "value": "\n// Define an animation on the second row of the sprite map (fromY = 1)\n// from the left most sprite (fromX = 0) to the fourth sprite\n// on that row (frameCount = 4), with a duration of 1 second\nCrafty.e(\"2D, DOM, SpriteAnimation, PlayerSprite\").reel('PlayerRunning', 1000, 0, 1, 4);"
+            },
+            {
+                "type": "raw",
+                "value": "\n// This is the same animation definition, but using the alternative method\nCrafty.e(\"2D, DOM, SpriteAnimation, PlayerSprite\").reel('PlayerRunning', 1000, [[0, 1], [1, 1], [2, 1], [3, 1]]);\n~~~"
+            }
+        ],
+        "name": ".reel",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .animate([String reelId] [, Number loopCount])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "reelId",
+                        "description": "ID of the animation reel to play.  Defaults to the current reel if none is specified."
+                    },
+                    {
+                        "type": "param",
+                        "name": "loopCount",
+                        "description": "Number of times to repeat the animation. Use -1 to repeat indefinitely.  Defaults to 1."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nPlay one of the reels previously defined through `.reel(...)`. Simply pass the name of the reel. If you wish the\nanimation to play multiple times in succession, pass in the amount of times as an additional parameter.\nTo have the animation repeat indefinitely, pass in `-1`."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf another animation is currently playing, it will be paused."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis will always play an animation from the beginning.  If you wish to resume from the current state of a reel, use `resumeAnimation()`."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nOnce an animation ends, it will remain at its last frame."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\n// Define a sprite-map component\nCrafty.sprite(16, \"images/sprite.png\", {\n    PlayerSprite: [0,0]\n});"
+            },
+            {
+                "type": "raw",
+                "value": "\n// Play the animation across 20 frames (so each sprite in the 4 sprite animation should be seen for 5 frames) and repeat indefinitely\nCrafty.e(\"2D, DOM, SpriteAnimation, PlayerSprite\")\n    .reel('PlayerRunning', 20, 0, 0, 3) // setup animation\n    .animate('PlayerRunning', -1); // start animation\n~~~"
+            }
+        ],
+        "name": ".animate",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .resumeAnimation()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nThis will resume animation of the current reel from its current state.\nIf a reel is already playing, or there is no current reel, there will be no effect."
+                    }
+                ]
+            }
+        ],
+        "name": ".resumeAnimation",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .pauseAnimation(void)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nPauses the currently playing animation, or does nothing if no animation is playing."
+                    }
+                ]
+            }
+        ],
+        "name": ".pauseAnimation",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .resetAnimation()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nResets the current animation to its initial state.  Resets the number of loops to the last specified value, which defaults to 1."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nNeither pauses nor resumes the current animation."
+                    }
+                ]
+            }
+        ],
+        "name": ".resetAnimation",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .loops(Number loopCount)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "loopCount",
+                        "description": "The number of times to play the animation"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nSets the number of times the animation will loop for.\nIf called while an animation is in progress, the current state will be considered the first loop."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public Number .loops()",
+                "contents": [
+                    {
+                        "type": "return",
+                        "value": "The number of loops left.  Returns 0 if no reel is active."
+                    }
+                ]
+            }
+        ],
+        "name": ".loops",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "method",
+                "signature": "public this .reelPosition(Integer position)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "Sets the position of the current reel by frame number."
+                    },
+                    {
+                        "type": "param",
+                        "name": "position",
+                        "description": "the frame to jump to.  This is zero-indexed.  A negative values counts back from the last frame."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .reelPosition(Number position)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "Sets the position of the current reel by percent progress."
+                    },
+                    {
+                        "type": "param",
+                        "name": "position",
+                        "description": "a non-integer number between 0 and 1"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .reelPosition(String position)",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "Jumps to the specified position.  The only currently accepted value is \"end\", which will jump to the end of the reel."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public Number .reelPosition()",
+                "contents": [
+                    {
+                        "type": "return",
+                        "value": "The current frame number"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            }
+        ],
+        "name": ".reelPosition",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Boolean .isPlaying([String reelId])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "reelId",
+                        "description": "The reelId of the reel we wish to examine"
+                    },
+                    {
+                        "type": "return",
+                        "value": "The current animation state"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nDetermines if the specified animation is currently playing. If no reelId is specified,\nchecks if any animation is playing."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nmyEntity.isPlaying() // is any animation playing\nmyEntity.isPlaying('PlayerRunning') // is the PlayerRunning animation playing\n~~~"
+            }
+        ],
+        "name": ".isPlaying",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Reel .getReel()",
+                "contents": [
+                    {
+                        "type": "return",
+                        "value": "The current reel, or null if there is no active reel"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public Reel .getReel(reelId)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "reelId",
+                        "description": "The id of the reel to fetch."
+                    },
+                    {
+                        "type": "return",
+                        "value": "The specified reel, or `undefined` if no such reel exists."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            }
+        ],
+        "name": ".getReel",
+        "comp": "SpriteAnimation"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this Crafty.sprite([Number tile, [Number tileh]], String url, Object map[, Number paddingX[, Number paddingY[, Boolean paddingAroundBorder]]])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "tile",
+                        "description": "Tile size of the sprite map, defaults to 1"
+                    },
+                    {
+                        "type": "param",
+                        "name": "tileh",
+                        "description": "Height of the tile; if provided, tile is interpreted as the width"
+                    },
+                    {
+                        "type": "param",
+                        "name": "url",
+                        "description": "URL of the sprite image"
+                    },
+                    {
+                        "type": "param",
+                        "name": "map",
+                        "description": "Object where the key is what becomes a new component and the value points to a position on the sprite map"
+                    },
+                    {
+                        "type": "param",
+                        "name": "paddingX",
+                        "description": "Horizontal space in between tiles. Defaults to 0."
+                    },
+                    {
+                        "type": "param",
+                        "name": "paddingY",
+                        "description": "Vertical space in between tiles. Defaults to paddingX."
+                    },
+                    {
+                        "type": "param",
+                        "name": "paddingAroundBorder",
+                        "description": "If padding should be applied around the border of the sprite sheet. If enabled the first tile starts at (paddingX,paddingY) instead of (0,0). Defaults to false."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "Generates components based on positions in a sprite image to be applied to entities."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nAccepts a tile size, URL and map for the name of the sprite and its position."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThe position must be an array containing the position of the sprite where index `0`\nis the `x` position, `1` is the `y` position and optionally `2` is the width and `3`\nis the height. If the sprite map has padding, pass the values for the `x` padding\nor `y` padding. If they are the same, just add one value."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf the sprite image has no consistent tile size, `1` or no argument need be\npassed for tile size."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nEntities that add the generated components are also given the `2D` component, and\na component called `Sprite`."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.sprite(\"imgs/spritemap6.png\", {flower:[0,0,20,30]});\nvar flower_entity = Crafty.e(\"2D, DOM, flower\");\n~~~\nThe first line creates a component called `flower` associated with the sub-image of\nspritemap6.png with top-left corner (0,0), width 20 pixels, and height 30 pixels.\nThe second line creates an entity with that image. (Note: The `2D` is not really\nnecessary here, because adding the `flower` component automatically also adds the\n`2D` component.)\n~~~\nCrafty.sprite(50, \"imgs/spritemap6.png\", {flower:[0,0], grass:[0,1,3,1]});\n~~~\nIn this case, the `flower` component is pixels 0 <= x < 50, 0 <= y < 50, and the\n`grass` component is pixels 0 <= x < 150, 50 <= y < 100. (The `3` means grass has a\nwidth of 3 tiles, i.e. 150 pixels.)\n~~~\nCrafty.sprite(50, 100, \"imgs/spritemap6.png\", {flower:[0,0], grass:[0,1]}, 10);\n~~~\nIn this case, each tile is 50x100, and there is a spacing of 10 pixels between\nconsecutive tiles. So `flower` is pixels 0 <= x < 50, 0 <= y < 100, and `grass` is\npixels 0 <= x < 50, 110 <= y < 210."
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Sprite"
+                ]
+            }
+        ],
+        "name": "Crafty.sprite",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Invalidate",
+                        "description": "when the sprites change",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "Component for using tiles in a sprite map."
+            }
+        ],
+        "name": "Sprite",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .sprite(Number x, Number y[, Number w, Number h])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "x",
+                        "description": "X cell position"
+                    },
+                    {
+                        "type": "param",
+                        "name": "y",
+                        "description": "Y cell position"
+                    },
+                    {
+                        "type": "param",
+                        "name": "w",
+                        "description": "Width in cells. Optional."
+                    },
+                    {
+                        "type": "param",
+                        "name": "h",
+                        "description": "Height in cells. Optional."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nUses a new location on the sprite map as its sprite. If w or h are ommitted, the width and height are not changed."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nValues should be in tiles or cells (not pixels)."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.e(\"2D, DOM, Sprite\")\n  .sprite(0, 0, 2, 2);\n~~~"
+            }
+        ],
+        "name": ".sprite",
+        "comp": "Sprite"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nThe coordinate of the slide within the sprite in the format of [x, y, w, h]."
+            }
+        ],
+        "name": ".__coord",
+        "comp": "Sprite"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .crop(Number x, Number y, Number w, Number h)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "x",
+                        "description": "Offset x position"
+                    },
+                    {
+                        "type": "param",
+                        "name": "y",
+                        "description": "Offset y position"
+                    },
+                    {
+                        "type": "param",
+                        "name": "w",
+                        "description": "New width"
+                    },
+                    {
+                        "type": "param",
+                        "name": "h",
+                        "description": "New height"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf the entity needs to be smaller than the tile size, use this method to crop it."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThe values should be in pixels rather than tiles."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.e(\"2D, DOM, Sprite\")\n  .crop(40, 40, 22, 23);\n~~~"
+            }
+        ],
+        "name": ".crop",
+        "comp": "Sprite"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Invalidate",
+                        "description": "when the text is changed",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "Component to make a text entity."
+            },
+            {
+                "type": "raw",
+                "value": "\nBy default, text will have the style \"10px sans-serif\"."
+            },
+            {
+                "type": "raw",
+                "value": "\nNote 1: An entity with the text component is just text! If you want to write text\ninside an image, you need one entity for the text and another entity for the image.\nMore tips for writing text inside an image: (1) Use the z-index (from 2D component)\nto ensure that the text is on top of the image, not the other way around; (2)\nuse .attach() (from 2D component) to glue the text to the image so they move and\nrotate together."
+            },
+            {
+                "type": "raw",
+                "value": "\nNote 2: For DOM (but not canvas) text entities, various font settings (like\ntext-decoration and text-align) can be set using `.css()` (see DOM component). But\nyou cannot use `.css()` to set the properties which are controlled by `.textFont()`\nor `.textColor()` -- the settings will be ignored."
+            },
+            {
+                "type": "raw",
+                "value": "\nNote 3: If you use canvas text with glyphs that are taller than standard letters, portions of the glyphs might be cut off."
+            }
+        ],
+        "name": "Text",
+        "cateogries": [
+            "Graphics"
+        ],
+        "requires": "Canvas or DOM"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .text(String text)",
+                "contents": []
+            },
+            {
+                "type": "method",
+                "signature": "public this .text(Function textgenerator)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "text",
+                        "description": "String of text that will be inserted into the DOM or Canvas element."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis method will update the text inside the entity."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf you need to reference attributes on the entity itself you can pass a function instead of a string."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.e(\"2D, DOM, Text\").attr({ x: 100, y: 100 }).text(\"Look at me!!\");"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D, DOM, Text\").attr({ x: 100, y: 100 })\n    .text(function () { return \"My position is \" + this._x });"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D, Canvas, Text\").attr({ x: 100, y: 100 }).text(\"Look at me!!\");"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D, Canvas, Text\").attr({ x: 100, y: 100 })\n    .text(function () { return \"My position is \" + this._x });\n~~~"
+            }
+        ],
+        "name": ".text",
+        "comp": "Text"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .textColor(String color)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "color",
+                        "description": "The color in name, hex, rgb or rgba"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nChange the color of the text. You can use HEX, rgb and rgba colors."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf you want the text to be transparent, you should use rgba where you can define alphaChannel."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.e(\"2D, DOM, Text\").attr({ x: 100, y: 100 }).text(\"Look at me!!\")\n  .textColor('#FF0000');"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D, Canvas, Text\").attr({ x: 100, y: 100 }).text('Look at me!!')\n  .textColor('rgba(0, 255, 0, 0.5)');"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D, Canvas, Text\").attr({ x: 100, y: 100 }).text('Look at me!!')\n  .textColor('white');\n~~~"
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Crafty.assignColor"
+                ]
+            }
+        ],
+        "name": ".textColor",
+        "comp": "Text"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Invalidate",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .textFont(String key, * value)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "key",
+                        "description": "Property of the entity to modify"
+                    },
+                    {
+                        "type": "param",
+                        "name": "value",
+                        "description": "Value to set the property to"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .textFont(Object map)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "map",
+                        "description": "Object where the key is the property to modify and the value as the property value"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nUse this method to set font property of the text entity.  Possible values are: type, weight, size, family, lineHeight, and variant."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nWhen rendered by the canvas, lineHeight and variant will be ignored."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.e(\"2D, DOM, Text\").textFont({ type: 'italic', family: 'Arial' });\nCrafty.e(\"2D, Canvas, Text\").textFont({ size: '20px', weight: 'bold' });"
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.e(\"2D, Canvas, Text\").textFont(\"type\", \"italic\");\nCrafty.e(\"2D, Canvas, Text\").textFont(\"type\"); // italic\n~~~"
+            }
+        ],
+        "name": ".textFont",
+        "comp": "Text"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Invalidate",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "method",
+                "signature": "public this .unselectable()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nThis method sets the text so that it cannot be selected (highlighted) by dragging.\n(Canvas text can never be highlighted, so this only matters for DOM text.)\nWorks by changing the css property \"user-select\" and its variants."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nLikewise, this sets the mouseover cursor to be \"default\" (arrow), not \"text\" (I-beam)"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.e(\"2D, DOM, Text\").text('This text cannot be highlighted!').unselectable();\n~~~"
+            }
+        ],
+        "name": ".unselectable",
+        "comp": "Text"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "ViewportScroll",
+                        "description": "when the viewport's x or y coordinates change",
+                        "objName": "Data",
+                        "objProp": null
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "ViewportScale",
+                        "description": "when the viewport's scale changes",
+                        "objName": "Data",
+                        "objProp": null
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "ViewportResize",
+                        "description": "when the viewport's dimension's change",
+                        "objName": "Data",
+                        "objProp": null
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "InvalidateViewport",
+                        "description": "when the viewport changes",
+                        "objName": "Data",
+                        "objProp": null
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "StopCamera",
+                        "description": "when any camera animations should stop, such as at the start of a new animation.",
+                        "objName": "Data",
+                        "objProp": null
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "CameraAnimationDone",
+                        "description": "when a camera animation comes reaches completion",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nViewport is essentially a 2D camera looking at the stage. Can be moved or zoomed, which\nin turn will react just like a camera moving in that direction."
+            },
+            {
+                "type": "raw",
+                "value": "\nTip: At any given moment, the stuff that you can see is..."
+            },
+            {
+                "type": "raw",
+                "value": "\n`x` between `(-Crafty.viewport._x)` and `(-Crafty.viewport._x + (Crafty.viewport._width / Crafty.viewport._scale))`"
+            },
+            {
+                "type": "raw",
+                "value": "\n`y` between `(-Crafty.viewport._y)` and `(-Crafty.viewport._y + (Crafty.viewport._height / Crafty.viewport._scale))`"
+            }
+        ],
+        "name": "Crafty.viewport",
+        "cateogries": [
+            "Stage"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nDecides if the viewport functions should clamp to game entities.\nWhen set to `true` functions such as Crafty.viewport.mouselook() will not allow you to move the\nviewport over areas of the game that has no entities.\nFor development it can be useful to set this to false."
+            }
+        ],
+        "name": "Crafty.viewport.clampToEntities",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nWill move the stage and therefore every visible entity along the `x`\naxis in the opposite direction."
+            },
+            {
+                "type": "raw",
+                "value": "\nWhen this value is set, it will shift the entire stage. This means that entity\npositions are not exactly where they are on screen. To get the exact position,\nsimply add `Crafty.viewport.x` onto the entities `x` position."
+            }
+        ],
+        "name": "Crafty.viewport.x",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nWill move the stage and therefore every visible entity along the `y`\naxis in the opposite direction."
+            },
+            {
+                "type": "raw",
+                "value": "\nWhen this value is set, it will shift the entire stage. This means that entity\npositions are not exactly where they are on screen. To get the exact position,\nsimply add `Crafty.viewport.y` onto the entities `y` position."
+            }
+        ],
+        "name": "Crafty.viewport.y",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nThis value is the current scale (zoom) of the viewport. When the value is bigger than 1, everything\nlooks bigger (zoomed in). When the value is less than 1, everything looks smaller (zoomed out). This\ndoes not alter the size of the stage itself, just the magnification of what it shows."
+            },
+            {
+                "type": "raw",
+                "value": "\nThis is a read-only property: Do not set it directly. Instead, use `Crafty.viewport.scale(...)`\nor `Crafty.viewport.zoom(...)`"
+            }
+        ],
+        "name": "Crafty.viewport._scale",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nA rectangle which defines the bounds of the viewport.\nIt should be an object with two properties, `max` and `min`,\nwhich are each an object with `x` and `y` properties."
+            },
+            {
+                "type": "raw",
+                "value": "\nIf this property is null, Crafty uses the bounding box of all the items\non the stage.  This is the initial value.  (To prevent this behavior, set `Crafty.viewport.clampToEntities` to `false`)"
+            },
+            {
+                "type": "raw",
+                "value": "\nIf you wish to bound the viewport along one axis but not the other, you can use `-Infinity` and `+Infinity` as bounds."
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Crafty.viewport.clampToEntities"
+                ]
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "Set the bounds to a 500 by 500 square:"
+            },
+            {
+                "type": "raw",
+                "value": "\n~~~\nCrafty.viewport.bounds = {min:{x:0, y:0}, max:{x:500, y:500}};\n~~~"
+            }
+        ],
+        "name": "Crafty.viewport.bounds",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "Crafty.viewport.scroll(String axis, Number val)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "axis",
+                        "description": "'x' or 'y'"
+                    },
+                    {
+                        "type": "param",
+                        "name": "val",
+                        "description": "The new absolute position on the axis"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nWill move the viewport to the position given on the specified axis"
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "Will move the camera 500 pixels right of its initial position, in effect\nshifting everything in the viewport 500 pixels to the left."
+            },
+            {
+                "type": "raw",
+                "value": "\n~~~\nCrafty.viewport.scroll('_x', 500);\n~~~"
+            }
+        ],
+        "name": "Crafty.viewport.scroll",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.pan(Number dx, Number dy, Number time[, String|function easingFn])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Number dx",
+                        "description": "The distance along the x axis"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number dy",
+                        "description": "The distance along the y axis"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number time",
+                        "description": "The duration in ms for the entire camera movement"
+                    },
+                    {
+                        "type": "param",
+                        "name": "easingFn",
+                        "description": "A string or custom function specifying an easing.  (Defaults to linear behavior.)  See Crafty.easing for more information."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nPans the camera a given number of pixels over the specified time"
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.pan",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.follow(Object target, Number offsetx, Number offsety)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Object target",
+                        "description": "An entity with the 2D component"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number offsetx",
+                        "description": "Follow target should be offsetx pixels away from center"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number offsety",
+                        "description": "Positive puts target to the right of center"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nFollows a given entity with the 2D component. If following target will take a portion of\nthe viewport out of bounds of the world, following will stop until the target moves away."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nvar ent = Crafty.e('2D, DOM').attr({w: 100, h: 100:});\nCrafty.viewport.follow(ent, 0, 0);\n~~~"
+            }
+        ],
+        "name": "Crafty.viewport.follow",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.centerOn(Object target, Number time)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Object target",
+                        "description": "An entity with the 2D component"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number time",
+                        "description": "The duration in ms of the camera motion"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nCenters the viewport on the given entity."
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.centerOn",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.zoom(Number amt, Number cent_x, Number cent_y, Number time[, String|function easingFn])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Number amt",
+                        "description": "amount to zoom in on the target by (eg. 2, 4, 0.5)"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number cent_x",
+                        "description": "the center to zoom on"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number cent_y",
+                        "description": "the center to zoom on"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number time",
+                        "description": "the duration in ms of the entire zoom operation"
+                    },
+                    {
+                        "type": "param",
+                        "name": "easingFn",
+                        "description": "A string or custom function specifying an easing.  (Defaults to linear behavior.)  See Crafty.easing for more information."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nZooms the camera in on a given point. amt > 1 will bring the camera closer to the subject\namt < 1 will bring it farther away. amt = 0 will reset to the default zoom level\nZooming is multiplicative. To reset the zoom amount, pass 0."
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.zoom",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.scale(Number amt)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Number amt",
+                        "description": "amount to zoom/scale in on the elements"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nAdjusts the scale (zoom). When `amt` is 1, it is set to the normal scale,\ne.g. an entity with `this.w == 20` would appear exactly 20 pixels wide.\nWhen `amt` is 10, that same entity would appear 200 pixels wide (i.e., zoomed in\nby a factor of 10), and when `amt` is 0.1, that same entity would be 2 pixels wide\n(i.e., zoomed out by a factor of `(1 / 0.1)`)."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf you pass an `amt` of 0, it is treated the same as passing 1, i.e. the scale is reset."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThis method sets the absolute scale, while `Crafty.viewport.zoom` sets the scale relative to the existing value."
+                    }
+                ]
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Crafty.viewport.zoom"
+                ]
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "example",
+                "contents": []
+            },
+            {
+                "type": "raw",
+                "value": "~~~\nCrafty.viewport.scale(2); // Zoom in -- all entities will appear twice as large.\n~~~"
+            }
+        ],
+        "name": "Crafty.viewport.scale",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.mouselook(Boolean active)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Boolean active",
+                        "description": "Activate or deactivate mouselook"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nToggle mouselook on the current viewport.\nSimply call this function and the user will be able to\ndrag the viewport around."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nIf the user starts a drag, \"StopCamera\" will be triggered, which will cancel any existing camera animations."
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.mouselook",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.init([Number width, Number height, String stage_elem])",
+                "contents": []
+            },
+            {
+                "type": "method",
+                "signature": "public void Crafty.viewport.init([Number width, Number height, HTMLElement stage_elem])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "Number width",
+                        "description": "Width of the viewport"
+                    },
+                    {
+                        "type": "param",
+                        "name": "Number height",
+                        "description": "Height of the viewport"
+                    },
+                    {
+                        "type": "param",
+                        "name": "String or HTMLElement stage_elem",
+                        "description": "the element to use as the stage (either its id or the actual element)."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nInitialize the viewport. If the arguments 'width' or 'height' are missing, use `window.innerWidth` and `window.innerHeight` (full screen model)."
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nThe argument 'stage_elem' is used to specify a stage element other than the default, and can be either a string or an HTMLElement.  If a string is provided, it will look for an element with that id and, if none exists, create a div.  If an HTMLElement is provided, that is used directly.  Omitting this argument is the same as passing an id of 'cr-stage'."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            },
+            {
+                "type": "xref",
+                "xrefs": [
+                    "Crafty.device",
+                    "Crafty.domHelper",
+                    "Crafty.stage"
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.init",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "The stage where all the DOM entities will be placed."
+            }
+        ],
+        "name": "Crafty.stage",
+        "cateogries": [
+            "Core"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "The `#cr-stage` div element."
+            }
+        ],
+        "name": "Crafty.stage.elem",
+        "comp": "Crafty.stage"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "`Crafty.domLayer._div` is a div inside the `#cr-stage` div that holds all DOM entities.\nIf you use canvas, a `canvas` element is created at the same level in the dom\nas the the `Crafty.domLayer._div` div. So the hierarchy in the DOM is"
+            },
+            {
+                "type": "raw",
+                "value": "\n~~~\nCrafty.stage.elem\n - Crafty.domLayer._div (a div HTMLElement)\n - Crafty.canvasLayer._canvas (a canvas HTMLElement)\n~~~"
+            }
+        ],
+        "name": "Crafty.domLayer._div",
+        "comp": "Crafty.stage, Crafty.domLayer"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "method",
+                "signature": "public Crafty.viewport.reload()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nRecalculate and reload stage width, height and position.\nUseful when browser return wrong results on init (like safari on Ipad2).\nYou should also call this method if you insert custom DOM elements that affect Crafty's stage offset."
+                    },
+                    {
+                        "type": "raw",
+                        "value": ""
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.reload",
+        "comp": "Crafty.stage"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "StopCamera",
+                        "description": "called to cancel camera animations",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": ""
+            },
+            {
+                "type": "method",
+                "signature": "public Crafty.viewport.reset()",
+                "contents": [
+                    {
+                        "type": "raw",
+                        "value": "\nResets the viewport to starting values, and cancels any existing camera animations.\nCalled when scene() is run."
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.reset",
+        "comp": "Crafty.stage"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public Crafty.viewport.onScreen(Object rect)",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "rect",
+                        "description": "A rectangle with field {_x: x_val, _y: y_val, _w: w_val, _h: h_val}"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nTest if a rectangle is completely in viewport"
+                    }
+                ]
+            }
+        ],
+        "name": "Crafty.viewport.onScreen",
+        "comp": "Crafty.viewport"
+    },
+    {
+        "contents": [
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "Draw",
+                        "description": "when the entity is ready to be drawn to the stage",
+                        "objName": "Data",
+                        "objProp": "{type: \"canvas\", pos, co, ctx}"
+                    },
+                    {
+                        "type": "trigger",
+                        "event": "NoCanvas",
+                        "description": "if the browser does not support canvas",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nWhen this component is added to an entity it will be drawn to the global webgl canvas element. Its canvas element (and hence any WebGL entity) is always rendered below any DOM entities."
+            },
+            {
+                "type": "raw",
+                "value": "\nCrafty.webgl.init() will be automatically called if it is not called already to initialize the canvas element."
+            },
+            {
+                "type": "raw",
+                "value": "\n**Note:** For better performance, minimize the number of spritesheets used, and try to arrange it so that entities with different spritesheets are on different z-levels."
+            },
+            {
+                "type": "raw",
+                "value": "\nCreate a webgl entity like this\n~~~\nvar myEntity = Crafty.e(\"2D, WebGL, Tint\")\n     .color(1, 1, 0, 0)\n     .attr({x: 13, y: 37, w: 42, h: 42});\n~~~"
+            }
+        ],
+        "name": "WebGL",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nThe webgl context this entity will be rendered to."
+            }
+        ],
+        "name": ".context",
+        "comp": "WebGL"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public this .draw([[Context ctx, ]Number x, Number y, Number w, Number h])",
+                "contents": [
+                    {
+                        "type": "param",
+                        "name": "ctx",
+                        "description": "Optionally supply a different r 2D context if drawing on another canvas is required"
+                    },
+                    {
+                        "type": "param",
+                        "name": "x",
+                        "description": "X offset for drawing a segment"
+                    },
+                    {
+                        "type": "param",
+                        "name": "y",
+                        "description": "Y offset for drawing a segment"
+                    },
+                    {
+                        "type": "param",
+                        "name": "w",
+                        "description": "Width of the segment to draw"
+                    },
+                    {
+                        "type": "param",
+                        "name": "h",
+                        "description": "Height of the segment to draw"
+                    },
+                    {
+                        "type": "raw",
+                        "value": "\nMethod to draw the entity on the webgl canvas element. Rather then rendering directly, it writes relevent information into a buffer to allow batch rendering."
+                    }
+                ]
+            }
+        ],
+        "name": ".draw",
+        "comp": "WebGL"
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nCollection of methods to handle webgl contexts."
+            }
+        ],
+        "name": "Crafty.webgl",
+        "cateogries": [
+            "Graphics"
+        ]
+    },
+    {
+        "contents": [
+            {
+                "type": "raw",
+                "value": "\nThis will return the context of the webgl canvas element."
+            }
+        ],
+        "name": "Crafty.webgl.context",
+        "comp": "Crafty.webgl"
+    },
+    {
+        "contents": [
+            {
+                "type": "method",
+                "signature": "public void Crafty.webgl.init(void)",
+                "contents": []
+            },
+            {
+                "type": "triggers",
+                "events": [
+                    {
+                        "type": "trigger",
+                        "event": "NoWebGL",
+                        "description": "triggered if `Crafty.support.webgl` is false",
+                        "objName": "Data",
+                        "objProp": null
+                    }
+                ]
+            },
+            {
+                "type": "raw",
+                "value": "\nCreates a `canvas` element inside `Crafty.stage.elem`."
+            },
+            {
+                "type": "raw",
+                "value": "\nThis method will automatically be called by any \"WebGL\" component if no `Crafty.webgl.context` is\nfound, so it is not neccessary to call this manually."
+            }
+        ],
+        "name": "Crafty.webgl.init",
+        "comp": "Crafty.webgl"
+    }
+]
