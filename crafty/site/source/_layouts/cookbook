@@ -1,0 +1,21 @@
+---
+layout: default
+---
+
+<div id='doc-nav'>
+	<ul id='doc-level-one'>
+		<li>
+			Text
+			<ul>
+				<li><a href='/cookbook/text-sprite.html'>Text Sprites</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>
+<div id='doc-content'>
+
+<h2> {{ page.title }} </h2>
+    {{#markdown}}
+		{{> body }}
+	{{/markdown}}
+</div>
