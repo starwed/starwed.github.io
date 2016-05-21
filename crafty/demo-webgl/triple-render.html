@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Crafty.js - comparison of WebGL, DOM, and Canvas rendering</title>
+  
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.9.1.js'></script>
+  
+  
+  
+  
+    
+      <script type='text/javascript' src="crafty.js"></script>
+    
+  
+  <style type='text/css'>
+      body{margin:0;}
+  </style>
+  
+
+
+<script type='text/javascript'>//<![CDATA[ 
+    function run(){
+
+      Crafty.sprite(200, 200, "runner.png", {
+        runstart: [0,0],
+        runmid: [0, 1]
+      })
+      Crafty.background("black");
+
+      Crafty.viewport.clampToEntities = false;
+      //Crafty.viewport.zoom(0.9, 500, 250, 1)
+
+      Crafty.sprite(500, 255, "castle.jpg", {
+        grad: [0,0]
+      });
+
+      var delayer = Crafty.e("Delay");
+      
+      Crafty.c("JumpMan", {
+
+        init: function(){
+          this.requires("runmid, SpriteAnimation");
+          this.h = this.w = 64
+          this.reel("running", 500, [ 
+            [0, 0], [1, 0], [2, 0],
+            [0, 1], [1, 1], [2, 1],
+            [0, 2], [1, 2] 
+          ])
+          this.origin("center");
+        },
+
+        start_run: function(){
+          this.animate("running", -1);
+        }
+      });
+      Crafty.c("Schedule", {
+        init:function(){
+          this.requires("Delay, Tween");
+        },
+        schedule: function(events){
+          for (var i=0; i<events.length; i++){
+            var e = events[i];
+            this.delay(e.f, e.t, 0);
+          }
+          return this;
+        }
+
+      })
+
+      Crafty.pixelart(true);
+      function comp(r, c){
+        return(Crafty.e("2D, " + r + ", Schedule, " + c))
+      }
+      var comps = ["WebGL", "DOM", "Canvas"]
+      //var comps = ["DOM", "Canvas"]
+      for (var m=0; m<comps.length; m++){
+
+        x_0 = 100
+        y_0 = 10 + m * 256
+        render = comps[m];
+
+        // label text
+        var e = Crafty.e("2D, DOM, Text").attr({x:x_0, y:y_0, z:3, w:100}).textColor("yellow").text(render);
+        console.log(e._x, e._y, e._w, e._h)
+
+        // Color bar
+        comp(render, "Color").color("blue").attr({x:x_0, y:y_0+144, h:20, w:1, z:3, alpha:0.0})
+          .schedule([{t:6000, f:function(){
+              this.tween({alpha:1, w:1024}, 2000)
+        }}]);
+
+        //Background image
+        var b1 = comp(render, "Image, Schedule").image("starynight.png", "repeat").attr({x:x_0, y:y_0, w:1024, z:0, h:256});
+         
+        var b2 = comp(render, "Image, Schedule").image("aurora.png", "repeat").attr({x:x_0, y:y_0, w:1, z:100, h:256, alpha:0.5})
+          .schedule([{t:0, f:function(){
+            this.tween({w:1024}, 2000)
+          }}, {
+            t:2000, f:function(){
+              this.tween({alpha:0}, 2000)
+            }
+          }
+        ]);
+
+        // Jumpman and his schedule
+        var j = comp(render, "JumpMan, Tween").attr({x:x_0 + 200, y: y_0 + 80, z:5, alpha:0});
+        j.render_name = render;
+        var schedule = [
+          {t:2000, f:function(){
+            this.tween({alpha:1}, 2000);
+          }},
+        ];
+
+        schedule.push({t:4000, f:function(){
+          this.flip("X");
+        }});
+
+        schedule.push({t:6000, f:function(){
+          this.unflip("X");
+        }});
+
+        for (var ii = 0; ii<10; ii++){
+            schedule.push( {t:4000+ii*200, f:function(){
+              var dx = 80 * Math.cos(this.rotation * Math.PI/180);
+              var dy = 80 * Math.sin(this.rotation * Math.PI/180);
+              var g = comp(this.render_name, "greenlegs").attr({x:this.x + this.w/2 + dx, y:this.y+this.h/2+dy, w:16, h:16, z:4}).tween({alpha:0}, 3000).bind("TweenEnd", function(){this.destroy();});
+              g.rotation = this.rotation;
+              this.tween({rotation:this.rotation+36}, 200);
+          }}); 
+        }
+
+        schedule.push({t:6000, f:function(){
+            this.rotation = 0;
+            this.start_run();
+            this.tween({x: 900}, 3000);
+        }});
+
+        schedule.push({t:9000, f:function(){
+            this.flip("X");
+            this.tween({x: 100}, 3000);
+        }});
+
+        schedule.push({t:12000, f:function(){
+          this.unflip("X");
+          this.pauseAnimation();
+          this.reelPosition(0);
+          this.tween({alpha: 0}, 2000);
+        }});
+        j.schedule(schedule);
+      }
+
+      var xc = 512, yc = 10 +  1.5 * 256;
+      delayer.delay(function(){
+        //Crafty.e("2D, DOM, Color").attr({x:xc, y:yc, h:4, w:4, z:1000}).color("red")
+        Crafty.viewport.zoom(0.8, xc, yc, 2000)
+      }, 6000)
+      .delay(function() {
+        Crafty.viewport.pan(300, -50, 2000)
+      }, 8000)
+      .delay(function(){
+        Crafty.viewport.zoom(1/0.8, xc, yc, 1000)
+      }, 10000);  
+
+      return
+
+    };
+
+    function loadScene(){
+
+    };
+    $(window).load(function(){
+      // Init Crafty:
+
+      Crafty.init();
+      Crafty.stage.fullscreen = true
+      //Crafty.webgl.init();
+
+      Crafty.timer.steptype("semifixed");
+      var greenlegsSprite = {
+          tile: 8,
+          tileh: 8,
+          map: {
+            greenlegs: [0,0],
+            greenlegs2: [1,1]
+          }
+      }
+      var loadData = {
+        images: ["runner.png", "aurora.png", "starynight.png"],
+        sprites: {
+          "greenlegs.png":greenlegsSprite
+        }
+      }
+
+      Crafty.load( loadData, run) 
+
+   
+    });//]]>
+
+</script>
+
+
+</head>
+<body>
+  
+  
+</body>
+
+
+</html>
+
