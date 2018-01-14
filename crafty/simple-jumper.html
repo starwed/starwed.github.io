@@ -19,7 +19,9 @@
 
  window.onload = function() {
     Crafty.init(600, 300);
-    Crafty.bind("BackgroundClick", function(){Crafty.trigger("KeyDown")})
+    // Map any click to keydown
+    Crafty.s("Mouse").bind("Click", function(){Crafty.trigger("Action")});
+    Crafty.s("Keyboard").bind("KeyDown", function(){Crafty.trigger("Action");})
     Crafty.timer.steptype("variable");
     Crafty.pixelart(false);
     Crafty.timer.FPS(50);
@@ -67,7 +69,7 @@
         //.color("blue")
         .attr({x:200, y:200, h:50, w:50})
         .origin(25, 25)
-        .bind("KeyDown", function(){
+        .bind("Action", function(){
             if (this.y > 199){
                 this.tween({y: 50, rotation:180}, 1000/VELOCITY, jump_ease);
                 this._flipX = true;
@@ -166,7 +168,7 @@ var goomba_number = 0;
 var coin_count = 0;
 var last_spawn = 0;
 var last_coin_spawn = 0;
-function spawnGoomba(frame_info){
+function spawnGoomba(frame_info) {
     var cf = frame_info.gameTime;
     if ( (cf - last_coin_spawn) * VELOCITY < 50*20) return;
     if ( (cf - last_spawn) * VELOCITY < 50*20) return;
@@ -222,7 +224,7 @@ function deathNote(){
                 .attr({x:200, y:200, w: 300})
                 .textFont({size: "20px", family:'Arial'});
                 
-            Crafty.one("KeyDown", function(){Crafty.scene("play");});
+            Crafty.one("Action", function(){Crafty.scene("play");});
 
         }, 500, 0);
 
