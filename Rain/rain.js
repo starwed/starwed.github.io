@@ -1,5 +1,6 @@
 function startGame() {
-    Crafty.timer.steptype("variable");
+    Crafty.timer.steptype("fixed");
+    //Crafty.timer.FPS(30);
     Crafty.init(600, 600);
     Crafty.background("lightblue");
     for (var i=0; i<6; i++) {
@@ -100,6 +101,8 @@ Crafty.c("Raindrop", {
         this._strength = 0.5;
         //this.color("blue");
         
+        this.__coord = [0, 0, 0, 0];
+
         this.w = 1;
         //if (Math.random() > 0.9) this.w = 2;
         this.h = 60 + Math.random()*10;
@@ -157,11 +160,15 @@ Crafty.c("Cloud", {
 });
 
 Crafty.c("RainDestroyer", {
+    init: function() {
+        this._destroyerResults = [];
+    },
     events: {
         "EnterFrame": function() {
             // Do a direct map search rather than using collision elements
             // TODO: wire into crafty support for simpler quad intersection tests with collision
-            var results = Crafty.map.search(this);
+            this._destroyerResults.length = 0;
+            var results = Crafty.map.search(this, this._destroyerResults);
             var drops = 0;
             for(var i in results) {
                 if(results[i].__c["Raindrop"]) {
@@ -263,4 +270,4 @@ DropfactoryFakeFreeze = {
     }
 }
 
-Dropfactory = DropfactoryFreeze;x``
+Dropfactory = DropfactoryFreeze;
