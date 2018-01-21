@@ -18,7 +18,8 @@
     }
 
  window.onload = function() {
-    Crafty.init(600, 300);
+    Crafty.init(600, 300);  
+    Crafty.multitouch(true);
     // Map any click to keydown
     Crafty.s("Mouse").bind("MouseDown", function(){Crafty.trigger("Action")});
     Crafty.s("Keyboard").bind("KeyDown", function(){Crafty.trigger("Action");})
