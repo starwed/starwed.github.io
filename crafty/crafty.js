@@ -13641,6 +13641,7 @@ Crafty.extend({
                     first.target.dispatchEvent(simulatedEvent);
                 }
             }
+            e.preventDefault();
         }
 
         return function(e) {
