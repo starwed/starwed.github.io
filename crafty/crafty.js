@@ -1,5 +1,5 @@
 /**
- * craftyjs 0.9.0-rc1
+ * craftyjs 0.9.0-rc2
  * http://craftyjs.com/
  *
  * Copyright 2018, Louis Stowasser
@@ -6090,7 +6090,7 @@ module.exports = {
 };
 
 },{"../core/core.js":10}],19:[function(require,module,exports){
-module.exports = "0.9.0-rc1";
+module.exports = "0.9.0-rc2";
 },{}],20:[function(require,module,exports){
 // Define common features available in both browser and node
 module.exports = function(requireNew) {
@@ -6643,12 +6643,17 @@ Crafty.DebugCanvas = {
             current = q[i];
 
             // If necessary, update the view transform to match the current entities layer
-            if (lastLayer !== current._drawlayer){
-                view = current._drawLayer._viewportRect();
-                ctx.setTransform(view._scale, 0, 0, view._scale, Math.round(-view._x*view._scale), Math.round(-view._y*view._scale));
+            // If the current entity has no layer, switch back to the viewport's transform
+            if (lastLayer !== current._drawLayer){
+                if (current._drawLayer) {
+                    view = current._drawLayer._viewportRect();
+                    ctx.setTransform(view._scale, 0, 0, view._scale, Math.round(-view._x*view._scale), Math.round(-view._y*view._scale));
+                } else {
+                    view = Crafty.viewport;
+                    ctx.setTransform(view._scale, 0, 0, view._scale, Math.round(view._x*view._scale), Math.round(view._y*view._scale));
+                }
                 lastLayer = current._drawLayer;
             }
-
             current.debugDraw(ctx);
         }
 
@@ -16833,7 +16838,7 @@ Crafty.c("Collision", {
                         SAT.obj = obj;
                         SAT.type = "SAT";
                     }
-                } else if (Crafty.rectManager.overlap(area, this._cbr || this._mbr || this)){
+                } else if (Crafty.rectManager.overlap(area, obj._cbr || obj._mbr || obj)){
                     results.push({
                         obj: obj,
                         type: "MBR"

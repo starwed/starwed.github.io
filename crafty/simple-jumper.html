@@ -20,9 +20,9 @@
  window.onload = function() {
     Crafty.init(600, 300);
     // Map any click to keydown
-    Crafty.s("Mouse").bind("Click", function(){Crafty.trigger("Action")});
+    Crafty.s("Mouse").bind("MouseDown", function(){Crafty.trigger("Action")});
     Crafty.s("Keyboard").bind("KeyDown", function(){Crafty.trigger("Action");})
-    Crafty.timer.steptype("variable");
+    Crafty.timer.steptype("variable");  
     Crafty.pixelart(false);
     Crafty.timer.FPS(50);
     Crafty.scene("play", startgame);
@@ -158,8 +158,6 @@
 
 
     Crafty.bind("EnterFrame", spawnGoomba);
-    //Crafty.bind("BackgroundClick", function(){jm.trigger("KeyDown")} );
-    
 };
 
 
@@ -227,8 +225,6 @@ function deathNote(){
             Crafty.one("Action", function(){Crafty.scene("play");});
 
         }, 500, 0);
-
-
 }
     //]]>  </script>
 
