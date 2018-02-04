@@ -19,11 +19,14 @@
 
  window.onload = function() {
     Crafty.init(600, 300);  
+    if (Crafty.mobile) {
+        Crafty.stage.fullscreen = true;
+    }
     //Crafty.multitouch(true);
     // Map any click to keydown
     Crafty.s("Mouse").bind("MouseDown", function(){Crafty.trigger("Action")});
     Crafty.s("Keyboard").bind("KeyDown", function(){Crafty.trigger("Action");})
-    //Crafty.s("Touch").bind("TouchStart", function(){Crafty.trigger("Action");})
+    //Crafty.s("Touch").bind("TouchStart", function(){Crafty.trigger("Action");})   
     Crafty.timer.steptype("variable");  
     Crafty.pixelart(false);
     Crafty.timer.FPS(50);
@@ -98,7 +101,7 @@
     Crafty.sprite(200, 200, "runner.png", {
         runstart: [0,0],
         runmid: [0, 1]
-    })
+    });
 
     Crafty.c("Thing", {
         init: function(){
