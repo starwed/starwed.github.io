@@ -19,9 +19,6 @@
 
  window.onload = function() {
     Crafty.init(600, 300);  
-    if (Crafty.mobile) {
-        Crafty.stage.fullscreen = true;
-    }
     //Crafty.multitouch(true);
     // Map any click to keydown
     Crafty.s("Mouse").bind("MouseDown", function(){Crafty.trigger("Action")});
