@@ -3633,6 +3633,11 @@ Crafty.extend({
 
     // async_resources is an array of promises, or functions that return a promise.
     // In the latter case, functions are passed the Crafty object as a parameter.
+    // In addition to the specified promises, also wait for the document to load
+    // That'll be added at the end of the promis array
+    // 
+    // Once complete it will call Crafty.init with w, h, stage_elem, and then finally 
+    // resolve a promise with the values of the promise array
     initAsync: function(async_resources, w, h, stage_elem) {
         var promises = [];
         for (var i in async_resources) {
@@ -11725,7 +11730,8 @@ function RenderProgramWrapper(layer, shader){
     this.draw = function() { };
 
     this.array_size = 16;
-    this.max_size = 1024;
+    // TODO make this configurable
+    this.max_size = 2048;
     this._indexArray = new Uint16Array(6 * this.array_size);
     this._indexBuffer = layer.context.createBuffer();
 }
