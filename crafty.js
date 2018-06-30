@@ -2,7 +2,7 @@
  * craftyjs 0.8.0
  * http://craftyjs.com/
  *
- * Copyright 2017, Louis Stowasser
+ * Copyright 2018, Louis Stowasser
  * Licensed under the MIT license.
  */
 
@@ -2279,6 +2279,13 @@ var version = require('./version');
  */
 
 var Crafty = function (selector) {
+    // optimization for selecting an entity by id
+    // TODO test that the branching isn't inherently expensive?
+    // TODO move some of the other logic in the init constructor into this method
+    // Invoking the constructor has a cost that can be avoided in some cases
+    if (typeof selector === 'number') {
+        return entities[selector];
+    }
     return new Crafty.fn.init(selector);
 };
     // Internal variables
@@ -2637,6 +2644,9 @@ Crafty.fn = Crafty.prototype = {
      * 
      * @sign public this .requires(String componentList)
      * @param componentList - List of components that must be added
+     * 
+     * @sign public this .addComponent(String component1, String component2[, .. , ComponentN])
+     * @param Component# - A component to add
      *
      * Makes sure the entity has the components listed. If the entity does not
      * have the component, it will add it.
@@ -2649,8 +2659,8 @@ Crafty.fn = Crafty.prototype = {
      *
      * @see .addComponent
      */
-    requires: function (list) {
-        return this.addComponent(list);
+    requires: function () {
+        return this.addComponent.apply(this, arguments);
     },
 
     /**@
@@ -2693,7 +2703,9 @@ Crafty.fn = Crafty.prototype = {
         }
         delete this.__c[id];
         // update map from component to (entityId -> entity)
-        delete compEntities[id][this[0]];
+        if (compEntities[id]) {
+            delete compEntities[id][this[0]];
+        }
 
         return this;
     },
@@ -3619,6 +3631,33 @@ Crafty.extend({
         return this;
     },
 
+    // async_resources is an array of promises, or functions that return a promise.
+    // In the latter case, functions are passed the Crafty object as a parameter.
+    initAsync: function(async_resources, w, h, stage_elem) {
+        var promises = [];
+        for (var i in async_resources) {
+            if (typeof async_resources[i] === 'function') {
+                promises.push(async_resources[i](Crafty));
+            } else {
+                promises.push(async_resources[i]);
+            }
+        }
+
+        // wait for document loading if necessary
+        // TODO probably could just wait for 'interactive', but this is simpler for now
+        if (document.readyState != 'complete') {
+            var window_load = new Promise(function(resolve,reject){
+                window.onload = resolve;
+                promises.push(window_load);
+            });
+        }
+
+        return Promise.all(promises).then(function(values){
+            Crafty.init(w, h, stage_elem);
+            return values;
+        });
+    },
+
     // There are some events that need to be bound to Crafty when it's started/restarted, so store them here
     // Switching Crafty's internals to use the new system idiom should allow removing this hack
     _bindOnInit: [],
@@ -4057,7 +4096,7 @@ Crafty.extend({
     e: function () {
         var id = UID();
         entities[id] = null;
-        entities[id] = Crafty(id);
+        entities[id] = new Crafty.fn.init(id);
 
         if (arguments.length > 0) {
             entities[id].addComponent.apply(entities[id], arguments);
@@ -5722,6 +5761,16 @@ Crafty.CraftySystem.prototype = {
  * This syncs with Crafty's internal clock, and so should generally be preferred to using methods such as `setTimeout`.
  */
 module.exports = {
+    /**@
+     * #.delaySpeed
+     * @comp Delay
+     *
+     * The rate of the delay. This property defaults to 1.
+     * When setting delaySpeed to 0.5, delays will take twice as long,
+     * setting it to 2.0 will make them twice as short
+     */
+    delaySpeed: 1,
+
     init: function () {
         this._delays = [];
         this._delaysPaused = false;
@@ -5734,7 +5783,7 @@ module.exports = {
                     // remove canceled item from array
                     this._delays.splice(index, 1);
                 } else {
-                    item.accumulator+=frameData.dt;
+                    item.accumulator += frameData.dt * this.delaySpeed;
                     // The while loop handles the (pathological) case where dt>delay
                     while(item.accumulator >= item.delay && item.repeat >= 0){
                         item.accumulator -= item.delay;
@@ -5911,6 +5960,16 @@ var Crafty = require('../core/core.js');
  */
 module.exports = {
 
+  /**@
+   * #.tweenSpeed
+   * @comp Tween
+   *
+   * The rate of the tween. This property defaults to 1.
+   * When setting tweenSpeed to 0.5, tweens will take twice as long,
+   * setting it to 2.0 will make them twice as short
+   */
+  tweenSpeed: 1,
+
   init: function(){
     this.tweenGroup = {};
     this.tweenStart = {};
@@ -5923,7 +5982,7 @@ module.exports = {
     var tween, v, i;
     for ( i = this.tweens.length-1; i>=0; i--){
       tween = this.tweens[i];
-      tween.easing.tick(frameData.dt);
+      tween.easing.tick(frameData.dt * this.tweenSpeed);
       v  = tween.easing.value();
       this._doTween(tween.props, v);
       if (tween.easing.complete) {
@@ -6618,12 +6677,17 @@ Crafty.DebugCanvas = {
             current = q[i];
 
             // If necessary, update the view transform to match the current entities layer
-            if (lastLayer !== current._drawlayer){
-                view = current._drawLayer._viewportRect();
-                ctx.setTransform(view._scale, 0, 0, view._scale, Math.round(-view._x*view._scale), Math.round(-view._y*view._scale));
+            // If the current entity has no layer, switch back to the viewport's transform
+            if (lastLayer !== current._drawLayer){
+                if (current._drawLayer) {
+                    view = current._drawLayer._viewportRect();
+                    ctx.setTransform(view._scale, 0, 0, view._scale, Math.round(-view._x*view._scale), Math.round(-view._y*view._scale));
+                } else {
+                    view = Crafty.viewport;
+                    ctx.setTransform(view._scale, 0, 0, view._scale, Math.round(view._x*view._scale), Math.round(view._y*view._scale));
+                }
                 lastLayer = current._drawLayer;
             }
-
             current.debugDraw(ctx);
         }
 
@@ -6898,8 +6962,8 @@ Crafty._registerLayerTemplate("Canvas", {
             rect._w = dirtyRects[i + 2];
             rect._h = dirtyRects[i + 3];
 
-            // Draw the rectangle, collision search doesn't need to check for duplicates
-            this._drawRect(rect, false);
+            // Draw the rectangle
+            this._drawRect(rect);
         }
 
         // Draw dirty rectangles for debugging, if that flag is set
@@ -6936,11 +7000,11 @@ Crafty._registerLayerTemplate("Canvas", {
     _drawAll: function (view) {
         var viewportRect = this._viewportRect(); // this updates the viewportRect for later cached use
 
-        // Draw the whole layer rectangle, collision search should check for duplicates
-        this._drawRect(view || viewportRect, true);
+        // Draw the whole layer rectangle
+        this._drawRect(view || viewportRect);
     },
 
-    _drawRect: function(rect, checkDupes) {
+    _drawRect: function(rect) {
         var i, l, q, obj, previousGlobalZ,
             integerBounds = Crafty.rectManager.integerBounds,
             ctx = this.context,
@@ -6968,7 +7032,7 @@ Crafty._registerLayerTemplate("Canvas", {
         searchRect._y = rect._y;
         searchRect._w = rect._w - 1;
         searchRect._h = rect._h - 1;
-        q = Crafty.map.search(searchRect, checkDupes);
+        q = Crafty.map.search(searchRect);
         // Sort objects by z level, duplicate objs will be ordered next to each other due to same _globalZ
         q.sort(this._sort);
 
@@ -7022,7 +7086,7 @@ Crafty._registerLayerTemplate("Canvas", {
 
             // we need to keep track of all stale states, because drawing method can change dynamically
             // track stale grid cell keys for dirty grid cell drawing
-            dirtyKeys = obj._entry.keys; // cached computation of Crafty.HashMap.key(obj)
+            dirtyKeys = Crafty.map.entries[obj[0]].keys; // cached computation of Crafty.HashMap.key(obj)
             staleKeys = obj.staleKeys;
             if (staleKeys === undefined) obj.staleKeys = staleKeys = { x1: 0, y1: 0, x2: 0, y2: 0 };
             staleKeys.x1 = dirtyKeys.x1;
@@ -7070,7 +7134,7 @@ Crafty._registerLayerTemplate("Canvas", {
                 }
             }
 
-            keys = obj._entry.keys; // cached computation of Crafty.HashMap.key(obj)
+            keys = Crafty.map.entries[obj[0]].keys; // cached computation of Crafty.HashMap.key(obj)
             for (j = keys.x1; j <= keys.x2; j++) {
                 for (k = keys.y1; k <= keys.y2; k++) {
                     // if dirty cell is inside area to be drawn
@@ -11366,8 +11430,8 @@ Crafty.extend({
          * @comp Crafty.stage
          * @kind Method
          * 
-         * @sign public void Crafty.viewport.init([Number width, Number height, String stage_elem])
-         * @sign public void Crafty.viewport.init([Number width, Number height, HTMLElement stage_elem])
+         * @sign public void Crafty.viewport.init([Number width, Number height][, String stage_elem])
+         * @sign public void Crafty.viewport.init([Number width, Number height][, HTMLElement stage_elem])
          * @param Number width - Width of the viewport
          * @param Number height - Height of the viewport
          * @param String or HTMLElement stage_elem - the element to use as the stage (either its id or the actual element).
@@ -11381,6 +11445,14 @@ Crafty.extend({
          * @see Crafty.device, Crafty.domHelper, Crafty.stage, Crafty.viewport.reload
          */
         init: function (w, h, stage_elem) {
+            // Handle specifying stage_elem without w & h
+            if (typeof(stage_elem) === 'undefined' && typeof(h) === 'undefined' &&
+                typeof(w) !=='undefined' && typeof(w) !== 'number') {
+                stage_elem = w;
+                w = window.innerWidth;
+                h = window.innerHeight;
+            }
+
             // Define default graphics layers with default z-layers
             Crafty.createLayer("DefaultCanvasLayer", "Canvas", {z: 20});
             Crafty.createLayer("DefaultDOMLayer", "DOM", {z: 30});
@@ -13340,12 +13412,12 @@ Crafty.extend({
 
                 // Get the position in this layer
                 pos = Crafty.domHelper.translate(x, y, layer);
-                q = Crafty.map.search({
+                q = Crafty.map.unfilteredSearch({
                     _x: pos.x,
                     _y: pos.y,
                     _w: 1,
                     _h: 1
-                }, false);
+                });
 
                 for (i = 0, l = q.length; i < l; ++i) {
                     current = q[i];
@@ -13525,9 +13597,10 @@ Crafty.extend({
      *
      * If this is set to true, it is expected that your entities have the `Touch` component instead of the `Mouse` component.
      * If false (default), then only entities with the Mouse component will respond to touch.
-     * It's recommended to add the `Button` component instead, which requires the proper component depending on this feature.
+     * For simple use cases, tt's recommended to add the `Button` component instead, which requires the proper component depending on this feature.
      *
      * @note The multitouch feature is currently incompatible with the `Draggable` component and `Crafty.viewport.mouselook`.
+     * @note When multitouch is not enabled, Crafty will cancel touch events when forwarding them to the mouse system.
      *
      * @example
      * ~~~
@@ -13603,6 +13676,7 @@ Crafty.extend({
                     first.target.dispatchEvent(simulatedEvent);
                 }
             }
+            e.preventDefault();
         }
 
         return function(e) {
@@ -14915,7 +14989,7 @@ var M = Math,
  * Component for any entity that has a position on the stage.
  * @trigger Move - when the entity has moved - { _x:Number, _y:Number, _w:Number, _h:Number } - Old position
  * @trigger Invalidate - when the entity needs to be redrawn
- * @trigger Rotate - when the entity is rotated - { cos:Number, sin:Number, deg:Number, rad:Number, o: {x:Number, y:Number}}
+ * @trigger Rotate - when the entity is rotated - { rotation:Number} - Rotation in degrees
  * @trigger Reorder - when the entity's z index has changed
  * @trigger Resize - when the entity's dimensions have changed - { axis: 'w' | 'h', amount: Number }
  */
@@ -15161,14 +15235,14 @@ Crafty.c("2D", {
         this._children = [];
 
         //insert self into the HashMap
-        this._entry = Crafty.map.insert(this);
+        Crafty.map.insert(this, this[0]);
         
 
         //when object changes, update HashMap
         this.bind("Move", function (e) {
             // Choose the largest bounding region that exists
             var area = this._cbr || this._mbr || this;
-            this._entry.update(area);
+            Crafty.map.updateEntry(area, this[0]);
             // Move children (if any) by the same amount
             if (this._children.length > 0) {
                 this._cascade(e);
@@ -15178,10 +15252,10 @@ Crafty.c("2D", {
         this.bind("Rotate", function (e) {
             // Choose the largest bounding region that exists
             var old = this._cbr || this._mbr || this;
-            this._entry.update(old);
+            Crafty.map.updateEntry(old, this[0]);
             // Rotate children (if any) by the same amount
             if (this._children.length > 0) {
-                this._cascade(e);
+                this._cascadeRotation(e);
             }
         });
 
@@ -15206,7 +15280,7 @@ Crafty.c("2D", {
                 this._parent.detach(this);
             }
 
-            Crafty.map.remove(this._entry);
+            Crafty.map.remove(this[0]);
 
             this.detach();
         });
@@ -15214,10 +15288,10 @@ Crafty.c("2D", {
 
     events: {
         "Freeze":function(){
-            Crafty.map.remove(this._entry);
+            Crafty.map.remove(this[0]);
         },
         "Unfreeze":function(){
-            this._entry = Crafty.map.insert(this, this._entry);
+            Crafty.map.insert(this, this[0]);
         }
     }, 
 
@@ -15331,30 +15405,9 @@ Crafty.c("2D", {
         else
             this._rotation = v;
 
-        //Calculate the new MBR
-        var //rad = theta * DEG_TO_RAD,
-            o = {
-                x: this._origin.x + this._x,
-                y: this._origin.y + this._y
-            };
-
         this._calculateMBR();
 
-
-        //trigger "Rotate" event
-        var drad = difference * DEG_TO_RAD,
-            // ct = Math.cos(rad),
-            // st = Math.sin(rad),
-            cos = Math.cos(drad),
-            sin = Math.sin(drad);
-
-        this.trigger("Rotate", {
-            cos: (-1e-10 < cos && cos < 1e-10) ? 0 : cos, // Special case 90 degree rotations to prevent rounding problems
-            sin: (-1e-10 < sin && sin < 1e-10) ? 0 : sin, // Special case 90 degree rotations to prevent rounding problems
-            deg: difference,
-            rad: drad,
-            o: o
-        });
+        this.trigger("Rotate", difference);
     },
 
     /**@
@@ -15579,8 +15632,7 @@ Crafty.c("2D", {
      * for an opposite direction.
      */
     shift: function (x, y, w, h) {
-        if (x) this.x += x;
-        if (y) this.y += y;
+        if (x || y) this._setPosition(this._x + x, this._y + y);
         if (w) this.w += w;
         if (h) this.h += h;
 
@@ -15596,7 +15648,7 @@ Crafty.c("2D", {
      * @sign public void ._cascade(e)
      * @param e - An object describing the motion
      *
-     * Move or rotate the entity's children according to a certain motion.
+     * Move the entity's children according to a certain motion.
      * This method is part of a function bound to "Move": It is used
      * internally for ensuring that when a parent moves, the child also
      * moves in the same way.
@@ -15607,25 +15659,55 @@ Crafty.c("2D", {
             children = this._children,
             l = children.length,
             obj;
-        //rotation
-        if (("cos" in e) || ("sin" in e)) {
-            for (; i < l; ++i) {
-                obj = children[i];
-                if (obj.__frozen) continue;
-                if ('rotate' in obj) obj.rotate(e);
-            }
-        } else {
-            //use current position
-            var dx = this._x - e._x,
-                dy = this._y - e._y,
-                dw = this._w - e._w,
-                dh = this._h - e._h;
 
-            for (; i < l; ++i) {
-                obj = children[i];
-                if (obj.__frozen) continue;
-                obj.shift(dx, dy, dw, dh);
-            }
+        //use current position
+        var dx = this._x - e._x,
+            dy = this._y - e._y,
+            dw = this._w - e._w,
+            dh = this._h - e._h;
+
+        for (; i < l; ++i) {
+            obj = children[i];
+            if (obj.__frozen) continue;
+            obj.shift(dx, dy, dw, dh);
+        }
+        
+    },
+    
+    /**@
+     * #._cascadeRotation
+     * @comp 2D
+     * @kind Method
+     * @private
+     * 
+     * @sign public void ._cascade(deg)
+     * @param deg - The amount of rotation in degrees
+     *
+     * Move the entity's children the specified amount
+     * This method is part of a function bound to "Move": It is used
+     * internally for ensuring that when a parent moves, the child also
+     * moves in the same way.
+     */
+    _cascadeRotation: function(deg) {
+        if (!deg) return;
+        var i = 0,
+            children = this._children,
+            l = children.length,
+            obj;
+        // precalculate rotation info
+        var drad = deg * DEG_TO_RAD;
+        var cos = Math.cos(drad);
+        var sin = Math.sin(drad);
+        // Avoid some rounding problems
+        cos = (-1e-10 < cos && cos < 1e-10) ? 0 : cos;
+        sin = (-1e-10 < sin && sin < 1e-10) ? 0 : sin;
+        var ox = this._origin.x + this._x;
+        var oy = this._origin.y + this._y;
+
+        for (; i < l; ++i) {
+            obj = children[i];
+            if (obj.__frozen) continue;
+            if ('rotate' in obj) obj.rotate(deg, ox, oy, cos, sin);
         }
     },
 
@@ -15768,14 +15850,38 @@ Crafty.c("2D", {
 
     /**
      * Method for rotation rather than through a setter
+     * 
+     * Pass in degree amount, origin coordinate and precalculated cos/sin
      */
-    rotate: function (e) {
+    rotate: function (deg, ox, oy, cos, sin) {
         var x2, y2;
-        x2 =  (this._x + this._origin.x - e.o.x) * e.cos + (this._y + this._origin.y - e.o.y) * e.sin + (e.o.x - this._origin.x);
-        y2 =  (this._y + this._origin.y - e.o.y) * e.cos - (this._x + this._origin.x - e.o.x) * e.sin + (e.o.y - this._origin.y);
-        this._setter2d('_rotation', this._rotation - e.deg);
+        x2 =  (this._x + this._origin.x - ox) * cos + (this._y + this._origin.y - oy) * sin + (ox - this._origin.x);
+        y2 =  (this._y + this._origin.y - oy) * cos - (this._x + this._origin.x - ox) * sin + (oy - this._origin.y);
+        this._setter2d('_rotation', this._rotation - deg);
         this._setter2d('_x', x2 );
         this._setter2d('_y', y2 );
+    },
+
+    // A separate setter for the common case of moving an entity along both axes
+    _setPosition: function(x, y) {
+        if (x === this._x && y === this._y) return;
+        var old = Crafty.rectManager._pool.copy(this);
+        var mbr = this._mbr;
+        if (mbr) {
+            mbr._x -= this._x - x;
+            mbr._y -= this._y - y;
+            // cbr is a non-minimal bounding rectangle that contains both hitbox and mbr
+            // It will exist only when the collision hitbox sits outside the entity
+            if (this._cbr){
+                this._cbr._x -= this._x - x;
+                this._cbr._y -= this._y - y;
+            }
+        }
+        this._x = x;
+        this._y = y;
+        this.trigger("Move", old);
+        this.trigger("Invalidate");
+        Crafty.rectManager._pool.recycle(old);
     },
 
     // This is a setter method for all 2D properties including
@@ -15798,7 +15904,7 @@ Crafty.c("2D", {
             mbr = this._mbr;
             if (mbr) {
                 mbr[name] -= this[name] - value;
-                // cbr is a non-minmal bounding rectangle that contains both hitbox and mbr
+                // cbr is a non-minimal bounding rectangle that contains both hitbox and mbr
                 // It will exist only when the collision hitbox sits outside the entity
                 if (this._cbr){
                     this._cbr[name] -= this[name] - value;
@@ -15962,15 +16068,15 @@ Crafty.polygon.prototype = {
         return new Crafty.polygon(this.points.slice(0));
     },
 
-    rotate: function (e) {
+    rotate: function (deg, ox, oy, cos, sin) {
         var i = 0, p = this.points,
             l = p.length,
             x, y;
 
         for (; i < l; i+=2) {
 
-            x = e.o.x + (p[i] - e.o.x) * e.cos + (p[i+1] - e.o.y) * e.sin;
-            y = e.o.y - (p[i] - e.o.x) * e.sin + (p[i+1] - e.o.y) * e.cos;
+            x = ox + (p[i] - ox) * cos + (p[i+1] - oy) * sin;
+            y = oy - (p[i] - ox) * sin + (p[i+1] - oy) * cos;
 
             p[i] = x;
             p[i+1] = y;
@@ -16243,7 +16349,7 @@ Crafty.extend({
      * #Crafty.raycast
      * @category 2D
      * @kind Method
-     * 
+     *  
      * @sign public Array .raycast(Object origin, Object direction[, Number maxDistance][, String comp][, Boolean sort])
      * @param origin - the point of origin from which the ray will be cast. The object must contain the properties `_x` and `_y`.
      * @param direction - the direction the ray will be cast. It must be normalized. The object must contain the properties `x` and `y`.
@@ -16308,10 +16414,11 @@ Crafty.extend({
         var argument, type;
         for (var i = 2, l = arguments.length; i < l; ++i) {
             argument = arguments[i];
-            type = typeof argument;
-            if (type === 'number') maxDistance = argument + EPSILON; // make it inclusive
-            else if (type === 'string') comp = argument;
-            else if (type === 'boolean') sort = argument;
+            switch(typeof argument) {
+                case 'number': maxDistance = argument + EPSILON; break;
+                case 'string': comp = argument; break;
+                case 'boolean': sort = argument; break;
+            }
         }
 
         var ox = origin._x,
@@ -16323,18 +16430,18 @@ Crafty.extend({
         var alreadyChecked = {},
             results = [];
 
-
+        var lastSetChecked = -1;
         if (maxDistance < 0) { // find first intersection
 
             var closestObj = null,
                 minDistance = Infinity;
 
             // traverse map
-            Crafty.map.traverseRay(origin, direction, function(obj, previousCellDistance) {
+            Crafty.map.traverseRay(origin, direction, function(obj, setNumber) {
                 // check if we advanced to next cell
                 //      then report closest object from previous cell
                 //          if intersection point is in previous cell
-                if (closestObj && minDistance < previousCellDistance) {
+                if (closestObj && lastSetChecked < setNumber) {
                     results.push({
                         obj: closestObj,
                         distance: minDistance,
@@ -16360,7 +16467,7 @@ Crafty.extend({
             });
 
             // in case traversal ended and we haven't yet pushed nearest intersecting object
-            if (closestObj) {
+            if (closestObj)  {
                 results.push({
                     obj: closestObj,
                     distance: minDistance,
@@ -16370,15 +16477,8 @@ Crafty.extend({
             }
 
         } else { // find intersections up to max distance
-
             // traverse map
-            Crafty.map.traverseRay(origin, direction, function(obj, previousCellDistance) {
-                // check if we advanced to next cell
-                //      then cancel traversal if previousCellDistance > maxDistance
-                if (previousCellDistance > maxDistance) {
-                    return true;
-                }
-
+            Crafty.map.traverseRay(origin, direction, function(obj, setNumber) {
                 // object must contain polygon hitbox, the specified component and must not already be checked
                 if (!obj.map || !obj.__c[comp] || alreadyChecked[obj[0]]) return;
                 alreadyChecked[obj[0]] = true;
@@ -16393,7 +16493,7 @@ Crafty.extend({
                         y: oy + distance * dy
                     });
                 }
-            });
+            }, maxDistance);
         }
 
 
@@ -16515,14 +16615,12 @@ Crafty.c("Collision", {
 
         // If the entity is currently rotated, the points in the hitbox must also be rotated
         if (this.rotation) {
-            polygon.rotate({
-                cos: Math.cos(-this.rotation * DEG_TO_RAD),
-                sin: Math.sin(-this.rotation * DEG_TO_RAD),
-                o: {
-                    x: this._origin.x,
-                    y: this._origin.y
-                }
-            });
+            polygon.rotate(
+                this.rotation,
+                this._origin.x,
+                this._origin.y,
+                Math.cos(-this.rotation * DEG_TO_RAD),
+                Math.sin(-this.rotation * DEG_TO_RAD));
         }
 
         // Finally, assign the hitbox, and attach it to the "Collision" entity
@@ -16663,18 +16761,23 @@ Crafty.c("Collision", {
      * @comp Collision
      * @kind Method
      * 
-     * @sign public Array .hit(String component)
+     * @sign public Array .hit(String component[, Array results])
      * @param component - Check collision with entities that have this component
      * applied to them.
+     * @param results - If a results array is supplied, any collisions will be appended to it 
      * @return `null` if there is no collision. If a collision is detected,
      * returns an Array of collision data objects (see below).
+     * If the results parameter was passed, it will be used as the return value.
      *
-     * Tests for collisions with entities that have the specified component
-     * applied to them.
-     * If a collision is detected, data regarding the collision will be present in
-     * the array returned by this method.
-     * If no collisions occur, this method returns `null`.
+     * Tests for collisions with entities that have the specified component applied to them.
+     * If a collision is detected, data regarding the collision will be present in the array 
+     * returned by this method. If no collisions occur, this method returns `null`.
      *
+     * When testing for collisions, if both entities have the `Collision` component, then 
+     * the collision test will use the Separating Axis Theorem (SAT), and provide more detailed
+     * information about the collision.  Otherwise, it will be a simple test of whether the
+     * minimal bounding rectangles (MBR) overlap.
+     * 
      * Following is a description of a collision data object that this method may
      * return: The returned collision data will be an Array of Objects with the
      * type of collision used, the object collided and if the type used was SAT (a polygon was used as the hitbox) then an amount of overlap.
@@ -16682,17 +16785,27 @@ Crafty.c("Collision", {
      * [{
      *    obj: [entity],
      *    type: ["MBR" or "SAT"],
-     *    overlap: [number]
+     *    overlap: [number],
+     *    nx: [number],
+     *    ny: [number]
      * }]
      * ~~~
      *
+     * All collision results will have these properties:
      * - **obj:** The entity with which the collision occured.
      * - **type:** Collision detection method used. One of:
      *   - *MBR:* Standard axis aligned rectangle intersection (`.intersect` in the 2D component).
      *   - *SAT:* Collision between any two convex polygons. Used when both colliding entities have the `Collision` component applied to them.
-     * - **overlap:** If SAT collision was used, this will signify the overlap percentage between the colliding entities.
+     * 
+     * If the collision result type is **SAT** then there will be three additional properties, which
+     * represent the minimum translation vector (MTV) -- the direction and distance of the minimal translation
+     * that will result in non-overlapping entities.
+     * - **overlap:** The magnitude of the translation vector.
+     * - **nx:** The x component of the MTV.
+     * - **ny:** The y component of the MTV.
      *
-     * Keep in mind that both entities need to have the `Collision` component, if you want to check for `SAT` (custom hitbox) collisions between them.
+     * These additional properties (returned only when both entities have the "Collision" component)
+     * are useful when providing more natural collision resolution.
      *
      * If you want more fine-grained control consider using `Crafty.map.search()`.
      *
@@ -16703,17 +16816,18 @@ Crafty.c("Collision", {
      *       .attr({x: 32, y: 32, w: 32, h: 32})
      *       .collision([0, 16, 16, 0, 32, 16, 16, 32])
      *       .fourway()
-     *       .bind('Moved', function(evt) { // after player moved
+     *       .bind('Move', function(evt) { // after player moved
      *         var hitDatas, hitData;
      *         if ((hitDatas = this.hit('wall'))) { // check for collision with walls
      *           hitData = hitDatas[0]; // resolving collision for just one collider
      *           if (hitData.type === 'SAT') { // SAT, advanced collision resolution
      *             // move player back by amount of overlap
-     *             this.x -= hitData.overlap * hitData.normal.x;
-     *             this.y -= hitData.overlap * hitData.normal.y;
+     *             this.x -= hitData.overlap * hitData.nx;
+     *             this.y -= hitData.overlap * hitData.ny;
      *           } else { // MBR, simple collision resolution
-     *             // move player to position before he moved (on respective axis)
-     *             this[evt.axis] = evt.oldValue;
+     *             // move player to previous position 
+     *             this.x = evt._x;
+     *             this.y = evt._y;
      *           }
      *         }
      *       });
@@ -16721,54 +16835,54 @@ Crafty.c("Collision", {
      *
      * @see Crafty.map#Crafty.map.search
      */
-    hit: function (component) {
-        var area = this._cbr || this._mbr || this,
-            results = Crafty.map.search(area, false),
-            i = 0,
-            l = results.length,
-            dupes = {},
-            id, obj, oarea, key,
-            overlap = Crafty.rectManager.overlap,
-            hasMap = ('map' in this && 'containsPoint' in this.map),
-            finalresult = [];
-
+    _collisionHitDupes: [],
+    _collisionHitResults: [],
+    hit: function (component, results) {
+        var area = this._cbr || this._mbr || this;
+        var searchResults = this._collisionHitResults;
+        searchResults.length = 0;
+        searchResults = Crafty.map.unfilteredSearch(area, searchResults);
+        var l = searchResults.length;
         if (!l) {
             return null;
         }
+        var  i = 0,
+            dupes = this._collisionHitDupes,
+            id, obj;
+
+        results = results || [];
+        dupes.length = 0;
 
         for (; i < l; ++i) {
-            obj = results[i];
-            oarea = obj._cbr || obj._mbr || obj; //use the mbr
+            obj = searchResults[i];
 
             if (!obj) continue;
             id = obj[0];
 
             //check if not added to hash and that actually intersects
-            if (!dupes[id] && this[0] !== id && obj.__c[component] && overlap(oarea, area))
+            if (!dupes[id] && this[0] !== id && obj.__c[component]){
                 dupes[id] = obj;
-        }
-
-        for (key in dupes) {
-            obj = dupes[key];
-
-            if (hasMap && 'map' in obj) {
-                var SAT = this._SAT(this.map, obj.map);
-                SAT.obj = obj;
-                SAT.type = "SAT";
-                if (SAT) finalresult.push(SAT);
-            } else {
-                finalresult.push({
-                    obj: obj,
-                    type: "MBR"
-                });
+                if (obj.map) {
+                    var SAT = this._SAT(this.map, obj.map);
+                    if (SAT) {
+                        results.push(SAT);
+                        SAT.obj = obj;
+                        SAT.type = "SAT";
+                    }
+                } else if (Crafty.rectManager.overlap(area, obj._cbr || obj._mbr || obj)){
+                    results.push({
+                        obj: obj,
+                        type: "MBR"
+                    });
+                }
             }
         }
 
-        if (!finalresult.length) {
+        if (!results.length) {
             return null;
         }
 
-        return finalresult;
+        return results;
     },
 
     /**@
@@ -16781,7 +16895,7 @@ Crafty.c("Collision", {
      * @param callbackOn - Callback method to execute upon collision with the component.
      *                     The first argument passed  will be the results of the collision check in the same format documented for `hit()`.
      *                     The second argument passed will be a Boolean indicating whether the collision with a component occurs for the first time.
-     * @param callbackOff - Callback method executed once as soon as collision stops.
+     * @param callbackOff - Callback method executed once as soon as collision stops.  No arguments are passed.
      *
      * Creates an `UpdateFrame` event calling `.hit()` each frame.  When a collision is detected the `callbackOn` will be invoked.
      *
@@ -17172,10 +17286,8 @@ Crafty.c("Collision", {
 
         return {
             overlap: MTV,
-            normal: {
-                x: MNx,
-                y: MNy
-            }
+            nx: MNx,
+            ny: MNy
         };
     }
 });
@@ -17439,6 +17551,12 @@ Crafty.math.Vector2D = (function () {
      * @sign public {Vector2D} new Vector2D(Vector2D vector);
      * @param {Vector2D} vector - A vector to copy
      * @returns {Vector2D} A new vector with the copied x and y values
+     * 
+     * @example
+     * ```
+     * var v1 = new Crafty.math.Vector2D(3, 5);
+     * var v2 = new Crafty.math.Vector2D(v1);
+     * ```
      * 
      */
 
@@ -17968,6 +18086,15 @@ Crafty.math.Matrix2D = (function () {
      * @param {Number=0} e - (dx) Horizontal translation
      * @param {Number=0} f - (dy) Vertical translation
      * @returns {Matrix2D} A new instance whose entries are set from the passed arguments
+     * 
+     * @example
+     * ```
+     * // Create the following translation matrix:
+     * // [1, 0, 5]
+     * // [0, 1, 7]
+     * // [0, 0, 1]
+     * var m = new Crafty.math.Matrix2D(1, 0, 0, 1, 5, 7);
+     * ```
      */
     function Matrix2D (a, b, c, d, e, f) {
         if (a instanceof Matrix2D) {
@@ -18589,7 +18716,6 @@ Crafty.c("AngularMotion", {
  * @category 2D
  * @kind Component
  * 
- * @trigger Moved - When entity has moved due to velocity/acceleration on either x or y axis a Moved event is triggered. If the entity has moved on both axes for diagonal movement the event is triggered twice. - { axis: 'x' | 'y', oldValue: Number } - Old position
  * @trigger NewDirection - When entity has changed direction due to velocity on either x or y axis a NewDirection event is triggered. The event is triggered once, if direction is different from last frame. - { x: -1 | 0 | 1, y: -1 | 0 | 1 } - New direction
  * @trigger MotionChange - When a motion property has changed a MotionChange event is triggered. - { key: String, oldValue: Number } - Motion property name and old value
  *
@@ -18720,7 +18846,6 @@ Crafty.c("Motion", {
         __motionProp(this, "d", "y", false);
         this._motionDelta = __motionVector(this, "d", false, new Crafty.math.Vector2D());
 
-        this.__movedEvent = {axis: '', oldValue: 0};
         this.__oldDirection = {x: 0, y: 0};
 
         this.bind("UpdateFrame", this._linearMotionTick);
@@ -18868,12 +18993,12 @@ Crafty.c("Motion", {
      */
     _linearMotionTick: function(frameData) {
         var dt = frameData.dt / 1000; // time in s
-        var oldX = this._x, vx = this._vx, ax = this._ax,
-            oldY = this._y, vy = this._vy, ay = this._ay;
+        var vx = this._vx, ax = this._ax,
+            vy = this._vy, ay = this._ay;
 
         // s += v * Δt + (0.5 * a) * Δt * Δt
-        var newX = oldX + vx * dt + 0.5 * ax * dt * dt;
-        var newY = oldY + vy * dt + 0.5 * ay * dt * dt;
+        var dx = vx * dt + 0.5 * ax * dt * dt;
+        var dy = vy * dt + 0.5 * ay * dt * dt;
         // v += a * Δt
         this.vx = vx + ax * dt;
         this.vy = vy + ay * dt;
@@ -18888,23 +19013,11 @@ Crafty.c("Motion", {
             this.trigger('NewDirection', oldDirection);
         }
 
-        // Check if velocity has changed
-        var movedEvent = this.__movedEvent;
-        // Δs = s[t] - s[t-1]
-        this._dx = newX - oldX;
-        this._dy = newY - oldY;
-        if (this._dx !== 0) {
-            this.x = newX;
-            movedEvent.axis = 'x';
-            movedEvent.oldValue = oldX;
-            this.trigger('Moved', movedEvent);
-        }
-        if (this._dy !== 0) {
-            this.y = newY;
-            movedEvent.axis = 'y';
-            movedEvent.oldValue = oldY;
-            this.trigger('Moved', movedEvent);
-        }
+        this._dx = dx;
+        this._dy = dy;
+
+        // Set the position using the optimized _setPosition method
+        this._setPosition(this._x + dx, this._y + dy);
     }
 });
 
@@ -19072,7 +19185,7 @@ Crafty.c("Supportable", {
         // check if we land (also possible to land on other ground object in same frame after lift-off from current ground object)
         if (!ground) {
             var obj, oarea,
-                results = Crafty.map.search(area, false),
+                results = Crafty.map.unfilteredSearch(area),
                 i = 0,
                 l = results.length;
 
@@ -19482,8 +19595,10 @@ var cellsize, // TODO: make cellsize an instance property, so multiple maps with
 var HashMap = function (cell) {
     cellsize = cell || 64;
     this.map = {};
+    this.entries = {};
 
     this.boundsDirty = false;
+    this.coordBoundsDirty = false;
     this.boundsHash = {
         maxX: -Infinity,
         maxY: -Infinity,
@@ -19542,12 +19657,24 @@ HashMap.cellsize = function() {
  * @see Crafty.HashMap
  */
 HashMap.prototype = {
+    // shim for moving off externally tracked entries
+    updateEntry: function (rect, id) {
+        var entry = this.entries[id];
+        //check if buckets change
+        if (HashMap.hash(HashMap.key(rect, keyHolder)) !== HashMap.hash(entry.keys)) {
+            this.refresh(id);
+        } else {
+            //mark map coordinate boundaries as dirty
+            this.map.coordBoundsDirty = true;
+        }
+    },
+
     /**@
      * #Crafty.map.insert
      * @comp Crafty.map
      * @kind Method
      *
-     * @sign public Object Crafty.map.insert(Object obj[, Object entry])
+     * @sign public Object Crafty.map.insert(Object obj, Number id)
      * @param obj - An entity to be inserted.
      * @param entry - An existing entry object to reuse.  (Optional)
      * @returns An object representing this object's entry in the HashMap
@@ -19561,10 +19688,11 @@ HashMap.prototype = {
      * }
      * ~~~
      */
-    insert: function (obj, entry) {
+    insert: function (obj, id) {
         var i, j, hash;
+        var entry = this.entries[id];
         var keys = HashMap.key(obj, entry && entry.keys);
-        entry = entry || new Entry(keys, obj, this);
+        entry = entry || (this.entries[id] = new Entry(keys, obj, this));
 
         //insert into all x buckets
         for (i = keys.x1; i <= keys.x2; i++) {
@@ -19578,8 +19706,6 @@ HashMap.prototype = {
 
         //mark map boundaries as dirty
         this.boundsDirty = true;
-
-        return entry;
     },
 
     /**@
@@ -19587,16 +19713,14 @@ HashMap.prototype = {
      * @comp Crafty.map
      * @kind Method
      *
-     * @sign public Object Crafty.map.search(Object rect[, Boolean filter])
+     * @sign public Array Crafty.map.search(Object rect[, Array results])
      * @param rect - the rectangular region to search for entities.
      *               This object must contain the properties `_x`,`_y`,`_w`,`_h`.
-     * @param filter - If `false`, only performs a broad-phase collision check.  The default value is `true`.
-     * @return an (possibly empty) array of entities that have been found in the given region
+     * @param results - If passed, entities found will be appended to this array.
+     * @return a (possibly empty) array of entities that have been found in the given region
      *
-     * Search for entities in the given region, using their broadphase bounding rectangles.
-     *
-     * - If `filter` is `false`, just search for all the entries in the give `rect` region by broad phase collision. Entity may be returned duplicated.
-     * - If `filter` is `true`, filter the above results by checking that they actually overlap `rect`.
+     * Do a search for entities in the given region.  Returned entities are guaranteed
+     * to overlap with the given region.
      *
      * The easier usage is with `filter == true`. For performance reason, you may use `filter == false`, and filter the result yourself. See examples in drawing.js and collision.js.
      *
@@ -19613,47 +19737,73 @@ HashMap.prototype = {
      * }
      * ~~~
      */
-
-    search: function (rect, filter) {
+     _searchHolder: [],
+    search: function (rect, results) {
         var keys = HashMap.key(rect, keyHolder),
-            i, j, k, l, cell,
-            results = [];
+            i, j, k,  cell,
+            previouslyChecked = this._searchHolder;
+        results = results || [];
+        previouslyChecked.length = 0;
 
-        if (filter === undefined) filter = true; //default filter to true
+        var obj;
+        //search in all x buckets
+        for (i = keys.x1; i <= keys.x2; i++) {
+            //insert into all y buckets
+            for (j = keys.y1; j <= keys.y2; j++) {
+                if ((cell = this.map[(i << 16) ^ j])) {
+                    for (k = 0; k < cell.length; k++) {
+                        if (previouslyChecked[cell[k][0]]) continue;
+                        obj = previouslyChecked[cell[k][0]] = cell[k];
+                        obj = obj._cbr || obj._mbr || obj;
+                        if (obj._x < rect._x + rect._w && obj._x + obj._w > rect._x &&
+                                obj._y < rect._y + rect._h && obj._y + obj._h > rect._y) {
+                            results.push(cell[k]);
+                        }
+                    }
+                }
+            }
+        }
+
+        return results;
+    },
+
+    /**@
+     * #Crafty.map.unfilteredSearch
+     * @comp Crafty.map
+     * @kind Method
+     *
+     * @sign public Array Crafty.map.search(Object rect[, Array results])
+     * @param rect - the rectangular region to search for entities.
+     *               This object must contain the properties `_x`,`_y`,`_w`,`_h`.
+     * @param results - If passed, entities found will be appended to this array.
+     * @return a (possibly empty) array of entities that have been found in the given region
+     *
+     * Do a search for entities in the given region.  Returned entities are **not** guaranteed
+     * to overlap with the given region, and the results may contain duplicates.
+     * 
+     * This method is intended to be used as the first step of a more complex search.
+     * More common use cases should use Crafty.map.search, which filters the results.
+     * 
+     * @see Crafty.map.search
+     */
+    unfilteredSearch: function(rect, results) {
+        var keys = HashMap.key(rect, keyHolder),
+            i, j, k,  cell;
+        results = results || [];
 
         //search in all x buckets
         for (i = keys.x1; i <= keys.x2; i++) {
             //insert into all y buckets
             for (j = keys.y1; j <= keys.y2; j++) {
                 if ((cell = this.map[(i << 16) ^ j])) {
-                    for (k = 0; k < cell.length; k++)
+                    for (k = 0; k < cell.length; k++) {
                         results.push(cell[k]);
+                    }
                 }
             }
         }
 
-        if (filter) {
-            var obj, id, finalresult = [],
-                found = {};
-            //add unique elements to lookup table with the entity ID as unique key
-            for (i = 0, l = results.length; i < l; i++) {
-                obj = results[i];
-                if (!obj) continue; //skip if deleted
-                id = obj[0]; //unique ID
-                obj = obj._cbr || obj._mbr || obj;
-                //check if not added to hash and that actually intersects
-                if (!found[id] && obj._x < rect._x + rect._w && obj._x + obj._w > rect._x &&
-                                  obj._y < rect._y + rect._h && obj._y + obj._h > rect._y)
-                    found[id] = results[i];
-            }
-
-            //loop over lookup table and copy to final array
-            for (obj in found) finalresult.push(found[obj]);
-
-            return finalresult;
-        } else {
-            return results;
-        }
+        return results;
     },
 
     /**@
@@ -19661,8 +19811,8 @@ HashMap.prototype = {
      * @comp Crafty.map
      * @kind Method
      *
-     * @sign public void Crafty.map.remove(Entry entry)
-     * @param entry - An entry to remove from the hashmap
+     * @sign public void Crafty.map.remove(Number id)
+     * @param entry - The id of an entry to remove from the hashmap
      *
      * Remove an entry from the broad phase map.
      *
@@ -19671,7 +19821,8 @@ HashMap.prototype = {
      * Crafty.map.remove(e);
      * ~~~
      */
-    remove: function (entry) {
+    remove: function (id) {
+        var entry = this.entries[id];
         var keys = entry.keys;
         var obj = entry.obj;
         var i = 0,
@@ -19690,7 +19841,7 @@ HashMap.prototype = {
                     for (m = 0; m < n; m++)
                         if (cell[m] && cell[m][0] === obj[0])
                             cell.splice(m, 1);
-                }
+                } 
             }
         }
 
@@ -19703,8 +19854,8 @@ HashMap.prototype = {
      * @comp Crafty.map
      * @kind Method
      *
-     * @sign public void Crafty.map.refresh(Entry entry)
-     * @param entry - An entry to update
+     * @sign public void Crafty.map.refresh(Number id)
+     * @param entry - The id of an entry to update
      *
      * Update an entry's keys, and its position in the broad phrase map.
      *
@@ -19713,7 +19864,8 @@ HashMap.prototype = {
      * Crafty.map.refresh(e);
      * ~~~
      */
-    refresh: function (entry) {
+    refresh: function (id) {
+        var entry = this.entries[id];
         var keys = entry.keys;
         var obj = entry.obj;
         var cell, i, j, m, n;
@@ -19817,20 +19969,25 @@ HashMap.prototype = {
 
     _updateBoundaries: function() {
         // update map boundaries if they were changed
-        if (!this.boundsDirty) return;
+        if (!this.boundsDirty && !this.coordBoundsDirty) return;
+
 
         var hash = this.boundsHash;
-        hash.maxX = -Infinity;
-        hash.maxY = -Infinity;
-        hash.minX = Infinity;
-        hash.minY = Infinity;
+        // Optimization: if no entities have moved cells, 
+        // we don't need to recalculate the hash boundaries
+        if (this.boundsDirty) {
+            hash.maxX = -Infinity;
+            hash.maxY = -Infinity;
+            hash.minX = Infinity;
+            hash.minY = Infinity;
+        }
 
         var coords = this.boundsCoords;
         coords.maxX = -Infinity;
         coords.maxY = -Infinity;
         coords.minX = Infinity;
         coords.minY = Infinity;
-
+        
         var k, ent, cell;
         //Using broad phase hash to speed up the computation of boundaries.
         for (var h in this.map) {
@@ -19886,15 +20043,15 @@ HashMap.prototype = {
 
         // mark map boundaries as clean
         this.boundsDirty = false;
+        this.coordBoundsDirty = false;
     },
-
 
     /**@
      * #Crafty.map.traverseRay
      * @comp Crafty.map
      * @kind Method
      *
-     * @sign public void Crafty.map.traverseRay(Object origin, Object direction, Function callback)
+     * @sign public void Crafty.map.traverseRay(Object origin, Object direction, Function callback[, Number maxDistance])
      * @param origin - the point of origin from which the ray will be cast. The object must contain the properties `_x` and `_y`.
      * @param direction - the direction the ray will be cast. It must be normalized. The object must contain the properties `x` and `y`.
      * @param callback - a callback that will be called for each object that is encountered along the ray.
@@ -19971,7 +20128,7 @@ HashMap.prototype = {
     //  d = -------------------
     //         direction.y
     //
-    traverseRay: function(origin, direction, callback) {
+    traverseRay: function(origin, direction, callback, maxDistance) {
         var dirX = direction.x,
             dirY = direction.y;
         // copy input data
@@ -19982,6 +20139,7 @@ HashMap.prototype = {
             _w: 0,
             _h: 0
         };
+        maxDistance = maxDistance || Infinity;
 
 
         var keyBounds = this._keyBoundaries();
@@ -20027,7 +20185,9 @@ HashMap.prototype = {
 
         // advance starting cell to be inside of map bounds
         while ((stepCol === 1 && currentCol < minCol && minCol !== Infinity) || (stepCol === -1 && currentCol > maxCol && maxCol !== -Infinity) ||
-               (stepRow === 1 && currentRow < minRow && minRow !== Infinity) || (stepRow === -1 && currentRow > maxRow && maxRow !== -Infinity)) {
+               (stepRow === 1 && currentRow < minRow && minRow !== Infinity) || (stepRow === -1 && currentRow > maxRow && maxRow !== -Infinity)
+                && previousDistance <= maxDistance
+            ) {
 
             // advance to closest cell
             if (nextDistanceX < nextDistanceY) {
@@ -20047,7 +20207,9 @@ HashMap.prototype = {
         // traverse over cells
         // TODO: maybe change condition to `while (currentCol !== endX) || (currentRow !== endY)`
         while ((minCol <= currentCol && currentCol <= maxCol) &&
-               (minRow <= currentRow && currentRow <= maxRow)) {
+               (minRow <= currentRow && currentRow <= maxRow) &&
+                previousDistance <= maxDistance
+            ) {
 
             // process cell
             if ((cell = this.map[(currentCol << 16) ^ currentRow])) {
@@ -20063,7 +20225,7 @@ HashMap.prototype = {
             if (nextDistanceX < nextDistanceY) {
                 previousDistance = nextDistanceX;
 
-                currentCol += stepCol;
+                currentCol += stepCol; 
                 nextDistanceX += deltaDistanceX;
             } else {
                 previousDistance = nextDistanceY;
@@ -20087,7 +20249,11 @@ Entry.prototype = {
         //check if buckets change
         if (HashMap.hash(HashMap.key(rect, keyHolder)) !== HashMap.hash(this.keys)) {
             this.map.refresh(this);
+        } else {
+            //mark map coordinate boundaries as dirty
+            this.map.coordBoundsDirty = true;
         }
+        
     }
 };
 

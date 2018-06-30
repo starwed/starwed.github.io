@@ -482,7 +482,7 @@
     Crafty.extraZoom = 1;
     Crafty.init(WIDTH, HEIGHT);
     Crafty.pixelart(true);
-    Crafty.DrawManager.debugDirty = false;
+    //Crafty.DrawManager.debugDirty = false;
     Crafty.timer.steptype("semifixed");
     window.addEventListener("click", clickControl);
     Crafty.scene("main", setup);

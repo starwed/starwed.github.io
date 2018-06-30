@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Crafty.js - demo of collision performance with/without wasm</title>
+  <script src='wasm-utils.js'></script>
+  <script src='faster-map.js'></script>
+  <script src="../crafty.js"></script>
+  <script src='collision-stress.js'></script>
+  <style type='text/css'>
+      body{margin:0;}
+  </style>
+</head>
+    <body>
+        <div style="padding: 1rem">
+            <label for='n'>n</label> <input type='text' id='n' value='30'></input>
+            <br/>
+            <label for='m'>m</label> <input type= 'text' id='m' value='30'></input>
+            <br/>
+            <label for='wasm'>Use wasm module</label><input type='checkbox' id='wasm'></input>
+            <br/>
+            <button onclick='go()'>Go</button>
+        </div>
+    </body>
+</html>
+
